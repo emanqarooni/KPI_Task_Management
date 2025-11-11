@@ -32,13 +32,7 @@ class EmployeeProfile(models.Model):
 class Kpi(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(max_length=250)
-<<<<<<< HEAD
     department = models.CharField(max_length=2, choices=DEPARTMENT, default=DEPARTMENT[0][0])
-=======
-    department = models.CharField(
-        max_length=2, choices=DEPARTMENT, default=DEPARTMENT[0][0]
-    )
->>>>>>> e3e1e1bebf33f8ce355522c3f130781de6d9f1b2
     # def __str__(self):
     #     return f"{self.plushie.name} {self.get_method_display()} on {self.date}"
 
@@ -53,10 +47,6 @@ class EmployeeKpi(models.Model):
     def __str__(self):
         return self.name
 
-<<<<<<< HEAD
-=======
-
->>>>>>> e3e1e1bebf33f8ce355522c3f130781de6d9f1b2
 class ProgressEntry(models.Model):
     employee_kpi = models.ForeignKey(EmployeeKpi, on_delete=models.CASCADE)
     value = models.DecimalField(max_digits=10, decimal_places=2)
