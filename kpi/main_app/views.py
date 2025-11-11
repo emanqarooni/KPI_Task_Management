@@ -10,3 +10,6 @@ def home(request):
 
 
 
+def kpis_index(request):
+    # kpi = Kpi.objects.get(id=kpi_id)
+    return render(request, "kpi/detail.html")
