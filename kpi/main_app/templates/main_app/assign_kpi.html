@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <div>
+      <h2>Assign KPI</h2>
+
+      <hr>
+
+      <form method="post">
+          <!-- {% csrf_token %} -->
+          <div>
+              {{ form.employee.label_tag }}<br>
+              {{ form.employee }}
+          </div><br>
+
+          <div>
+              {{ form.kpi.label_tag }}<br>
+              {{ form.kpi }}
+          </div><br>
+
+          <div>
+              {{ form.target_value.label_tag }}<br>
+              {{ form.target_value }}
+          </div><br>
+
+          <div>
+              {{ form.weight.label_tag }}<br>
+              {{ form.weight }}
+          </div><br>
+
+          <div>
+              {{ form.start_date.label_tag }}<br>
+              {{ form.start_date }}
+          </div><br>
+
+          <div>
+              {{ form.end_date.label_tag }}<br>
+              {{ form.end_date }}
+          </div><br>
+
+          <button type="submit">
+              Assign KPI
+          </button>
+      </form>
+  </div>
+
+{% endblock %}
