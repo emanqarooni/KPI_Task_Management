@@ -38,6 +38,7 @@ class Kpi(models.Model):
 
 
 class EmployeeKpi(models.Model):
+    employee = models.ForeignKey(EmployeeProfile, on_delete=models.CASCADE, default="")
     kpi = models.ForeignKey(Kpi, on_delete=models.CASCADE)
     target_value = models.DecimalField(max_digits=10, decimal_places=2)
     start_date = models.DateField()
