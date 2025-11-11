@@ -7,6 +7,3 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # create your views here
 def home(request):
     return render(request, 'home.html')
-
-
-
