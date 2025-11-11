@@ -35,8 +35,9 @@ class Kpi(models.Model):
     department = models.CharField(
         max_length=2, choices=DEPARTMENT, default=DEPARTMENT[0][0]
     )
-    # def __str__(self):
-    #     return f"{self.plushie.name} {self.get_method_display()} on {self.date}"
+
+    def __str__(self):
+        return self.title
 
 
 class EmployeeKpi(models.Model):
