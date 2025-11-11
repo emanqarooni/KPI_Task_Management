@@ -11,6 +11,12 @@ def home(request):
 
 
 def kpis_index(request):
-    # kpi = Kpi.objects.get(id=kpi_id)
+    kpis = Kpi.objects.all()
+    return render(request, "kpi/index.html", {"kpis": kpis})
 
-    return render(request, "kpi/detail.html")
+
+def kpis_detail(request,kpi_id):
+    kpi = Kpi.objects.get(id=kpi_id)
+    return render(request, "kpi/detail.html", {"kpi": kpi})
+
+
