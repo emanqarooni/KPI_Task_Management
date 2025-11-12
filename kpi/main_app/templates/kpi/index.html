@@ -1,17 +1,6 @@
 {% extends 'base.html'%} {% block content%}
 <h1>All KPIs</h1>
 
-<!-- {% for kpi in kpis %}
-<div class="card">
-  <a href="{% url 'detail' kpi.id%}">
-    <div class="card-content">
-      <h5>{{kpi.title}}</h5>
-      <h6>department: {{kpi.department}}</h6>
-    </div>
-  </a>
-</div>
-{% endfor %} -->
-
 <table>
   <thead>
     <tr>
@@ -28,10 +17,16 @@
       <td>{{kpi.department}}</td>
       <td>
         <a href="{% url 'detail' kpi.id%}"><button>Details</button></a>
-        <a href=""><button>Edit</button></a>
+        <a href="{% url 'kpis_update' kpi.id %}"><button>Edit</button></a>
       </td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+<br />
+<a href="{% url 'kpis_create' %}">
+  <button>Add New KPI</button>
+</a>
+
+
 {% endblock %}
