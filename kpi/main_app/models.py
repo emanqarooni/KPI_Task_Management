@@ -36,11 +36,14 @@ class Kpi(models.Model):
     department = models.CharField(
         max_length=2, choices=DEPARTMENT, default=DEPARTMENT[0][0]
     )
+    def __str__(self):
+        return self.title
     # def __str__(self):
     #     return f"{self.plushie.name} {self.get_method_display()} on {self.date}"
 
 
 class EmployeeKpi(models.Model):
+    employee = models.ForeignKey(EmployeeProfile, on_delete=models.CASCADE, related_name="assigned_kpis")
     kpi = models.ForeignKey(Kpi, on_delete=models.CASCADE)
     target_value = models.DecimalField(max_digits=10, decimal_places=2)
     start_date = models.DateField()
@@ -48,7 +51,9 @@ class EmployeeKpi(models.Model):
     weight = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return self.name
+        return f"{self.employee.user.username} - {self.kpi.title}"
+        # return self.name
+
 
     def current_progress(self):
         total = sum(entry.value for entry in self.progressentry_set.all())
@@ -67,4 +72,4 @@ class ProgressEntry(models.Model):
     date = models.DateField()
 
     def __str__(self):
-        return self.name
+        return f"{self.employee_kpi.employee.user.username} - {self.value}"
