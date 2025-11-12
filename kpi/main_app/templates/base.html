@@ -8,8 +8,10 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
     />
+
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
     <title>KPI</title>
   </head>
   <body>
@@ -25,7 +27,23 @@
           </ul>
 
           <ul class="right">
+            {% if user.is_authenticated %}
             <li><a href="{% url 'index' %}">View KPI</a></li>
+            <li>
+              <form
+                action="{% url 'logout' %}"
+                method="post"
+                style="display: inline"
+              >
+                {% csrf_token %}
+                <button type="submit" class="btn-flat white-text">
+                  Log out
+                </button>
+              </form>
+            </li>
+            {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
           </ul>
         </div>
       </nav>
