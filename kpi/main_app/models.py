@@ -51,10 +51,10 @@ class EmployeeKpi(models.Model):
     weight = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.employee.user.username} - {self.kpi.title}"
+        return f"{self.employee.user.username} - {self.kpi.title} ({self.weight}%)"
         # return self.name
 
-
+# in views for dashboard
     def current_progress(self):
         total = sum(entry.value for entry in self.progressentry_set.all())
         return total
