@@ -54,6 +54,9 @@ def manager_dashboard(request):
     #     "team_kpis": team_kpis,
     # })
 
+def employee_dashboard(request):
+    profile = EmployeeProfile.objects.get(user=request.user)
+    return render(request, "dashboards/employee_dashboard.html", {"profile": profile})
 
     # profile = EmployeeProfile.objects.get(user=request.user)
     # kpis = profile.assigned_kpis.select_related("kpi").all()
