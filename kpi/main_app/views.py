@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from .models import EmployeeKpi, ProgressEntry, Kpi
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import CreateView, UpdateView
 
 
 # create your views here
@@ -15,8 +16,18 @@ def kpis_index(request):
     return render(request, "kpi/index.html", {"kpis": kpis})
 
 
-def kpis_detail(request,kpi_id):
+def kpis_detail(request, kpi_id):
     kpi = Kpi.objects.get(id=kpi_id)
     return render(request, "kpi/detail.html", {"kpi": kpi})
+
+
+class KpiCreate(CreateView):
+    model = Kpi
+    fields = "__all__"
+    success_url="/kpis/"
+
+class KpiUpdate(UpdateView):
+    model = Kpi
+    fields = "__all__"
 
 
