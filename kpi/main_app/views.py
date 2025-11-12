@@ -33,7 +33,18 @@ def admin_dashboard(request):
     #     "profiles": profiles,
     #     "kpis": kpis,
 
+def manager_dashboard(request):
+    profile = EmployeeProfile.objects.get(user=request.user)
+    department = profile.department
 
+    employees_in_department = EmployeeProfile.objects.filter(department=department, role="employee").count()
+
+    context = {
+        "manager": profile,
+        "department": profile.get_department_display(),
+        "employees_count": employees_in_department,
+    }
+    return render(request, "dashboards/manager_dashboard.html", context)
 
     # team = profile.team_members.all()
     # team_kpis = EmployeeKpi.objects.filter(employee__in=team)
