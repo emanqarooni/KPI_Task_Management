@@ -24,7 +24,7 @@ class KpiCreate(CreateView):
     fields = "__all__"
     success_url="/kpis/"
     allowed_role=['admin']
-    
+
 class KpiUpdate(UpdateView):
     model = Kpi
     fields = "__all__"
@@ -34,4 +34,14 @@ class KpiUpdate(UpdateView):
 # unauthorized access page
 def unauthorized(request):
     return render(request,"unauthorized.html")
+
+class KpiCreate(CreateView):
+    model = Kpi
+    fields = "__all__"
+    success_url="/kpis/"
+
+class KpiUpdate(UpdateView):
+    model = Kpi
+    fields = "__all__"
+
 
