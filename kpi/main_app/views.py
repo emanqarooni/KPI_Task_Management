@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.http import HttpResponse
 from .models import EmployeeKpi, ProgressEntry, Kpi, EmployeeProfile
 from django.contrib.auth.decorators import login_required
@@ -38,16 +39,14 @@ def kpis_index(request):
 #     }
 #     return render(request, 'main_app/assign_kpi.html', context)
 
+# Assign KPI: managers assign employees to KPI; KPIs & employees filtered by manager's department
 def assign_kpi(request):
-    # TEMP: Disable authentication & role check for testing
-    if request.method == 'POST':
-        form = AssignKpiForm(request.POST)
+    # pass request.user into the form so it filters by department if user is manager
+    form = AssignKpiForm(request.POST or None, user=(request.user if request.user.is_authenticated else None))
+    if request.method == "POST":
         if form.is_valid():
             form.save()
-            messages.success(request, "KPI successfully assigned.")
-            return redirect('assign_kpi')
-    else:
-        form = AssignKpiForm()
+            messages.success(request, "KPI assigned successfully.")
+            return redirect('employee_kpi_list')
+    return render(request, 'main_app/assign_kpi.html', {'form': form})
 
-    context = {'form': form}
-    return render(request, 'main_app/assign_kpi.html', context)
