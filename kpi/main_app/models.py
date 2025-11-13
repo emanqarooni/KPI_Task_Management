@@ -24,7 +24,7 @@ class EmployeeProfile(models.Model):
     department = models.CharField(max_length=2, choices=DEPARTMENT)
     image = models.ImageField(upload_to="profile_images/", blank=True, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="employee")
-    manager = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="team_members",)
+    # manager = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="team_members",)
 
     def __str__(self):
         return f"{self.user.username} - {self.job_role}"
@@ -38,6 +38,7 @@ class Kpi(models.Model):
     )
     def __str__(self):
         return self.title
+
     # def __str__(self):
     #     return f"{self.plushie.name} {self.get_method_display()} on {self.date}"
 
@@ -55,15 +56,15 @@ class EmployeeKpi(models.Model):
         # return self.name
 
 # in views for dashboard
-    def current_progress(self):
-        total = sum(entry.value for entry in self.progressentry_set.all())
-        return total
-    def progress_percentage(self):
-        if self.target_value == 0:
-            return 0
-        return (self.current_progress() / self.target_value) * 100
-    def days_left(self):
-        return (self.end_date - date.today()).days
+#     def current_progress(self):
+#         total = sum(entry.value for entry in self.progressentry_set.all())
+#         return total
+#     def progress_percentage(self):
+#         if self.target_value == 0:
+#             return 0
+#         return (self.current_progress() / self.target_value) * 100
+#     def days_left(self):
+#         return (self.end_date - date.today()).days
 
 class ProgressEntry(models.Model):
     employee_kpi = models.ForeignKey(EmployeeKpi, on_delete=models.CASCADE)
