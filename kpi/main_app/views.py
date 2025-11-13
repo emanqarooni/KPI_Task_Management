@@ -86,3 +86,11 @@ def employee_kpi_delete(request, pk):
 
     return render(request, 'main_app/employee_kpi_confirm_delete.html', {'kpi': kpi_assign})
 
+def employee_kpi_detail(request, pk):
+    kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
+    progress_entries = kpi_assign.progressentry_set.order_by('date')
+    return render(request, 'main_app/employee_kpi_detail.html', {
+        'kpi': kpi_assign,
+        'progress_entries': progress_entries,
+    })
+
