@@ -59,4 +59,17 @@ def employee_kpi_list(request):
         kpis = EmployeeKpi.objects.select_related('employee__user', 'kpi').all()
     return render(request, 'main_app/employee_kpi_list.html', {'kpis': kpis})
 
+def employee_kpi_edit(request, pk):
+    kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
+    if kpi_assign.progressentry_set.exists():
+        messages.error(request, "Cannot edit KPI — progress already exists.")
+        return redirect('employee_kpi_list')
+
+    form = AssignKpiForm(request.POST or None, instance=kpi_assign, user=(request.user if request.user.is_authenticated else None))
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "KPI updated successfully.")
+        return redirect('employee_kpi_list')
+
+    return render(request, 'main_app/employee_kpi_edit.html', {'form': form, 'kpi': kpi_assign})
 
