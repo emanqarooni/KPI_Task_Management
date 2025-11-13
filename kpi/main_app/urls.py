@@ -8,4 +8,5 @@ urlpatterns = [
     # kpi assignments urls from manager portal
     path('assign-kpi/', views.assign_kpi, name='assign_kpi'),
     path('employee-kpis/', views.employee_kpi_list, name='employee_kpi_list'),
+    path('employee-kpi/<int:pk>/edit/', views.employee_kpi_edit, name='employee_kpi_edit'),
 ]
