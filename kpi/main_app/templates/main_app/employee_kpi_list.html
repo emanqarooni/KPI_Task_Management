@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Assigned KPIs</h2>
+<a href="{% url 'assign_kpi' %}">+ Assign New KPI</a>
+<br><br>
+
+<table border="1" cellpadding="6">
+<tr>
+    <th>Employee</th>
+    <th>KPI</th>
+    <th>Target</th>
+    <th>Weight</th>
+    <th>Period</th>
+    <th>Status</th>
+    <th>Progress Count</th>
+    <th>Actions</th>
+</tr>
+
+{% for k in kpis %}
+<tr>
+    <td>{{ k.employee.user.username }}</td>
+    <td>{{ k.kpi.title }}</td>
+    <td>{{ k.target_value }}</td>
+    <td>{{ k.weight }}%</td>
+    <td>{{ k.start_date }} → {{ k.end_date }}</td>
+    <td>{{ k.status }}</td>
+    <td>{{ k.progress_count }}</td>
+
+    <td>
+        {% if k.progress_count == 0 %}
+            <a href="{% url 'employee_kpi_edit' k.pk %}">Edit</a> |
+            <a href="{% url 'employee_kpi_delete' k.pk %}">Delete</a> |
+            <a href="{% url 'employee_kpi_detail' k.pk %}">View</a>
+        {% else %}
+            <a href="{% url 'employee_kpi_detail' k.pk %}">View</a>
+            <span>Locked</span>
+        {% endif %}
+    </td>
+</tr>
+{% empty %}
+<tr><td colspan="8">No KPI assignments yet.</td></tr>
+{% endfor %}
+</table>
+{% endblock %}
