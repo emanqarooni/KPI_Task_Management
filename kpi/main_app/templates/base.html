@@ -13,6 +13,7 @@
     <title>KPI</title>
     <!-- <link rel="stylesheet" href="{% static 'css/style.css' %}"> -->
   </head>
+
   <body>
     <header>
       <h1>KPI Dashboard</h1>
@@ -20,13 +21,35 @@
         <div class="navbar-fixed">
           <ul>
             <li>
-              <a href="{% url 'home' %}" class="left brand-logo">&nbsp;&nbsp;SEEF</a>
+              <a href="{% url 'home' %}" class="left brand-logo"
+                >&nbsp;&nbsp;SEEF</a
+              >
             </li>
 
           </ul>
 
-
           <ul class="right">
+            {% if user.is_authenticated %}
+
+            <li><a href="{% url 'index' %}">View KPI</a></li>
+            <li><a href="{% url 'profile' %}">Profile</a></li>
+
+            <li>
+              <form
+                action="{% url 'logout' %}"
+                method="post"
+                style="display: inline"
+              >
+                {% csrf_token %}
+                <button type="submit" class="btn-flat white-text">
+                  Log out
+                </button>
+              </form>
+            </li>
+
+            {% else %}
+            <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
             <li><a href="{% url 'dashboard' %}">Dashboards</a></li>
             <li><a href="{% url 'index' %}">View KPI</a></li>
             <li><a href="{% url 'progress' %}">Add Progress</a></li>
@@ -35,6 +58,7 @@
         </div>
       </nav>
     </header>
-    <main class="container">{% block content %} {% endblock %}</main>
+
+    <main class="container">{% block content %}{% endblock %}</main>
   </body>
 </html>
