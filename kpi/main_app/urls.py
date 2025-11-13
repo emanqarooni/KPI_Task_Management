@@ -12,6 +12,8 @@ urlpatterns = [
     path("kpis/create/", views.KpiCreate.as_view(), name="kpis_create"),
     path("kpis/<int:pk>/update/", views.KpiUpdate.as_view(), name="kpis_update"),
     path("kpis/progress/", views.add_progress, name="progress"),
+    path("kpis/employee/", views.employee_kpi, name="employee_kpi"),
+
 
     # kpi assignments urls from manager portal
     path('assign-kpi/', views.assign_kpi, name='assign_kpi'),
