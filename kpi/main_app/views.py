@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import AssignKpiForm, KpiProgressForm
 from django.contrib import messages
 from django.views.generic import CreateView, UpdateView, View
+from django.contrib import messages
 
 # Employee dashboard'
 def dashboard(request):
@@ -114,9 +115,18 @@ def kpis_detail(request, kpi_id):
 
 def add_progress(request):
     form = KpiProgressForm()
+
+    employee_kpi_id = request.POST.get('employee_kpi')
+    if employee_kpi_id:
+        employee_kpi = EmployeeKpi.objects.get(id=employee_kpi_id)
+        if employee_kpi.status() == "Complete":
+            messages.warning(request, "This KPI is already complete. You cannot add more progress.")
+            return redirect('progress')
     if form.is_valid():
-        form.save()
-        return redirect('progress')
+            form.save()
+            messages.success(request, "Progress added successfully!")
+            return redirect('progress')
+
     return render(request, 'kpi/progress.html', {'form': form})
 
 
