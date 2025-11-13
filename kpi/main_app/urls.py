@@ -7,4 +7,6 @@ urlpatterns = [
     path("kpis/<int:kpi_id>/", views.kpis_detail, name="detail"),
     path("kpis/create/", views.KpiCreate.as_view(), name="kpis_create"),
     path("kpis/<int:pk>/update/", views.KpiUpdate.as_view(), name="kpis_update"),
+    path("kpis/progress/", views.add_progress, name="progress"),
+
 ]
