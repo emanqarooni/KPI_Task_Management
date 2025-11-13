@@ -11,6 +11,8 @@ urlpatterns = [
     path("kpis/<int:kpi_id>/", views.kpis_detail, name="detail"),
     path("kpis/create/", views.KpiCreate.as_view(), name="kpis_create"),
     path("kpis/<int:pk>/update/", views.KpiUpdate.as_view(), name="kpis_update"),
+    path("unauthorized/", views.unauthorized, name="unauthorized"),
+    path("profile/", views.profile, name="profile"),
     path("kpis/progress/", views.add_progress, name="progress"),
     path("kpis/employee/", views.employee_kpi, name="employee_kpi"),
 

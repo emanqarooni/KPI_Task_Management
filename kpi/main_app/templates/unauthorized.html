@@ -1,0 +1,18 @@
+{% extends "base.html" %} {% block content %}
+<div style="text-align: center; margin-top: 80px">
+  <h2 style="color: red">❌ Unauthorized Access</h2>
+  <p style="font-size: 18px">You don’t have permission to view this page.</p>
+  <a
+    href="{% url 'home' %}"
+    style="
+      color: white;
+      background: #007bff;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+    "
+  >
+    Return Home
+  </a>
+</div>
+{% endblock %}

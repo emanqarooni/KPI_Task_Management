@@ -10,6 +10,12 @@ DEPARTMENT = (
     ("HR", "Human Resources"),
     ("PM", "Project Management"),
 )
+
+GENDER = (
+    ("M", "Male"),
+    ("F", "Female"),
+)
+
 # Create your models here.
 
 
@@ -21,13 +27,21 @@ class EmployeeProfile(models.Model):
     ]
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    gender = models.CharField(max_length=1, choices=GENDER, default="M")
     job_role = models.CharField(max_length=100)
     department = models.CharField(
         max_length=2, choices=DEPARTMENT, default=DEPARTMENT[0][0]
     )
     image = models.ImageField(upload_to="profile_images/", blank=True, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="employee")
-    # manager = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="team_members",)
+
+    manager = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="managed_employees",
+    )
 
     def __str__(self):
         return f"{self.user.username} - {self.job_role}"
@@ -58,21 +72,21 @@ class EmployeeKpi(models.Model):
     def __str__(self):
         return f"{self.employee.user.username} - {self.kpi.title} ({self.weight}%)"
 
-# in views for dashboard
-#     def current_progress(self):
-#         total = sum(entry.value for entry in self.progressentry_set.all())
-#         return total
-#     def progress_percentage(self):
-#         if self.target_value == 0:
-#             return 0
-#         return (self.current_progress() / self.target_value) * 100
-#     def days_left(self):
-#         return (self.end_date - date.today()).days
+    # in views for dashboard
+    #     def current_progress(self):
+    #         total = sum(entry.value for entry in self.progressentry_set.all())
+    #         return total
+    #     def progress_percentage(self):
+    #         if self.target_value == 0:
+    #             return 0
+    #         return (self.current_progress() / self.target_value) * 100
+    #     def days_left(self):
+    #         return (self.end_date - date.today()).days
 
     # func for counting the total progress entries that the employees add
     def total_progress(self):
-        agg = self.progressentry_set.aggregate(total=Sum('value'))
-        return agg['total'] or 0
+        agg = self.progressentry_set.aggregate(total=Sum("value"))
+        return agg["total"] or 0
 
     # func for returining the num of each progress entries added by employees
     def progress_count(self):
@@ -86,6 +100,7 @@ class EmployeeKpi(models.Model):
         if total >= self.target_value:
             return "Complete"
         return "In Progress"
+
 
 class ProgressEntry(models.Model):
     employee_kpi = models.ForeignKey(EmployeeKpi, on_delete=models.CASCADE)
