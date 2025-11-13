@@ -92,12 +92,21 @@ class EmployeeKpi(models.Model):
     def progress_count(self):
         return self.progressentry_set.count()
 
+
+    # func to calculate and return the percentage of completion
+    def progress_percentage(self):
+        total = self.total_progress()
+        if self.target_value == 0:
+            return 0
+        percentage = (total / self.target_value) * 100
+        return round(percentage)
+
     # func for status: so if the total entries is 0 then no progress, and if the total entires is more than zero then and if the target value reach the total then the status will be complete
     def status(self):
         total = self.total_progress()
         if total == 0:
             return "No Progress"
-        if total >= self.target_value:
+        if total == self.target_value:
             return "Complete"
         return "In Progress"
 
@@ -107,6 +116,8 @@ class ProgressEntry(models.Model):
     value = models.DecimalField(max_digits=10, decimal_places=2)
     note = models.TextField(max_length=250)
     date = models.DateField()
+
+
 
     def __str__(self):
         return f"{self.employee_kpi.employee.user.username} - {self.value}"
