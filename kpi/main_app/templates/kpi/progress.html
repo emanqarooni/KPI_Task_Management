@@ -1,0 +1,11 @@
+{% extends 'base.html'%}
+{% block content%}
+<h1>Add Progress</h1>
+<form method="POST" action="{% url 'progress' %}">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save Progress</button>
+</form>
+
+
+{% endblock %}
