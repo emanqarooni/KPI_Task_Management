@@ -84,12 +84,19 @@ Employee:
 
 - Future expansion: Integrate AI suggestions for performance improvements.
 
+
 ⚙️ Tools & Technologies
 
-Framework: Django (Python)
-Frontend: HTML, CSS, Bootstrap (optional)
-Backend: Django Models, Views, and Templates
-Database: SQLite (development)
-Version Control: Git & GitHub
-Project Management: Trello
-Utilities: Pillow (for images), Django Auth System
+- Framework: Django (Python)
+- Frontend: HTML, CSS, Bootstrap (optional)
+- Backend: Django Models, Views, and Templates
+- Database: SQLite (development)
+- Version Control: Git & GitHub
+- Project Management: Trello
+- Utilities: Pillow (for images), Django Auth System
+
+A Trello board was used to track development progress and can be viewed [here](https://trello.com/b/gjUDr0Cr/project-4-kpi).
+### ***Screenshots***
+![Wireframe](main_app/static/uploads/Wireframe.png)
+![ERD](main_app/static/uploads/ERD.png)
+
