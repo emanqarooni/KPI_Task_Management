@@ -4,17 +4,44 @@ from django.http import HttpResponse
 from .models import EmployeeKpi, ProgressEntry, Kpi, EmployeeProfile
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from .forms import AssignKpiForm
+from .forms import AssignKpiForm, KpiProgressForm
 from django.contrib import messages
+from django.views.generic import CreateView, UpdateView, View
+
 
 # create your views here
 def home(request):
     return render(request, "home.html")
 
 def kpis_index(request):
-    # kpi = Kpi.objects.get(id=kpi_id)
+    kpis = Kpi.objects.all()
+    return render(request, "kpi/index.html", {"kpis": kpis})
 
-    return render(request, "kpi/detail.html")
+
+def kpis_detail(request, kpi_id):
+    kpi = Kpi.objects.get(id=kpi_id)
+    return render(request, "kpi/detail.html", {"kpi": kpi})
+
+
+
+def add_progress(request):
+    form = KpiProgressForm()
+    if form.is_valid():
+        form.save()
+        return redirect('progress')
+    return render(request, 'kpi/progress.html', {'form': form})
+
+
+class KpiCreate(CreateView):
+    model = Kpi
+    fields = "__all__"
+    success_url = "/kpis/"
+
+
+class KpiUpdate(UpdateView):
+    model = Kpi
+    fields = "__all__"
+
 
 # manager: assign kpi
 # # @login_required

@@ -1,6 +1,6 @@
 # main_app/forms.py
 from django import forms
-from .models import EmployeeKpi, EmployeeProfile, Kpi
+from .models import EmployeeKpi, EmployeeProfile, Kpi, ProgressEntry
 
 class AssignKpiForm(forms.ModelForm):
     class Meta:
@@ -21,3 +21,19 @@ class AssignKpiForm(forms.ModelForm):
             # default: show all employees who are role='employee' and all KPIs
             self.fields['employee'].queryset = EmployeeProfile.objects.filter(role='employee')
             self.fields['kpi'].queryset = Kpi.objects.all()
+
+class KpiProgressForm(forms.ModelForm):
+    employee_kpi = forms.ModelChoiceField(
+        queryset=EmployeeKpi.objects.all(),
+        label="Select KPI Assignment",
+        widget=forms.Select(attrs={"class": "form-control"}),
+    )
+
+    class Meta:
+        model = ProgressEntry
+        fields = ["employee_kpi", "value", "note", "date"]
+        widgets = {
+            "value": forms.NumberInput(attrs={"class": "form-control"}),
+            "note": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+        }
