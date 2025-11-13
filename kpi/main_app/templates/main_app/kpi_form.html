@@ -1,4 +1,6 @@
-{% extends "base.html" %} {% block content %} {% if object %}
+{% extends "base.html" %} {% block content %}
+
+{% if object  %}
 <h1>Edit <span class="teal-text">{{object.title}}</span></h1>
 {% else %}
 <h1>Add KPI</h1>
@@ -9,7 +11,7 @@
   <table>
     {{form.as_table}}
   </table>
-  <br />
+  <br>
   <input type="submit" value="Submit!" class="btn" />
 </form>
 

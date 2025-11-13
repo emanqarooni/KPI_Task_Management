@@ -11,10 +11,12 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <title>KPI</title>
+    <!-- <link rel="stylesheet" href="{% static 'css/style.css' %}"> -->
   </head>
 
   <body>
     <header>
+      <h1>KPI Dashboard</h1>
       <nav>
         <div class="navbar-fixed">
           <ul>
@@ -23,6 +25,7 @@
                 >&nbsp;&nbsp;SEEF</a
               >
             </li>
+
           </ul>
 
           <ul class="right">
@@ -47,6 +50,10 @@
             {% else %}
             <li><a href="{% url 'login' %}">Login</a></li>
             {% endif %}
+            <li><a href="{% url 'dashboard' %}">Dashboards</a></li>
+            <li><a href="{% url 'index' %}">View KPI</a></li>
+            <li><a href="{% url 'progress' %}">Add Progress</a></li>
+            <li><a href="{% url 'employee_kpi' %}">My KPIs</a></li>
           </ul>
         </div>
       </nav>

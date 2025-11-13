@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Dashboard Selection</h2>
+<p>Select which dashboard to view:</p>
+
+<ul>
+  <li><a href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
+  <li><a href="{% url 'manager_dashboard' %}">Manager Dashboard</a></li>
+  <li><a href="{% url 'employee_dashboard' %}">Employee Dashboard</a></li>
+</ul>
+{% endblock %}
