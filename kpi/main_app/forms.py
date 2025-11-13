@@ -18,7 +18,6 @@ class AssignKpiForm(forms.ModelForm):
             self.fields['employee'].queryset = EmployeeProfile.objects.filter(department=dept, role='employee')
             self.fields['kpi'].queryset = Kpi.objects.filter(department=dept)
         else:
-            # default: show all employees who are role='employee' and all KPIs
             self.fields['employee'].queryset = EmployeeProfile.objects.filter(role='employee')
             self.fields['kpi'].queryset = Kpi.objects.all()
 
