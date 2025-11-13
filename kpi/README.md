@@ -6,3 +6,90 @@
 [Shooq Bin Zaiman Github]("https://github.com/shooqbinzaiman") |
 [Fatima Zaid]("https://github.com/fatima-zaid")
 
+🧭 Overview
+
+The KPI Task Management System is a web-based platform built using Django that helps organizations monitor employee performance efficiently through Key Performance Indicators (KPIs).
+
+The system provides role-based access for Admins, Managers, and Employees, allowing each role to interact with KPIs differently:
+
+- Admins can manage users, departments, and KPIs.
+
+- Managers can assign KPIs and monitor the performance of their department members.
+
+- Employees can view their assigned KPIs and update their progress regularly.
+
+The goal of this system is to streamline performance tracking, improve accountability, and enhance transparency within the workplace.
+
+🎯 Main Objective
+
+- To build a simple, efficient, and scalable system that helps organizations:
+
+- Define and assign KPIs for each employee.
+
+- Track performance progress over time.
+
+- Simplify communication between managers and their teams.
+
+- Generate a clear overview of departmental and individual achievements.
+
+🧩 Functional Requirements
+
+Admin:
+
+- Manage user accounts and roles (Admin, Manager, Employee).
+
+- Create, edit, and delete KPI categories.
+
+- Assign KPIs to departments or managers.
+
+- View all employees and KPI statistics.
+
+Manager:
+
+- View all employees within their department.
+
+- Assign KPIs to employees.
+
+- Track progress entries submitted by employees.
+
+- Monitor department performance in real time.
+
+Employee:
+
+- View their own KPIs.
+
+- Submit progress updates (daily or weekly).
+
+- Add notes or comments related to their KPI performance.
+
+- See overall progress percentage and days remaining for each KPI.
+
+🧠 Features (Planned and Completed)
+
+- Role-based dashboards: Admin, Manager, and Employee each have separate views.
+
+- KPI management: Create, assign, and monitor Key Performance Indicators.
+
+- Progress tracking: Employees can log progress entries tied to assigned KPIs.
+
+- Performance overview: Managers and Admins can view completion percentages and remaining time.
+
+- Department-based filtering: Managers only see KPIs and employees under their department.
+
+- Dynamic dashboards: Display data visually and update automatically when KPIs are changed.
+
+- Authentication system: Users log in and are redirected to their respective dashboard.
+
+- Clean and simple UI: Beginner-friendly HTML/CSS structure following CH4 standards.
+
+- Future expansion: Integrate AI suggestions for performance improvements.
+
+⚙️ Tools & Technologies
+
+Framework: Django (Python)
+Frontend: HTML, CSS, Bootstrap (optional)
+Backend: Django Models, Views, and Templates
+Database: SQLite (development)
+Version Control: Git & GitHub
+Project Management: Trello
+Utilities: Pillow (for images), Django Auth System
