@@ -24,17 +24,3 @@
 
 <a href="{% url 'employee_kpi_list' %}">Back to list</a>
 {% endblock %}
-
-employee_kpi_edit.html:
-{% extends 'base.html' %}
-{% block content %}
-<h2>Edit KPI</h2>
-
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Changes</button>
-</form>
-
-<a href="{% url 'employee_kpi_list' %}">Back</a>
-{% endblock %}
