@@ -1,0 +1,29 @@
+{% extends 'base.html'%}
+{% block content%}
+<h1>My KPIs</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>KPI Name</th>
+      <th>Progress</th>
+      <th>Deadline</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for ekpi in employee_kpi %}
+    <tr>
+      <td>{{ekpi.kpi.title}}</td>
+      <td>progress</td>
+      <td>{{ekpi.end_date}}</td>
+      <td>
+        <a href="{% url 'detail' ekpi.kpi.id%}"><button>Details</button></a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+{% endblock %}

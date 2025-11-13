@@ -22,13 +22,19 @@ def kpis_detail(request, kpi_id):
     return render(request, "kpi/detail.html", {"kpi": kpi})
 
 
-
 def add_progress(request):
     form = KpiProgressForm()
     if form.is_valid():
         form.save()
         return redirect('progress')
     return render(request, 'kpi/progress.html', {'form': form})
+
+
+
+def employee_kpi(request):
+     employee_kpi = EmployeeKpi.objects.all()
+     return render(request, "kpi/employee_kpi.html", {"employee_kpi": employee_kpi})
+
 
 
 class KpiCreate(CreateView):
