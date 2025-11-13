@@ -50,3 +50,13 @@ def assign_kpi(request):
             return redirect('employee_kpi_list')
     return render(request, 'main_app/assign_kpi.html', {'form': form})
 
+def employee_kpi_list(request):
+    if request.user.is_authenticated and hasattr(request.user, "employeeprofile") and request.user.employeeprofile.role == "manager":
+        dept = request.user.employeeprofile.department
+        # show only assignments where employee is in manager's department
+        kpis = EmployeeKpi.objects.filter(employee__department=dept).select_related('employee__user', 'kpi')
+    else:
+        kpis = EmployeeKpi.objects.select_related('employee__user', 'kpi').all()
+    return render(request, 'main_app/employee_kpi_list.html', {'kpis': kpis})
+
+
