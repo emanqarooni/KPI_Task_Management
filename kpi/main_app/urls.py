@@ -8,4 +8,5 @@ urlpatterns = [
     path("kpis/create/", views.KpiCreate.as_view(), name="kpis_create"),
     path("kpis/<int:pk>/update/", views.KpiUpdate.as_view(), name="kpis_update"),
     path("unauthorized/", views.unauthorized, name="unauthorized"),
+    path("profile/", views.profile, name="profile"),
 ]
