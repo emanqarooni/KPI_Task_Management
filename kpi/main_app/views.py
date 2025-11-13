@@ -132,8 +132,8 @@ def add_progress(request):
 
 
 def employee_kpi(request):
-     employee_kpi = EmployeeKpi.objects.all()
-     return render(request, "kpi/employee_kpi.html", {"employee_kpi": employee_kpi})
+    employee_kpi = EmployeeKpi.objects.all()
+    return render(request, "kpi/employee_kpi.html", {"employee_kpi": employee_kpi})
 
 
 
