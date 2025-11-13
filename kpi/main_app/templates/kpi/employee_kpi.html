@@ -8,6 +8,7 @@
       <th>KPI Name</th>
       <th>Progress</th>
       <th>Deadline</th>
+      <th>Status</th>
       <th>Action</th>
     </tr>
   </thead>
@@ -15,8 +16,10 @@
     {% for ekpi in employee_kpi %}
     <tr>
       <td>{{ekpi.kpi.title}}</td>
-      <td>progress</td>
+      <td>{{ekpi.progress_percentage}}%</td>
       <td>{{ekpi.end_date}}</td>
+      <td>{{ekpi.status}}</td>
+
       <td>
         <a href="{% url 'detail' ekpi.kpi.id%}"><button>Details</button></a>
       </td>

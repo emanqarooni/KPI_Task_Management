@@ -10,7 +10,6 @@ from django.contrib import messages
 from .decorators import RoleRequiredMixin, role_required
 from django.contrib.auth.models import User
 
-
 # Employee dashboard'
 def dashboard(request):
     return render(request, "dashboards/dashboard_home.html")
@@ -131,10 +130,18 @@ class KpiCreate(RoleRequiredMixin, CreateView):
 
 def add_progress(request):
     form = KpiProgressForm()
+
+    employee_kpi_id = request.POST.get('employee_kpi')
+    if employee_kpi_id:
+        employee_kpi = EmployeeKpi.objects.get(id=employee_kpi_id)
+        if employee_kpi.status() == "Complete":
+            messages.warning(request, "This KPI is already complete. You cannot add more progress.")
+            return redirect('progress')
     if form.is_valid():
         form.save()
-        return redirect("progress")
-    return render(request, "kpi/progress.html", {"form": form})
+        return redirect('progress')
+    return render(request, 'kpi/progress.html', {'form': form})
+
 
 
 def employee_kpi(request):
