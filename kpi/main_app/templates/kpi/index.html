@@ -17,6 +17,7 @@
       <td>{{kpi.department}}</td>
       <td>
         <a href="{% url 'detail' kpi.id%}"><button>Details</button></a>
+
         <a href="{% url 'kpis_update' kpi.id %}"><button>Edit</button></a>
       </td>
     </tr>
@@ -24,9 +25,9 @@
   </tbody>
 </table>
 <br />
+
+{% if request.user.employeeprofile.role == "admin" %}
 <a href="{% url 'kpis_create' %}">
   <button>Add New KPI</button>
 </a>
-
-
-{% endblock %}
+{% endif %} {% endblock %}

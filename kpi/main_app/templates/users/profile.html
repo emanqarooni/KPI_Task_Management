@@ -1,0 +1,29 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h2>Welcome, {{ request.user.username }}</h2>
+  <p><strong>Email:</strong> {{ request.user.email }}</p>
+  <p><strong>First Name:</strong> {{ request.user.first_name }}</p>
+  <p><strong>Last Name:</strong> {{ request.user.last_name }}</p>
+
+  {% if request.user.employeeprofile %}
+  <p>
+    <strong>Department:</strong> {{
+    request.user.employeeprofile.get_department_display }}
+  </p>
+  <p>
+    <strong>Role:</strong> {{ request.user.employeeprofile.get_role_display }}
+  </p>
+  <p>
+    <strong>Gender:</strong> {{ request.user.employeeprofile.get_gender_display
+    }}
+  </p>
+
+  {% if request.user.employeeprofile.image %}
+  <img
+    src="{{ request.user.employeeprofile.image.url }}"
+    alt="Profile Image"
+    style="height: 120px; border-radius: 8px"
+  />
+  {% endif %} {% endif %}
+</div>
+{% endblock %}
