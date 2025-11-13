@@ -1,9 +1,9 @@
 # KPI_Task_Management
 ## Date: 11/11/2025
-### By: Eman Qarooni, Eman Rauf, Shooq Bin Zaiman, Fatima Zaid
+### By: Eman Qarooni, Eman Rauf, Shooq BinZaiman, Fatima Zaid
 
 [Eman Qarooni Github]("https://github.com/emanqarooni") | [Eman Rauf Github]("https://github.com/emannn077") |
-[Shooq Bin Zaiman Github]("https://github.com/shooqbinzaiman") |
+[Shooq BinZaiman Github]("https://github.com/shooqbinzaiman") |
 [Fatima Zaid]("https://github.com/fatima-zaid")
 
 🧭 Overview
@@ -22,7 +22,7 @@ The goal of this system is to streamline performance tracking, improve accountab
 
 🎯 Main Objective
 
-- To build a simple, efficient, and scalable system that helps organizations:
+To build a simple, efficient, and scalable system that helps organizations:
 
 - Define and assign KPIs for each employee.
 
