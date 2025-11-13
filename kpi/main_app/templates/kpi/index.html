@@ -1,6 +1,32 @@
 {% extends 'base.html'%} {% block content%}
+<h1>All KPIs</h1>
 
-<h1>index</h1>
-ngggggg
+<table>
+  <thead>
+    <tr>
+      <th>KPI Name</th>
+      <th>Category</th>
+
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for kpi in kpis %}
+    <tr>
+      <td>{{kpi.title}}</td>
+      <td>{{kpi.department}}</td>
+      <td>
+        <a href="{% url 'detail' kpi.id%}"><button>Details</button></a>
+        <a href="{% url 'kpis_update' kpi.id %}"><button>Edit</button></a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<br />
+<a href="{% url 'kpis_create' %}">
+  <button>Add New KPI</button>
+</a>
+
 
 {% endblock %}

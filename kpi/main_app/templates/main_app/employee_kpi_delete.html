@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Confirm Delete</h2>
+
+<p>Delete KPI for <strong>{{ kpi.employee.user.username }} - {{ kpi.kpi.title }}</strong>?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, Delete</button>
+    <a href="{% url 'employee_kpi_list' %}">Cancel</a>
+</form>
+{% endblock %}
