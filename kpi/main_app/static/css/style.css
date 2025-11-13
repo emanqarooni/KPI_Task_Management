@@ -24,11 +24,11 @@ nav a {
   padding: 20px;
   margin-top: 15px;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+}
+
 .navbar-fixed {
   background-color: gray;
 }
-
-
 
 table {
   border-collapse: collapse;
