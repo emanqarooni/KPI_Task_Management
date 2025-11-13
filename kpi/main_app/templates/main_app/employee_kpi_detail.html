@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>KPI Details</h2>
+
+<p><strong>Employee:</strong> {{ kpi.employee.user.username }}</p>
+<p><strong>KPI:</strong> {{ kpi.kpi.title }}</p>
+<p><strong>Target:</strong> {{ kpi.target_value }}</p>
+<p><strong>Weight:</strong> {{ kpi.weight }}%</p>
+<p><strong>Period:</strong> {{ kpi.start_date }} → {{ kpi.end_date }}</p>
+<p><strong>Status:</strong> {{ kpi.status }}</p>
+<p><strong>Total progress:</strong> {{ kpi.total_progress }}</p>
+
+<hr>
+<h3>Progress entries</h3>
+{% if progress_entries %}
+  <ul>
+  {% for p in progress_entries %}
+    <li>{{ p.date }} — {{ p.value }} ({{ p.note }})</li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <p>No progress entries yet.</p>
+{% endif %}
+
+<a href="{% url 'employee_kpi_list' %}">Back to list</a>
+{% endblock %}
