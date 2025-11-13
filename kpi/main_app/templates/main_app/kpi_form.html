@@ -1,0 +1,23 @@
+{% extends "base.html" %} {% block content %}
+
+{% if object  %}
+<h1>Edit <span class="teal-text">{{object.title}}</span></h1>
+{% else %}
+<h1>Add KPI</h1>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <table>
+    {{form.as_table}}
+  </table>
+  <br>
+  <input type="submit" value="Submit!" class="btn" />
+</form>
+
+<script>
+  let selectEl = document.getElementById("id_department")
+  M.FormSelect.init(selectEl)
+</script>
+
+{% endblock %}

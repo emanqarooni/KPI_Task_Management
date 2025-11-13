@@ -22,7 +22,9 @@ class EmployeeProfile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     job_role = models.CharField(max_length=100)
-    department = models.CharField(max_length=2, choices=DEPARTMENT)
+    department = models.CharField(
+        max_length=2, choices=DEPARTMENT, default=DEPARTMENT[0][0]
+    )
     image = models.ImageField(upload_to="profile_images/", blank=True, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="employee")
 
@@ -33,10 +35,15 @@ class EmployeeProfile(models.Model):
 class Kpi(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField(max_length=250)
-    department = models.CharField(max_length=2, choices=DEPARTMENT, default=DEPARTMENT[0][0])
+    department = models.CharField(
+        max_length=2, choices=DEPARTMENT, default=DEPARTMENT[0][0]
+    )
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("detail", kwargs={"kpi_id": self.id})
 
 
 class EmployeeKpi(models.Model):
