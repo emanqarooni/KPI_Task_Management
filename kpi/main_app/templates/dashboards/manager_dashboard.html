@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Manager Dashboard</h2>
+
+<div class="dashboard-box">
+  <p><strong>Manager Name:</strong> {{ manager_name }}</p>
+  <p><strong>Department:</strong> {{ department }}</p>
+  <p><strong>Total Employees in Department:</strong> {{ employees_count }}</p>
+</div>
+{% endblock %}
