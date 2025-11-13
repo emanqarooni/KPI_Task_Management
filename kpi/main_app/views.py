@@ -73,3 +73,16 @@ def employee_kpi_edit(request, pk):
 
     return render(request, 'main_app/employee_kpi_edit.html', {'form': form, 'kpi': kpi_assign})
 
+def employee_kpi_delete(request, pk):
+    kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
+    if kpi_assign.progressentry_set.exists():
+        messages.error(request, "Cannot delete KPI — progress already exists.")
+        return redirect('employee_kpi_list')
+
+    if request.method == 'POST':
+        kpi_assign.delete()
+        messages.success(request, "KPI assignment deleted.")
+        return redirect('employee_kpi_list')
+
+    return render(request, 'main_app/employee_kpi_confirm_delete.html', {'kpi': kpi_assign})
+
