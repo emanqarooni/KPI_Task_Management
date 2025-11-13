@@ -21,7 +21,9 @@ class EmployeeProfile(models.Model):
 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     job_role = models.CharField(max_length=100)
-    department = models.CharField(max_length=2, choices=DEPARTMENT, default=DEPARTMENT[0][0])
+    department = models.CharField(
+        max_length=2, choices=DEPARTMENT, default=DEPARTMENT[0][0]
+    )
     image = models.ImageField(upload_to="profile_images/", blank=True, null=True)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="employee")
 
@@ -43,8 +45,8 @@ class Kpi(models.Model):
         return reverse("detail", kwargs={"kpi_id": self.id})
 
 
-
 class EmployeeKpi(models.Model):
+    employee = models.ForeignKey(EmployeeProfile, on_delete=models.CASCADE)
     kpi = models.ForeignKey(Kpi, on_delete=models.CASCADE)
     target_value = models.DecimalField(max_digits=10, decimal_places=2)
     start_date = models.DateField()
@@ -52,7 +54,7 @@ class EmployeeKpi(models.Model):
     weight = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return self.name
+        return f"{self.employee.user.username} - {self.kpi.title} ({self.weight}%)"
 
 
 class ProgressEntry(models.Model):
@@ -62,4 +64,4 @@ class ProgressEntry(models.Model):
     date = models.DateField()
 
     def __str__(self):
-        return self.name
+        return f"{self.employee_kpi.employee.user.username} - {self.value}"
