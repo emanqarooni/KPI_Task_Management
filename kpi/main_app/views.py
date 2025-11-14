@@ -128,8 +128,9 @@ class KpiCreate(RoleRequiredMixin, CreateView):
     allowed_roles = ["admin"]
 
 
+@login_required
 def add_progress(request):
-    form = KpiProgressForm()
+    form = KpiProgressForm(request.POST)
 
     employee_kpi_id = request.POST.get('employee_kpi')
     if employee_kpi_id:
@@ -143,9 +144,9 @@ def add_progress(request):
     return render(request, 'kpi/progress.html', {'form': form})
 
 
-
+@login_required
 def employee_kpi(request):
-    employee_kpi = EmployeeKpi.objects.all()
+    employee_kpi = EmployeeKpi.objects.all(request.POST)
     return render(request, "kpi/employee_kpi.html", {"employee_kpi": employee_kpi})
 
 
