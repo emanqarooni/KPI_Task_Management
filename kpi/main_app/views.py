@@ -110,15 +110,18 @@ def home(request):
 
 
 @login_required
+@role_required(['admin'])
 def kpis_index(request):
     kpis = Kpi.objects.all()
     return render(request, "kpi/index.html", {"kpis": kpis})
+
 
 
 @login_required
 def kpis_detail(request, kpi_id):
     kpi = Kpi.objects.get(id=kpi_id)
     return render(request, "kpi/detail.html", {"kpi": kpi})
+
 
 
 class KpiCreate(RoleRequiredMixin, CreateView):
@@ -128,25 +131,36 @@ class KpiCreate(RoleRequiredMixin, CreateView):
     allowed_roles = ["admin"]
 
 
-@login_required
-def add_progress(request):
-    form = KpiProgressForm(request.POST)
 
-    employee_kpi_id = request.POST.get('employee_kpi')
-    if employee_kpi_id:
-        employee_kpi = EmployeeKpi.objects.get(id=employee_kpi_id)
-        if employee_kpi.status() == "Complete":
-            messages.warning(request, "This KPI is already complete. You cannot add more progress.")
-            return redirect('progress')
-    if form.is_valid():
-        form.save()
-        return redirect('progress')
+@login_required
+@role_required(['employee'])
+def add_progress(request):
+    if request.method == 'POST':
+        form = KpiProgressForm(request.POST, user=request.user)
+
+        if form.is_valid():
+            employee_kpi = form.cleaned_data['employee_kpi']
+
+            if employee_kpi.status() == "Complete":
+                messages.error(request, "This KPI is already complete. You cannot add more progress.")
+                return redirect('employee_kpi')
+
+            form.save()
+            messages.success(request, "Progress added successfully!")
+
+            return redirect('employee_kpi')
+
+    else:
+        form = KpiProgressForm(user=request.user)
+
     return render(request, 'kpi/progress.html', {'form': form})
 
 
+
 @login_required
+@role_required(['employee'])
 def employee_kpi(request):
-    employee_kpi = EmployeeKpi.objects.all(request.POST)
+    employee_kpi = EmployeeKpi.objects.all()
     return render(request, "kpi/employee_kpi.html", {"employee_kpi": employee_kpi})
 
 
