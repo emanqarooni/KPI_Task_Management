@@ -43,6 +43,12 @@ class EmployeeProfile(models.Model):
         related_name="managed_employees",
     )
 
+    def save(self, *args, **kwargs):
+        # automatically assign admin role to superusers
+        if self.user.is_superuser:
+            self.role = "admin"
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.user.username} - {self.job_role}"
 
