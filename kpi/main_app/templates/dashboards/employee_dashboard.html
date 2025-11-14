@@ -1,40 +1,59 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
+
 <div class="dashboard-container">
+
+  <!-- Sidebar -->
   <div class="sidebar">
     <ul>
       <li><a href="#">Company</a></li>
-      <li><a href="#">Dashboard</a></li>
-      <li><a href="#">Update Progress</a></li>
-      <li><a href="#">My KPIs</a></li>
+      <li><a href="{% url 'employee_dashboard' %}">Dashboard</a></li>
+      <li><a href="{% url 'progress' %}">Update Progress</a></li>
+      <li><a href="{% url 'employee_kpi' %}">My KPIs</a></li>
     </ul>
   </div>
 
+  <!-- Main Content -->
   <div class="dashboard-content">
-    <h2>Employee Dashboard</h2>
+
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2>Employee Dashboard</h2>
+      <span>{{ employee_name }}</span>
+    </div>
+
     <div class="kpi-box">
       <h3>Welcome, {{ employee_name }}</h3>
       <p>Role: {{ role }}</p>
     </div>
 
     <h3>KPI Overview</h3>
-    <div class="kpi-grid">
-      <div class="kpi-item">
-        <h4>Sales Target</h4>
-        <p>Target: 100</p>
-        <p>Progress: 70</p>
-        <p>Deadline: 8 days left</p>
-        <button>Add Update</button>
-      </div>
 
+    <div class="kpi-grid">
+
+      {% for kpi in kpi_cards %}
       <div class="kpi-item">
-        <h4>Bugs Fixed KPI</h4>
-        <p>Target: 40</p>
-        <p>Progress: 25</p>
-        <p>Deadline: 5 days left</p>
-        <button>Add Update</button>
+
+        <h4>{{ kpi.title }}</h4>
+        <p><strong>Target:</strong> {{ kpi.target }}</p>
+        <p><strong>Progress:</strong> {{ kpi.progress }}</p>
+        <p><strong>Deadline:</strong> {{ kpi.days_left }} days left</p>
+
+        <a href="{% url 'progress' %}">
+          <button>Add Update</button>
+        </a>
+
       </div>
+      {% endfor %}
+
     </div>
+
+    <div class="kpi-box">
+      <canvas id="employeeChart" width="400" height="200"></canvas>
+    </div>
+
   </div>
+
 </div>
+
 {% endblock %}
