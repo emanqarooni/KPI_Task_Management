@@ -28,5 +28,16 @@
   </tbody>
 </table>
 
+{% if messages %}
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      {% for message in messages %}
+        M.toast({html: "{{ message }}", classes: "{{ message.tags }}"});
+      {% endfor %}
+    });
+  </script>
+{% endif %}
 
 {% endblock %}

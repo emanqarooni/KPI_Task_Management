@@ -36,14 +36,22 @@ class KpiProgressForm(forms.ModelForm):
     employee_kpi = forms.ModelChoiceField(
         queryset=EmployeeKpi.objects.all(),
         label="Select KPI Assignment",
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": "browser-default"}),
     )
 
     class Meta:
         model = ProgressEntry
         fields = ["employee_kpi", "value", "note", "date"]
         widgets = {
-            "value": forms.NumberInput(attrs={"class": "form-control"}),
-            "note": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
-            "date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
+            "value": forms.NumberInput(attrs={"class": "validate"}),
+            "note": forms.Textarea(attrs={"class": "materialize-textarea", "rows": 3}),
+            "date": forms.DateInput(attrs={"type": "date", "class": ""}),
         }
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if user and hasattr(user, 'employeeprofile'):
+            # filter to show only kpis assigned to this employee
+            self.fields['employee_kpi'].queryset = EmployeeKpi.objects.filter(
+                employee=user.employeeprofile
+            ).select_related('kpi', 'employee__user')
