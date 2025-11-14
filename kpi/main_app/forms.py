@@ -29,12 +29,12 @@ class AssignKpiForm(forms.ModelForm):
             )
             # check all the kpi's that relates to the manager dept
             self.fields["kpi"].queryset = Kpi.objects.filter(department=dept)
-        # else:
-        #     # default: show all employees who are role='employee' and all KPIs for the admin from his django admin portal
-        #     self.fields["employee"].queryset = EmployeeProfile.objects.filter(
-        #         role="employee"
-        #     )
-        #     self.fields["kpi"].queryset = Kpi.objects.all()
+        else:
+            # default: show all employees who are role='employee' and all KPIs for the admin from his django admin portal
+            self.fields["employee"].queryset = EmployeeProfile.objects.filter(
+                role="employee"
+            )
+            self.fields["kpi"].queryset = Kpi.objects.all()
 
 
 class KpiProgressForm(forms.ModelForm):

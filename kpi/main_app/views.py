@@ -179,32 +179,9 @@ def unauthorized(request):
 def profile(request):
     return render(request, "users/profile.html")
 
-
-# manager: assign kpi
-# # @login_required
-# def assign_kpi(request):
-#     # Only managers can assign KPI
-#     if not request.user.employeeprofile.role in ['manager']:
-#         messages.error(request, "You are not authorized to assign KPIs.")
-#         return redirect('home')
-
-#     if request.method == 'POST':
-#         form = AssignKpiForm(request.POST)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, "KPI successfully assigned to employee.")
-#             return redirect('assign_kpi')
-#     else:
-#         form = AssignKpiForm()
-
-#     context = {
-#         'form': form,
-#         'user': request.user
-#     }
-#     return render(request, 'main_app/assign_kpi.html', context)
-
-
 # Assign KPI: managers assign employees to KPI; KPIs & employees filtered by manager's department
+@login_required
+@role_required(['manager'])
 def assign_kpi(request):
     # pass request.user into the form so it filters by department if user is manager
     form = AssignKpiForm(
@@ -218,7 +195,8 @@ def assign_kpi(request):
             return redirect("employee_kpi_list")
     return render(request, "main_app/assign_kpi.html", {"form": form})
 
-
+@login_required
+@role_required(['manager'])
 def employee_kpi_list(request):
     if (
         request.user.is_authenticated
@@ -234,7 +212,8 @@ def employee_kpi_list(request):
         kpis = EmployeeKpi.objects.select_related("employee__user", "kpi").all()
     return render(request, "main_app/employee_kpi_list.html", {"kpis": kpis})
 
-
+@login_required
+@role_required(['manager'])
 def employee_kpi_edit(request, pk):
     kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
     if kpi_assign.progressentry_set.exists():
@@ -255,7 +234,8 @@ def employee_kpi_edit(request, pk):
         request, "main_app/employee_kpi_edit.html", {"form": form, "kpi": kpi_assign}
     )
 
-
+@login_required
+@role_required(['manager'])
 def employee_kpi_delete(request, pk):
     kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
     if kpi_assign.progressentry_set.exists():
@@ -269,7 +249,8 @@ def employee_kpi_delete(request, pk):
 
     return render(request, "main_app/employee_kpi_delete.html", {"kpi": kpi_assign})
 
-
+@login_required
+@role_required(['manager'])
 def employee_kpi_detail(request, pk):
     kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
     progress_entries = kpi_assign.progressentry_set.order_by("date")
