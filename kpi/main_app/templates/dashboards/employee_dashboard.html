@@ -1,10 +1,40 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Employee Dashboard</h2>
+<div class="dashboard-container">
+  <div class="sidebar">
+    <ul>
+      <li><a href="#">Company</a></li>
+      <li><a href="#">Dashboard</a></li>
+      <li><a href="#">Update Progress</a></li>
+      <li><a href="#">My KPIs</a></li>
+    </ul>
+  </div>
 
-<div class="dashboard-box">
-  <p><strong>Name:</strong> {{ employee_name }}</p>
-  <p><strong>Department:</strong> {{ department }}</p>
-  <p><strong>Role:</strong> {{ role }}</p>
+  <div class="dashboard-content">
+    <h2>Employee Dashboard</h2>
+    <div class="kpi-box">
+      <h3>Welcome, {{ employee_name }}</h3>
+      <p>Role: {{ role }}</p>
+    </div>
+
+    <h3>KPI Overview</h3>
+    <div class="kpi-grid">
+      <div class="kpi-item">
+        <h4>Sales Target</h4>
+        <p>Target: 100</p>
+        <p>Progress: 70</p>
+        <p>Deadline: 8 days left</p>
+        <button>Add Update</button>
+      </div>
+
+      <div class="kpi-item">
+        <h4>Bugs Fixed KPI</h4>
+        <p>Target: 40</p>
+        <p>Progress: 25</p>
+        <p>Deadline: 5 days left</p>
+        <button>Add Update</button>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

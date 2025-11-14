@@ -1,9 +1,38 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Admin Dashboard</h2>
+<div class="dashboard-container">
+  <div class="sidebar">
+    <h3>COMPANY NAME</h3>
+    <ul>
+      <li><a href="#">Dashboard</a></li>
+      <li><a href="#">Accounts</a></li>
+      <li><a href="#">KPI Catalog</a></li>
+      <li><a href="#">Reports</a></li>
+    </ul>
+  </div>
 
-<div class="dashboard-box">
-  <p><strong>Total Users:</strong> {{ total_users }}</p>
-  <p><strong>Total Employees:</strong> {{ total_employees }}</p>
+  <div class="dashboard-content">
+    <h2>Admin Dashboard</h2>
+    <div class="kpi-box">
+      <p><strong>Total Users:</strong> {{ total_users }}</p>
+      <p><strong>Total Employees:</strong> {{ total_employees }}</p>
+    </div>
+
+    <h3>KPI Library</h3>
+    <div class="kpi-grid">
+      <div class="kpi-item">
+        <h4>Sales</h4>
+        <p>Value: 20</p>
+      </div>
+      <div class="kpi-item">
+        <h4>Bugs Fix</h4>
+        <p>Value: 80</p>
+      </div>
+      <div class="kpi-item">
+        <h4>CS Score</h4>
+        <p>Value: 35</p>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
