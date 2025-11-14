@@ -30,8 +30,6 @@
 
           <ul class="right">
             {% if user.is_authenticated %}
-
-            <li><a href="{% url 'index' %}">View KPI</a></li>
             <li><a href="{% url 'profile' %}">Profile</a></li>
 
             <li>
@@ -50,10 +48,19 @@
             {% else %}
             <li><a href="{% url 'login' %}">Login</a></li>
             {% endif %}
+
+
             <li><a href="{% url 'dashboard' %}">Dashboards</a></li>
+
+            {% if user.employeeprofile.role == 'admin' %}
             <li><a href="{% url 'index' %}">View KPI</a></li>
+            {% endif %}
+
+            {% if user.employeeprofile.role == 'employee' %}
             <li><a href="{% url 'progress' %}">Add Progress</a></li>
             <li><a href="{% url 'employee_kpi' %}">My KPIs</a></li>
+            {% endif %}
+
           </ul>
         </div>
       </nav>
