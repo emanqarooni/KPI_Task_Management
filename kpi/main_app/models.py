@@ -33,7 +33,7 @@ class EmployeeProfile(models.Model):
         max_length=2, choices=DEPARTMENT, default=DEPARTMENT[0][0]
     )
     image = models.ImageField(upload_to="profile_images/", blank=True, null=True)
-    
+
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="employee")
 
     manager = models.ForeignKey(
@@ -113,9 +113,10 @@ class EmployeeKpi(models.Model):
         total = self.total_progress()
         if total == 0:
             return "No Progress"
-        if total == self.target_value:
+        elif total == self.target_value:
             return "Complete"
-        return "In Progress"
+        else:
+            return "In Progress"
 
 
 class ProgressEntry(models.Model):
