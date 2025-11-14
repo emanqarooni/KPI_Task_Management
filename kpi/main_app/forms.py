@@ -12,24 +12,29 @@ class AssignKpiForm(forms.ModelForm):
             "end_date": forms.DateInput(attrs={"type": "date"}),
         }
 
+    # when creating the forum run this func first
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
+        # check if the user assigining the employee is a manager
         if (
             user
             and hasattr(user, "employeeprofile")
             and user.employeeprofile.role == "manager"
         ):
+            # check what department is the manager
             dept = user.employeeprofile.department
+            # check all the employees that belong to the manager's dept
             self.fields["employee"].queryset = EmployeeProfile.objects.filter(
                 department=dept, role="employee"
             )
+            # check all the kpi's that relates to the manager dept
             self.fields["kpi"].queryset = Kpi.objects.filter(department=dept)
-        else:
-            # default: show all employees who are role='employee' and all KPIs
-            self.fields["employee"].queryset = EmployeeProfile.objects.filter(
-                role="employee"
-            )
-            self.fields["kpi"].queryset = Kpi.objects.all()
+        # else:
+        #     # default: show all employees who are role='employee' and all KPIs for the admin from his django admin portal
+        #     self.fields["employee"].queryset = EmployeeProfile.objects.filter(
+        #         role="employee"
+        #     )
+        #     self.fields["kpi"].queryset = Kpi.objects.all()
 
 
 class KpiProgressForm(forms.ModelForm):
