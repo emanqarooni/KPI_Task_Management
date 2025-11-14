@@ -45,4 +45,13 @@
       </form>
   </div>
 
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      let employeeSelect = document.getElementById('id_employee')
+      let kpiSelect = document.getElementById('id_kpi')
+
+      M.FormSelect.init(employeeSelect)
+      M.FormSelect.init(kpiSelect)
+    })
+  </script>
 {% endblock %}
