@@ -97,6 +97,7 @@ nav a {
   background-color: gray;
 } */
 
+
 table {
   border-collapse: collapse;
   width: 600px;
@@ -132,4 +133,36 @@ button {
 
 button:hover {
   background-color: rgb(42, 42, 106);
+}
+
+.add-user-container {
+  background: #fafafa;
+  padding: 2rem;
+  border-radius: 10px;
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.add-user-container label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+.add-user-container input,
+.add-user-container select {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.add-user-container button {
+  background-color: #2e026d;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
 }
