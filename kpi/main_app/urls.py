@@ -23,4 +23,7 @@ urlpatterns = [
     path('employee-kpi/<int:pk>/edit/', views.employee_kpi_edit, name='employee_kpi_edit'),
     path('employee-kpi/<int:pk>/delete/', views.employee_kpi_delete, name='employee_kpi_delete'),
     path('employee-kpi/<int:pk>/', views.employee_kpi_detail, name='employee_kpi_detail'),
+
+    # reports urls for admin and manager portal
+    path('reports/', views.manager_reports, name='reports'),
 ]

@@ -313,3 +313,53 @@ def employee_kpi_detail(request, pk):
             "progress_entries": progress_entries,
         },
     )
+
+# reports views
+
+# manager reports view with filtering
+@login_required
+@role_required(['manager'])
+def manager_reports(request):
+    dept = request.user.employeeprofile.department
+
+    # get kpis that r filtered by manager's department
+    kpis = EmployeeKpi.objects.filter(
+        employee__department=dept
+    ).select_related('employee__user', 'kpi').order_by('-id')
+
+    # apply filters from get parameters
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        kpis = kpis.filter(
+            Q(employee__user__username__icontains=search_query) |
+            Q(employee__user__first_name__icontains=search_query) |
+            Q(employee__user__last_name__icontains=search_query)
+        )
+
+    kpi_filter = request.GET.get('kpi', '')
+    if kpi_filter:
+        kpis = kpis.filter(kpi__id=kpi_filter)
+
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+
+    if start_date:
+        kpis = kpis.filter(start_date__gte=start_date)
+    if end_date:
+        kpis = kpis.filter(end_date__lte=end_date)
+
+    # get all kpis for the filter dropdown
+    all_kpis = Kpi.objects.filter(department=dept)
+
+    context = {
+        'kpis': kpis,
+        'all_kpis': all_kpis,
+        'search_query': search_query,
+        'kpi_filter': kpi_filter,
+        'start_date': start_date,
+        'end_date': end_date,
+    }
+    return render(request, "reports/manager_reports.html", context)
+
+
+
