@@ -1,26 +1,243 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>KPI Details</h2>
+<div class="max-w-7xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-3 mb-2">
+      <a href="{% url 'employee_kpi_list' %}" class="btn btn-ghost btn-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </a>
+      <div>
+        <h1 class="text-3xl font-bold text-base-content">KPI Details</h1>
+        <p class="text-base-content/70">View performance tracking and progress</p>
+      </div>
+    </div>
+  </div>
 
-<p><strong>Employee:</strong> {{ kpi.employee.user.username }}</p>
-<p><strong>KPI:</strong> {{ kpi.kpi.title }}</p>
-<p><strong>Target:</strong> {{ kpi.target_value }}</p>
-<p><strong>Weight:</strong> {{ kpi.weight }}%</p>
-<p><strong>Period:</strong> {{ kpi.start_date }} → {{ kpi.end_date }}</p>
-<p><strong>Status:</strong> {{ kpi.status }}</p>
-<p><strong>Total progress:</strong> {{ kpi.total_progress }}</p>
+  <!-- Stats Overview -->
+  <div class="stats stats-vertical lg:stats-horizontal shadow w-full mb-6">
+    <div class="stat">
+      <div class="stat-figure text-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      </div>
+      <div class="stat-title">Current Progress</div>
+      <div class="stat-value text-primary">{{ kpi.total_progress }}</div>
+      <div class="stat-desc">of {{ kpi.target_value }} target</div>
+    </div>
 
-<hr>
-<h3>Progress entries</h3>
-{% if progress_entries %}
-  <ul>
-  {% for p in progress_entries %}
-    <li>{{ p.date }} — {{ p.value }} ({{ p.note }})</li>
-  {% endfor %}
-  </ul>
-{% else %}
-  <p>No progress entries yet.</p>
-{% endif %}
+    <div class="stat">
+      <div class="stat-figure text-secondary">
+        <div class="radial-progress text-secondary" style="--value:{{ kpi.progress_percentage }};" role="progressbar">
+          <span class="text-lg font-bold">{{ kpi.progress_percentage }}%</span>
+        </div>
+      </div>
+      <div class="stat-title">Completion</div>
+      <div class="stat-value">{{ kpi.progress_percentage }}%</div>
+      <div class="stat-desc">Overall completion rate</div>
+    </div>
 
-<a href="{% url 'employee_kpi_list' %}">Back to list</a>
+    <div class="stat">
+      <div class="stat-figure text-info">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+      <div class="stat-title">Status</div>
+      <div class="stat-value text-sm">
+        <span class="badge badge-lg kpi-status-{{ kpi.status|lower|cut:' ' }}">{{ kpi.status }}</span>
+      </div>
+      <div class="stat-desc">{{ kpi.start_date }} → {{ kpi.end_date }}</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-figure text-warning">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+        </svg>
+      </div>
+      <div class="stat-title">Weight</div>
+      <div class="stat-value">{{ kpi.weight }}%</div>
+      <div class="stat-desc">Priority importance</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Left Column: KPI Info -->
+    <div class="lg:col-span-1">
+      <!-- Employee Card -->
+      <div class="card bg-base-100 shadow-xl mb-6">
+        <div class="card-body">
+          <h2 class="card-title text-lg mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            Employee Information
+          </h2>
+          <div class="flex items-center gap-4">
+            <div class="avatar placeholder">
+              <div class="bg-primary text-primary-content rounded-full w-16">
+                <span class="text-xl">{{ kpi.employee.user.username|slice:":2"|upper }}</span>
+              </div>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg">{{ kpi.employee.user.username }}</h3>
+              <p class="text-sm text-base-content/70">{{ kpi.employee.job_role }}</p>
+              <p class="text-xs text-base-content/50">{{ kpi.employee.get_department_display }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Info Card -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-lg mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            KPI Information
+          </h2>
+
+          <div class="space-y-3">
+            <div>
+              <p class="text-xs text-base-content/70 mb-1">KPI Title</p>
+              <p class="font-semibold">{{ kpi.kpi.title }}</p>
+            </div>
+
+            <div class="divider my-2"></div>
+
+            <div>
+              <p class="text-xs text-base-content/70 mb-1">Description</p>
+              <p class="text-sm">{{ kpi.kpi.description }}</p>
+            </div>
+
+            <div class="divider my-2"></div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <p class="text-xs text-base-content/70 mb-1">Target Value</p>
+                <p class="font-semibold text-primary">{{ kpi.target_value }}</p>
+              </div>
+              <div>
+                <p class="text-xs text-base-content/70 mb-1">Weight</p>
+                <p class="font-semibold">{{ kpi.weight }}%</p>
+              </div>
+            </div>
+
+            <div class="divider my-2"></div>
+
+            <div>
+              <p class="text-xs text-base-content/70 mb-1">Period</p>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="font-semibold">{{ kpi.start_date }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+                <span class="font-semibold">{{ kpi.end_date }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Progress Entries -->
+    <div class="lg:col-span-2">
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-lg mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Progress Entries
+            <span class="badge badge-primary ml-2">{{ progress_entries|length }}</span>
+          </h2>
+
+          {% if progress_entries %}
+            <!-- Progress Timeline -->
+            <div class="progress-timeline">
+              {% for p in progress_entries %}
+              <div class="progress-entry">
+                <div class="progress-marker">
+                  <div class="progress-dot"></div>
+                  <div class="progress-line"></div>
+                </div>
+                <div class="progress-content">
+                  <div class="flex justify-between items-start mb-2">
+                    <div>
+                      <p class="text-xs text-base-content/70">{{ p.date }}</p>
+                      <p class="font-bold text-2xl text-primary mt-1">{{ p.value }}</p>
+                    </div>
+                    <div class="badge badge-success badge-lg">
+                      +{{ p.value }}
+                    </div>
+                  </div>
+                  <div class="bg-base-200 rounded-lg p-3 mt-2">
+                    <p class="text-sm">{{ p.note }}</p>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+
+            <!-- Progress Summary -->
+            <div class="divider"></div>
+            <div class="alert alert-success">
+              <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>
+                <strong>Total Progress:</strong> {{ kpi.total_progress }} out of {{ kpi.target_value }}
+                ({{ progress_entries|length }} entr{{ progress_entries|length|pluralize:"y,ies" }})
+              </span>
+            </div>
+          {% else %}
+            <!-- Empty State -->
+            <div class="flex flex-col items-center justify-center py-12">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-base-content/30 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <h3 class="font-semibold text-lg mb-2">No Progress Entries Yet</h3>
+              <p class="text-base-content/70 text-center max-w-md">
+                The employee hasn't recorded any progress for this KPI yet. Progress entries will appear here once they start tracking their work.
+              </p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex justify-between items-center mt-6">
+    <a href="{% url 'employee_kpi_list' %}" class="btn btn-ghost">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to List
+    </a>
+
+    {% if kpi.progress_count == 0 %}
+    <div class="flex gap-2">
+      <a href="{% url 'employee_kpi_edit' kpi.pk %}" class="btn btn-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        Edit KPI
+      </a>
+      <a href="{% url 'employee_kpi_delete' kpi.pk %}" class="btn btn-error">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        Delete
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

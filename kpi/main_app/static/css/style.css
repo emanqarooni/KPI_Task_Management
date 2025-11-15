@@ -260,3 +260,101 @@ input:focus {
     font-size: 0.875rem;
   }
 }
+
+/* ===================================
+   Progress Timeline Styling
+   =================================== */
+
+.progress-timeline {
+  position: relative;
+  padding: 1rem 0;
+}
+
+.progress-entry {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.progress-entry:last-child {
+  margin-bottom: 0;
+}
+
+.progress-entry:last-child .progress-line {
+  display: none;
+}
+
+.progress-marker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.progress-dot {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background-color: #3B82F6;
+  border: 3px solid #DBEAFE;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.progress-line {
+  width: 2px;
+  flex: 1;
+  background: linear-gradient(to bottom, #3B82F6, #93C5FD);
+  margin-top: 0.5rem;
+  min-height: 3rem;
+}
+
+.progress-content {
+  flex: 1;
+  background-color: var(--color-base-100);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.progress-content:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Dark mode support for progress timeline */
+@media (prefers-color-scheme: dark) {
+  .progress-content {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .progress-dot {
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+}
+
+/* Stats card styling */
+.stats .stat-figure {
+  color: inherit;
+}
+
+/* Radial progress in stats */
+.stat .radial-progress {
+  --thickness: 4px;
+}
+
+/* Empty state styling */
+.empty-state-icon {
+  opacity: 0.3;
+}
+
+/* Badge size adjustments */
+.badge-lg {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}

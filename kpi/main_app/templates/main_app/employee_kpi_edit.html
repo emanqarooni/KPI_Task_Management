@@ -1,22 +1,161 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>Edit KPI</h2>
+<div class="max-w-4xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-3 mb-2">
+      <a href="{% url 'employee_kpi_list' %}" class="btn btn-ghost btn-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </a>
+      <h1 class="text-3xl font-bold text-base-content">Edit KPI Assignment</h1>
+    </div>
+    <p class="text-base-content/70 ml-14">Update the KPI assignment details</p>
+  </div>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Changes</button>
-</form>
+  <!-- Info Alert -->
+  <div class="alert alert-info shadow-lg mb-6">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <div>
+      <h3 class="font-bold">Editing Assigned KPI</h3>
+      <div class="text-xs">You can only edit KPIs that have no progress entries recorded yet.</div>
+    </div>
+  </div>
 
-<a href="{% url 'employee_kpi_list' %}">Back</a>
+  <!-- Form Card -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <form method="post" class="space-y-6">
+        {% csrf_token %}
 
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    let employeeSelect = document.getElementById('id_employee')
-    let kpiSelect = document.getElementById('id_kpi')
+        <!-- Employee Selection -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text font-semibold">{{ form.employee.label }}</span>
+            <span class="label-text-alt text-error">*</span>
+          </label>
+          {{ form.employee }}
+          {% if form.employee.errors %}
+            <label class="label">
+              <span class="label-text-alt text-error">{{ form.employee.errors.0 }}</span>
+            </label>
+          {% endif %}
+          <label class="label">
+            <span class="label-text-alt">Select the employee for this KPI</span>
+          </label>
+        </div>
 
-    M.FormSelect.init(employeeSelect)
-    M.FormSelect.init(kpiSelect)
-  })
-</script>
+        <!-- KPI Selection -->
+        <div class="form-control w-full">
+          <label class="label">
+            <span class="label-text font-semibold">{{ form.kpi.label }}</span>
+            <span class="label-text-alt text-error">*</span>
+          </label>
+          {{ form.kpi }}
+          {% if form.kpi.errors %}
+            <label class="label">
+              <span class="label-text-alt text-error">{{ form.kpi.errors.0 }}</span>
+            </label>
+          {% endif %}
+          <label class="label">
+            <span class="label-text-alt">Choose the KPI to assign</span>
+          </label>
+        </div>
+
+        <!-- Target Value and Weight Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Target Value -->
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text font-semibold">{{ form.target_value.label }}</span>
+              <span class="label-text-alt text-error">*</span>
+            </label>
+            {{ form.target_value }}
+            {% if form.target_value.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.target_value.errors.0 }}</span>
+              </label>
+            {% endif %}
+            <label class="label">
+              <span class="label-text-alt">Goal to achieve</span>
+            </label>
+          </div>
+
+          <!-- Weight -->
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text font-semibold">{{ form.weight.label }}</span>
+              <span class="label-text-alt text-error">*</span>
+            </label>
+            {{ form.weight }}
+            {% if form.weight.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.weight.errors.0 }}</span>
+              </label>
+            {% endif %}
+            <label class="label">
+              <span class="label-text-alt">Importance percentage</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Date Range Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Start Date -->
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text font-semibold">{{ form.start_date.label }}</span>
+              <span class="label-text-alt text-error">*</span>
+            </label>
+            {{ form.start_date }}
+            {% if form.start_date.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.start_date.errors.0 }}</span>
+              </label>
+            {% endif %}
+          </div>
+
+          <!-- End Date -->
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text font-semibold">{{ form.end_date.label }}</span>
+              <span class="label-text-alt text-error">*</span>
+            </label>
+            {{ form.end_date }}
+            {% if form.end_date.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.end_date.errors.0 }}</span>
+              </label>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="divider"></div>
+
+        <div class="card-actions justify-between items-center">
+          <a href="{% url 'employee_kpi_list' %}" class="btn btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Cancel
+          </a>
+
+          <div class="flex gap-3">
+            <button type="submit" class="btn btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 {% endblock %}
