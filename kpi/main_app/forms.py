@@ -86,6 +86,40 @@ class AssignKpiForm(forms.ModelForm):
 
         return weight
 
+    # clean method is used for validating multiple fields at once, and i am using this to check for if the scenario1: if the employee has already a kpi that may overlap the dates, scenario2: if the employee is assigned to the kpi but when the manager assign a new kpi there may be a partial overlap in dates, and the third thing is making sure that if there is no overlapping for the newly assigned kpi to the employee then the forum will be submitted
+    def clean(self):
+        # cross-field validation for progress entry
+        cleaned_data = super().clean()
+        employee_kpi = cleaned_data.get('employee_kpi')
+        progress_date = cleaned_data.get('date')
+        value = cleaned_data.get('value')
+
+        if employee_kpi and progress_date:
+            # check if date is within KPI period
+            if progress_date < employee_kpi.start_date:
+                raise forms.ValidationError(
+                    f"Progress date cannot be before the KPI start date ({employee_kpi.start_date})."
+                )
+
+            if progress_date > employee_kpi.end_date:
+                raise forms.ValidationError(
+                    f"Progress date cannot be after the KPI end date ({employee_kpi.end_date})."
+                )
+
+        # check if adding this value would exceed the target
+        if employee_kpi and value:
+            current_progress = employee_kpi.total_progress()
+            new_total = current_progress + value
+
+            if new_total > employee_kpi.target_value:
+                self.add_error('value',
+                    f"Adding {value} would exceed the target value of {employee_kpi.target_value}. "
+                    f"Current progress: {current_progress}. Maximum you can add: {employee_kpi.target_value - current_progress}."
+                )
+
+        return cleaned_data
+
+
 class KpiProgressForm(forms.ModelForm):
     employee_kpi = forms.ModelChoiceField(
         queryset=EmployeeKpi.objects.all(),
