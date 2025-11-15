@@ -16,6 +16,102 @@
     </a>
   </div>
 
+  <!-- Search and Filter Card -->
+  <div class="card bg-base-100 shadow-xl mb-6">
+    <div class="card-body">
+      <form method="get" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Search Input -->
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text font-semibold">Search Employee</span>
+            </label>
+            <div class="relative">
+              <input
+                type="text"
+                name="search"
+                value="{{ search_query }}"
+                placeholder="Search by name or username..."
+                class="input input-bordered w-full pr-10"
+              />
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute right-3 top-3.5 text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+
+          <!-- KPI Filter -->
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text font-semibold">Filter by KPI</span>
+            </label>
+            <select name="kpi" class="select select-bordered w-full">
+              <option value="">All KPIs</option>
+              {% for kpi in all_kpis %}
+                <option value="{{ kpi.id }}" {% if kpi_filter == kpi.id|stringformat:"s" %}selected{% endif %}>
+                  {{ kpi.title }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text font-semibold">Filter by Status</span>
+            </label>
+            <select name="status" class="select select-bordered w-full">
+              <option value="">All Statuses</option>
+              <option value="no_progress" {% if status_filter == "no_progress" %}selected{% endif %}>No Progress</option>
+              <option value="in_progress" {% if status_filter == "in_progress" %}selected{% endif %}>In Progress</option>
+              <option value="complete" {% if status_filter == "complete" %}selected{% endif %}>Complete</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-2 justify-end">
+          <a href="{% url 'employee_kpi_list' %}" class="btn btn-ghost btn-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Reset
+          </a>
+          <button type="submit" class="btn btn-primary btn-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            </svg>
+            Apply Filters
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Results Summary -->
+  {% if search_query or kpi_filter or status_filter %}
+  <div class="alert shadow-lg mb-6">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-info flex-shrink-0 w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <div>
+      <h3 class="font-bold">Active Filters</h3>
+      <div class="text-xs flex flex-wrap gap-2 mt-1">
+        {% if search_query %}
+          <span class="badge badge-primary">Search: "{{ search_query }}"</span>
+        {% endif %}
+        {% if kpi_filter %}
+          <span class="badge badge-secondary">KPI Filter Applied</span>
+        {% endif %}
+        {% if status_filter %}
+          <span class="badge badge-accent">Status: {{ status_filter|title }}</span>
+        {% endif %}
+        <span class="badge badge-ghost">{{ kpis|length }} result{{ kpis|length|pluralize }}</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Table Card -->
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-0">
@@ -38,81 +134,86 @@
           <!-- Table Body -->
           <tbody>
             {% for k in kpis %}
-            <tr class="hover">
-              <td>
-                <div class="flex items-center gap-3">
-                  <div class="avatar placeholder">
-                    <div class="bg-primary text-primary-content rounded-full w-10">
-                      <span class="text-sm">{{ k.employee.user.username|slice:":2"|upper }}</span>
+              {% if not status_filter or status_filter == "no_progress" and k.status == "No Progress" or status_filter == "in_progress" and k.status == "In Progress" or status_filter == "complete" and k.status == "Complete" %}
+              <tr class="hover">
+                <td>
+                  <div class="flex items-center gap-3">
+                    <div class="avatar placeholder">
+                      <div class="bg-primary text-primary-content rounded-full w-10">
+                        <span class="text-sm">{{ k.employee.user.username|slice:":2"|upper }}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="font-semibold">{{ k.employee.user.username }}</div>
+                      {% if k.employee.user.first_name or k.employee.user.last_name %}
+                        <div class="text-xs text-base-content/50">{{ k.employee.user.first_name }} {{ k.employee.user.last_name }}</div>
+                      {% endif %}
                     </div>
                   </div>
-                  <div>
-                    <div class="font-semibold">{{ k.employee.user.username }}</div>
+                </td>
+                <td>
+                  <div class="font-medium">{{ k.kpi.title }}</div>
+                </td>
+                <td>
+                  <span class="font-mono text-sm">{{ k.target_value }}</span>
+                </td>
+                <td>
+                  <div class="badge badge-outline">{{ k.weight }}%</div>
+                </td>
+                <td>
+                  <div class="text-sm">
+                    <div>{{ k.start_date }}</div>
+                    <div class="text-base-content/50">→ {{ k.end_date }}</div>
                   </div>
-                </div>
-              </td>
-              <td>
-                <div class="font-medium">{{ k.kpi.title }}</div>
-              </td>
-              <td>
-                <span class="font-mono text-sm">{{ k.target_value }}</span>
-              </td>
-              <td>
-                <div class="badge badge-outline">{{ k.weight }}%</div>
-              </td>
-              <td>
-                <div class="text-sm">
-                  <div>{{ k.start_date }}</div>
-                  <div class="text-base-content/50">→ {{ k.end_date }}</div>
-                </div>
-              </td>
-              <td>
-                <span class="badge kpi-status-{{ k.status|lower|cut:' ' }}">{{ k.status }}</span>
-              </td>
-              <td>
-                <div class="flex items-center gap-2">
-                  <div class="badge badge-primary badge-lg">
-                    <span class="font-semibold">{{ k.progress_count }}</span>
+                </td>
+                <td>
+                  <span class="badge kpi-status-{{ k.status|lower|cut:' ' }}">{{ k.status }}</span>
+                </td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div class="badge badge-primary badge-lg">
+                      <span class="font-semibold">{{ k.progress_count }}</span>
+                    </div>
+                    <span class="text-xs text-base-content/50">entries</span>
                   </div>
-                  <span class="text-xs text-base-content/50">entries</span>
-                </div>
-              </td>
-              <td>
-                <div class="flex justify-center gap-2">
-                  {% if k.progress_count == 0 %}
-                    <a href="{% url 'employee_kpi_edit' k.pk %}" class="btn btn-ghost btn-xs" title="Edit">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </a>
-                    <a href="{% url 'employee_kpi_delete' k.pk %}" class="btn btn-ghost btn-xs text-error" title="Delete">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </a>
-                    <a href="{% url 'employee_kpi_detail' k.pk %}" class="btn btn-ghost btn-xs btn-primary" title="View Details">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </a>
-                  {% else %}
-                    <a href="{% url 'employee_kpi_detail' k.pk %}" class="btn btn-ghost btn-xs btn-primary" title="View Details">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    </a>
-                    <span class="badge badge-warning badge-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      Locked
-                    </span>
-                  {% endif %}
-                </div>
-              </td>
-            </tr>
+                </td>
+                <td>
+                  <div class="flex justify-center gap-2">
+                    {% if k.progress_count == 0 %}
+                      <a href="{% url 'employee_kpi_edit' k.pk %}" class="btn btn-ghost btn-xs" title="Edit">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </a>
+                      <a href="{% url 'employee_kpi_delete' k.pk %}" class="btn btn-ghost btn-xs text-error" title="Delete">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </a>
+                      <a href="{% url 'employee_kpi_detail' k.pk %}" class="btn btn-ghost btn-xs btn-primary" title="View Details">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </a>
+                    {% else %}
+                      <a href="{% url 'employee_kpi_detail' k.pk %}" class="btn btn-ghost btn-xs btn-primary" title="View Details">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                      </a>
+                      <span class="badge badge-warning badge-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        Locked
+                      </span>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+              {% endif %}
             {% empty %}
             <tr>
               <td colspan="8" class="text-center py-12">
@@ -121,12 +222,30 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   <div>
-                    <h3 class="font-semibold text-lg mb-1">No KPI Assignments Yet</h3>
-                    <p class="text-base-content/70">Get started by assigning your first KPI to an employee.</p>
+                    <h3 class="font-semibold text-lg mb-1">
+                      {% if search_query or kpi_filter or status_filter %}
+                        No Results Found
+                      {% else %}
+                        No KPI Assignments Yet
+                      {% endif %}
+                    </h3>
+                    <p class="text-base-content/70">
+                      {% if search_query or kpi_filter or status_filter %}
+                        Try adjusting your search or filter criteria.
+                      {% else %}
+                        Get started by assigning your first KPI to an employee.
+                      {% endif %}
+                    </p>
                   </div>
-                  <a href="{% url 'assign_kpi' %}" class="btn btn-primary btn-sm">
-                    Assign First KPI
-                  </a>
+                  {% if not search_query and not kpi_filter and not status_filter %}
+                    <a href="{% url 'assign_kpi' %}" class="btn btn-primary btn-sm">
+                      Assign First KPI
+                    </a>
+                  {% else %}
+                    <a href="{% url 'employee_kpi_list' %}" class="btn btn-ghost btn-sm">
+                      Clear Filters
+                    </a>
+                  {% endif %}
                 </div>
               </td>
             </tr>
@@ -136,30 +255,5 @@
       </div>
     </div>
   </div>
-
-  <!-- Summary Stats (Optional becayse maybe adding it in the dashboard better still deciding :))
-  {% if kpis %}
-  <div class="stats shadow mt-6 w-full">
-    <div class="stat">
-      <div class="stat-title">Total KPIs</div>
-      <div class="stat-value text-primary">{{ kpis|length }}</div>
-      <div class="stat-desc">Assigned to employees</div>
-    </div>
-
-    <div class="stat">
-      <div class="stat-title">Active</div>
-      <div class="stat-value text-success">{{ kpis|length }}</div>
-      <div class="stat-desc">Currently tracking</div>
-    </div>
-
-    <div class="stat">
-      <div class="stat-title">With Progress</div>
-      <div class="stat-value text-info">
-        {% widthratio kpis|length 1 1 %}
-      </div>
-      <div class="stat-desc">Updates recorded</div>
-    </div>
-  </div>
-  {% endif %} -->
 </div>
 {% endblock %}

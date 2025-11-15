@@ -9,18 +9,19 @@ from .forms import AssignKpiForm, KpiProgressForm
 from django.contrib import messages
 from .decorators import RoleRequiredMixin, role_required
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 # Employee dashboard'
 def dashboard(request):
-    return render(request, "dashboards/dashboard_home.html")
-    # profile = EmployeeProfile.objects.get(user=request.user)
+    # return render(request, "dashboards/dashboard_home.html")
+    profile = EmployeeProfile.objects.get(user=request.user)
 
-    # if profile.role == "admin":
-    #     return admin_dashboard(request)
-    # elif profile.role == "manager":
-    #     return manager_dashboard(request)
-    # else:
-    #     return employee_dashboard(request)
+    if profile.role == "admin":
+        return admin_dashboard(request)
+    elif profile.role == "manager":
+        return manager_dashboard(request)
+    else:
+        return employee_dashboard(request)
 
 
 def admin_dashboard(request):
@@ -210,7 +211,57 @@ def employee_kpi_list(request):
         ).order_by('-id')
     else:
         kpis = EmployeeKpi.objects.select_related("employee__user", "kpi").all()
-    return render(request, "main_app/employee_kpi_list.html", {"kpis": kpis})
+
+    # search functionality
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        kpis = kpis.filter(
+            Q(employee__user__username__icontains=search_query) |
+            Q(employee__user__first_name__icontains=search_query) |
+            Q(employee__user__last_name__icontains=search_query) |
+            Q(employee__job_role__icontains=search_query)
+        )
+
+    # filter by KPI
+    kpi_filter = request.GET.get('kpi', '')
+    if kpi_filter:
+        kpis = kpis.filter(kpi__id=kpi_filter)
+
+    # order by newest first
+    kpis = kpis.order_by('-id')
+
+    status_filter = request.GET.get('status', '')
+    if status_filter:
+        # convert the queryset to a list and filter by status since status is a method
+        filtered_kpis = []
+        for kpi in kpis:
+            kpi_status = kpi.status().lower().replace(' ', '_')
+            if kpi_status == status_filter:
+                filtered_kpis.append(kpi)
+        kpis = filtered_kpis
+    else:
+        # convert to list for consistency
+        kpis = list(kpis)
+
+    # get all KPIs for the filter dropdown
+    if (
+        request.user.is_authenticated
+        and hasattr(request.user, "employeeprofile")
+        and request.user.employeeprofile.role == "manager"
+    ):
+        dept = request.user.employeeprofile.department
+        all_kpis = Kpi.objects.filter(department=dept)
+    else:
+        all_kpis = Kpi.objects.all()
+
+    context = {
+        'kpis': kpis,
+        'all_kpis': all_kpis,
+        'search_query': search_query,
+        'kpi_filter': kpi_filter,
+        'status_filter': status_filter,
+    }
+    return render(request, "main_app/employee_kpi_list.html", context)
 
 @login_required
 @role_required(['manager'])
