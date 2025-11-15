@@ -13,12 +13,11 @@
     </ul>
   </div>
 
-
   <div class="dashboard-content">
 
-    <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="dashboard-header">
       <h2>Manager Dashboard</h2>
-      <span style="font-size:16px;">{{ manager_name }}</span>
+      <span class="manager-name">{{ manager_name }}</span>
     </div>
 
     <div class="kpi-box">
@@ -29,22 +28,28 @@
     <h3>Team KPI Summary</h3>
 
     <div class="kpi-box">
-    <table style="width:100%;">
-      <tr>
-        <th>Employee</th>
-        <th>KPI Completion</th>
-        <th>Status</th>
-      </tr>
+      <table class="kpi-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>KPI Completion</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in employee_rows %}
+          <tr>
+            <td>{{ row.name }}</td>
+            <td>{{ row.completion }}%</td>
+            <td>{{ row.status }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-      {% for row in employee_rows %}
-      <tr>
-        <td>{{ row.name }}</td>
-        <td>{{ row.completion }}%</td>
-        <td>{{ row.status }}</td>
-      </tr>
-      {% endfor %}
-
-    </table>
+    <div class="kpi-box">
+      <canvas id="managerChart"></canvas>
     </div>
 
   </div>

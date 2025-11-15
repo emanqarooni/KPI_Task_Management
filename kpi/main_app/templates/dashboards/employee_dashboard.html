@@ -4,7 +4,6 @@
 
 <div class="dashboard-container">
 
-  <!-- Sidebar -->
   <div class="sidebar">
     <ul>
       <li><a href="#">Company</a></li>
@@ -14,12 +13,11 @@
     </ul>
   </div>
 
-  <!-- Main Content -->
   <div class="dashboard-content">
 
-    <div style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="dashboard-header">
       <h2>Employee Dashboard</h2>
-      <span>{{ employee_name }}</span>
+      <span class="employee-name">{{ employee_name }}</span>
     </div>
 
     <div class="kpi-box">
@@ -30,30 +28,24 @@
     <h3>KPI Overview</h3>
 
     <div class="kpi-grid">
-
       {% for kpi in kpi_cards %}
       <div class="kpi-item">
-
         <h4>{{ kpi.title }}</h4>
         <p><strong>Target:</strong> {{ kpi.target }}</p>
         <p><strong>Progress:</strong> {{ kpi.progress }}</p>
         <p><strong>Deadline:</strong> {{ kpi.days_left }} days left</p>
-
         <a href="{% url 'progress' %}">
           <button>Add Update</button>
         </a>
-
       </div>
       {% endfor %}
-
     </div>
 
     <div class="kpi-box">
-      <canvas id="employeeChart" width="400" height="200"></canvas>
+      <canvas id="employeeChart"></canvas>
     </div>
 
   </div>
-
 </div>
 
 {% endblock %}

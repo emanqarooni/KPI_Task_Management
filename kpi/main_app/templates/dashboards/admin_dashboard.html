@@ -4,7 +4,6 @@
 
 <div class="dashboard-container">
 
-  
   <div class="sidebar">
     <h3>COMPANY NAME</h3>
     <ul>
@@ -15,11 +14,11 @@
     </ul>
   </div>
 
-
   <div class="dashboard-content">
 
-    <h2>Admin Dashboard</h2>
-
+    <div class="dashboard-header">
+      <h2>Admin Dashboard</h2>
+    </div>
 
     <div class="kpi-box">
       <p><strong>Total Users:</strong> {{ total_users }}</p>
@@ -28,29 +27,21 @@
 
     <h3>KPI Library</h3>
 
-
     <div class="kpi-grid">
-
       {% for kpi in kpis %}
       <div class="kpi-item">
         <h4>{{ kpi.title }}</h4>
-
         <p>Value:
-          {% for value in chart_values %}
-            {% if forloop.counter0 == forloop.parentloop.counter0 %}
-              {{ value }}
-            {% endif %}
-          {% endfor %}
+          {% if chart_values|length > forloop.counter0 %}
+            {{ chart_values|index:forloop.counter0 }}
+          {% endif %}
         </p>
-
       </div>
       {% endfor %}
-
     </div>
 
-
     <div class="kpi-box">
-      <canvas id="adminChart" width="400" height="200"></canvas>
+      <canvas id="adminChart"></canvas>
     </div>
 
   </div>

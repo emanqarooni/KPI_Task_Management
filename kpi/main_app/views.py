@@ -11,6 +11,7 @@ from .decorators import RoleRequiredMixin, role_required
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from datetime import date
+
 # Employee dashboard'
 @login_required
 def dashboard(request):
@@ -36,7 +37,7 @@ def admin_dashboard(request):
     chart_labels_list = []
     chart_values_list = []
 
-    # Prepare ChartJS data
+
     for kpi in all_kpis:
         chart_labels_list.append(kpi.title)
 
@@ -75,7 +76,7 @@ def manager_dashboard(request):
 
     employee_dashboard_rows = []
 
-    # Loop through each employee
+
     for employee in employees_in_department:
         employee_kpis = EmployeeKpi.objects.filter(employee=employee)
 
@@ -83,7 +84,7 @@ def manager_dashboard(request):
             total_progress_value = 0
             total_target_value = 0
 
-            # Sum progress and target for all KPIs
+
             for employee_kpi in employee_kpis:
                 progress_entries = employee_kpi.progressentry_set.all()
                 for entry in progress_entries:
@@ -134,7 +135,7 @@ def employee_dashboard(request):
     chart_values_list = []
     kpi_cards_list = []
 
-    # Loop through each assigned KPI
+
     for employee_kpi in assigned_kpis:
         kpi_title = employee_kpi.kpi.title
         total_progress_value = 0
