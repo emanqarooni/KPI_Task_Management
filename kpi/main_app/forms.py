@@ -70,6 +70,22 @@ class AssignKpiForm(forms.ModelForm):
 
         return target_value
 
+    def validate_weight(self):
+        # validate that weight is between 0 and 100 cannot be more thn that
+        weight = self.cleaned_data.get('weight')
+
+        if weight is not None:
+            if weight <= 0:
+                raise forms.ValidationError(
+                    "Weight must be greater than 0."
+                )
+            if weight > 100:
+                raise forms.ValidationError(
+                    "Weight cannot exceed 100%."
+                )
+
+        return weight
+
 class KpiProgressForm(forms.ModelForm):
     employee_kpi = forms.ModelChoiceField(
         queryset=EmployeeKpi.objects.all(),
