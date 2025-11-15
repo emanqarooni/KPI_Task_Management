@@ -171,3 +171,92 @@ input:focus {
   color: #ef4444;
   font-size: 0.875rem;
 }
+
+/* ===================================
+   KPI Table Styling
+   =================================== */
+
+/* Table Header */
+.kpi-table-header {
+  background-color: #0F172A;
+  color: white;
+}
+
+.kpi-table-header th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 1rem;
+}
+
+/* KPI Status Badges */
+.kpi-status-active,
+.kpi-status-inprogress {
+  background-color: #10B981;
+  color: white;
+  font-weight: 600;
+}
+
+.kpi-status-pending,
+.kpi-status-noprogress {
+  background-color: #F59E0B;
+  color: white;
+  font-weight: 600;
+}
+
+.kpi-status-completed,
+.kpi-status-complete {
+  background-color: #3B82F6;
+  color: white;
+  font-weight: 600;
+}
+
+.kpi-status-overdue {
+  background-color: #EF4444;
+  color: white;
+  font-weight: 600;
+}
+
+.kpi-status-inactive {
+  background-color: #6B7280;
+  color: white;
+  font-weight: 600;
+}
+
+/* Table Row Hover Effect */
+.table tbody tr.hover:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* Action Buttons */
+.btn-xs {
+  transition: all 0.2s ease;
+}
+
+.btn-xs:hover {
+  transform: translateY(-1px);
+}
+
+/* Progress Indicator */
+.radial-progress {
+  font-weight: 600;
+}
+
+/* Empty State */
+.table tbody tr td[colspan] {
+  background-color: transparent;
+}
+
+/* Responsive Table */
+@media (max-width: 768px) {
+  .kpi-table-header th {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+  }
+}
