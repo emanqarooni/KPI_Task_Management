@@ -12,7 +12,6 @@
       </a>
       <div>
         <h1 class="text-3xl font-bold text-base-content">KPI Details</h1>
-        <p class="text-base-content/70">View performance tracking and progress</p>
       </div>
     </div>
   </div>
@@ -32,8 +31,8 @@
 
     <div class="stat">
       <div class="stat-figure text-secondary">
-        <div class="radial-progress text-secondary" style="--value:{{ kpi.progress_percentage }};" role="progressbar">
-          <span class="text-lg font-bold">{{ kpi.progress_percentage }}%</span>
+        <div class="radial-progress text-secondary" style="--value: {{ kpi.progress_percentage|default:0 }}" role="progressbar">
+          <span class="text-lg font-bold">{{ kpi.progress_percentage|default:0 }}% </span>
         </div>
       </div>
       <div class="stat-title">Completion</div>
@@ -161,7 +160,7 @@
           {% if progress_entries %}
             <!-- Progress Timeline -->
             <div class="progress-timeline">
-              {% for p in progress_entries %}
+              {% for p in progress_entries reversed %}
               <div class="progress-entry">
                 <div class="progress-marker">
                   <div class="progress-dot"></div>

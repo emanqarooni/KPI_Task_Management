@@ -207,7 +207,7 @@ def employee_kpi_list(request):
         # show only assignments where employee is in manager's department
         kpis = EmployeeKpi.objects.filter(employee__department=dept).select_related(
             "employee__user", "kpi"
-        )
+        ).order_by('-id')
     else:
         kpis = EmployeeKpi.objects.select_related("employee__user", "kpi").all()
     return render(request, "main_app/employee_kpi_list.html", {"kpis": kpis})

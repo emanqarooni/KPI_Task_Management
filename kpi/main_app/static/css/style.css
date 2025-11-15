@@ -358,3 +358,53 @@ input:focus {
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
 }
+
+/* ===================================
+   Delete Confirmation Page Styling
+   =================================== */
+
+/* Error state card border */
+.card.border-error\/20 {
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* Delete icon container */
+.bg-error\/10 {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Info box styling */
+.bg-info\/10 {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Hover effect for delete button */
+.btn-error:hover {
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+
+/* Alert warning animation */
+.alert-warning {
+  animation: pulse-warning 2s ease-in-out infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+/* Mobile responsive adjustments for delete page */
+@media (max-width: 640px) {
+  .card-body {
+    padding: 1rem;
+  }
+
+  .grid.grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
