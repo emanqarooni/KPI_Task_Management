@@ -59,6 +59,16 @@ class AssignKpiForm(forms.ModelForm):
 
         return end_date
 
+    def validate_target_value(self):
+        # validating that the target_value is a positive number
+        target_value = self.cleaned_data.get('target_value')
+
+        if target_value is not None and target_value <= 0:
+            raise forms.ValidationError(
+                "Target value must be greater than 0."
+            )
+
+        return target_value
 
 class KpiProgressForm(forms.ModelForm):
     employee_kpi = forms.ModelChoiceField(
