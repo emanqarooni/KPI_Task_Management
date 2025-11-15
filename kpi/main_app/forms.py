@@ -1,6 +1,7 @@
 # main_app/forms.py
 from django import forms
 from .models import EmployeeKpi, EmployeeProfile, Kpi, ProgressEntry
+from datetime import date
 
 
 class AssignKpiForm(forms.ModelForm):
@@ -35,6 +36,28 @@ class AssignKpiForm(forms.ModelForm):
                 role="employee"
             )
             self.fields["kpi"].queryset = Kpi.objects.all()
+
+    def validate_start_date(self):
+        # validate that start date is not in the past
+        start_date = self.cleaned_data.get('start_date')
+
+        if start_date and start_date < date.today():
+            raise forms.ValidationError(
+                "Start date cannot be in the past. Please select today or a future date."
+            )
+
+        return start_date
+
+    def validate_end_date(self):
+        # validate that end_date is not in the past
+        end_date = self.cleaned_data.get('end_date')
+
+        if end_date and end_date < date.today():
+            raise forms.ValidationError(
+                "End date cannot be in the past. Please select today or a future date."
+            )
+
+        return end_date
 
 
 class KpiProgressForm(forms.ModelForm):
