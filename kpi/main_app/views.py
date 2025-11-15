@@ -12,15 +12,15 @@ from django.contrib.auth.models import User
 
 # Employee dashboard'
 def dashboard(request):
-    return render(request, "dashboards/dashboard_home.html")
-    # profile = EmployeeProfile.objects.get(user=request.user)
+    # return render(request, "dashboards/dashboard_home.html")
+    profile = EmployeeProfile.objects.get(user=request.user)
 
-    # if profile.role == "admin":
-    #     return admin_dashboard(request)
-    # elif profile.role == "manager":
-    #     return manager_dashboard(request)
-    # else:
-    #     return employee_dashboard(request)
+    if profile.role == "admin":
+        return admin_dashboard(request)
+    elif profile.role == "manager":
+        return manager_dashboard(request)
+    else:
+        return employee_dashboard(request)
 
 
 def admin_dashboard(request):

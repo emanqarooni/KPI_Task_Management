@@ -4,12 +4,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
+    <!-- <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
     />
-    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" /> -->
 
+    <link rel="stylesheet" href="{% static 'css/output.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <title>KPI</title>
   </head>
@@ -25,7 +27,6 @@
                 >&nbsp;&nbsp;SEEF</a
               >
             </li>
-
           </ul>
 
           <ul class="right">
@@ -44,27 +45,25 @@
                 </button>
               </form>
             </li>
-
             {% else %}
             <li><a href="{% url 'login' %}">Login</a></li>
             {% endif %}
 
-
             <li><a href="{% url 'dashboard' %}">Dashboards</a></li>
 
-            {% if user.employeeprofile.role == 'admin' %}
+            {# ---- ROLE-BASED NAV MENU ---- #} {% if user.is_authenticated and
+            user.employeeprofile %} {# ADMIN #} {% if user.employeeprofile.role
+            == 'admin' %}
             <li><a href="{% url 'index' %}">View KPI</a></li>
-            {% endif %}
-
-            {% if user.employeeprofile and user.employeeprofile.role == 'manager' %}
-              <li><a href="{% url 'assign_kpi' %}">Assign KPI</a></li>
-            {% endif %}
-
-            {% if user.employeeprofile.role == 'employee' %}
+            {% endif %} {# MANAGER #} {% if user.employeeprofile.role ==
+            'manager' %}
+            <li><a href="{% url 'assign_kpi' %}">Assign KPI</a></li>
+            <li><a href="{% url 'employee_kpi_list' %}">Team KPIs</a></li>
+            {% endif %} {# EMPLOYEE #} {% if user.employeeprofile.role ==
+            'employee' %}
             <li><a href="{% url 'progress' %}">Add Progress</a></li>
             <li><a href="{% url 'employee_kpi' %}">My KPIs</a></li>
-            {% endif %}
-
+            {% endif %} {% endif %}
           </ul>
         </div>
       </nav>
