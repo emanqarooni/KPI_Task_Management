@@ -1,3 +1,8 @@
 .env
 __pycache__/
 migrations/
+main_app/static/css/output.css
+tailwindcss.exe
+main_app/static/css/input.css
+main_app/static/css/daisyui.mjs
+main_app/static/css/daisyui-theme.mjs
