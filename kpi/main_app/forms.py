@@ -37,7 +37,7 @@ class AssignKpiForm(forms.ModelForm):
             )
             self.fields["kpi"].queryset = Kpi.objects.all()
 
-    def validate_start_date(self):
+    def clean_start_date(self):
         # validate that start date is not in the past
         start_date = self.cleaned_data.get('start_date')
 
@@ -48,7 +48,7 @@ class AssignKpiForm(forms.ModelForm):
 
         return start_date
 
-    def validate_end_date(self):
+    def clean_end_date(self):
         # validate that end_date is not in the past
         end_date = self.cleaned_data.get('end_date')
 
@@ -59,7 +59,7 @@ class AssignKpiForm(forms.ModelForm):
 
         return end_date
 
-    def validate_target_value(self):
+    def clean_target_value(self):
         # validating that the target_value is a positive number
         target_value = self.cleaned_data.get('target_value')
 
@@ -70,7 +70,7 @@ class AssignKpiForm(forms.ModelForm):
 
         return target_value
 
-    def validate_weight(self):
+    def clean_weight(self):
         # validate that weight is between 0 and 100 cannot be more thn that
         weight = self.cleaned_data.get('weight')
 
