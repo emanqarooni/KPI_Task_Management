@@ -88,36 +88,42 @@ class AssignKpiForm(forms.ModelForm):
 
     # clean method is used for validating multiple fields at once, and i am using this to check for if the scenario1: if the employee has already a kpi that may overlap the dates, scenario2: if the employee is assigned to the kpi but when the manager assign a new kpi there may be a partial overlap in dates, and the third thing is making sure that if there is no overlapping for the newly assigned kpi to the employee then the forum will be submitted
     def clean(self):
-        # cross-field validation for progress entry
-        cleaned_data = super().clean()
-        employee_kpi = cleaned_data.get('employee_kpi')
-        progress_date = cleaned_data.get('date')
-        value = cleaned_data.get('value')
+            # cross-field validation
+            cleaned_data = super().clean()
+            start_date = cleaned_data.get('start_date')
+            end_date = cleaned_data.get('end_date')
+            employee = cleaned_data.get('employee')
+            kpi = cleaned_data.get('kpi')
 
-        if employee_kpi and progress_date:
-            # check if date is within KPI period
-            if progress_date < employee_kpi.start_date:
-                raise forms.ValidationError(
-                    f"Progress date cannot be before the KPI start date ({employee_kpi.start_date})."
+            # validate that end_date is after start_date
+            if start_date and end_date:
+                if end_date < start_date:
+                    raise forms.ValidationError(
+                        "End date must be after or equal to the start date."
+                    )
+
+            # check for duplicate KPI assignments (same employee + same kpi + overlapping dates)
+            if employee and kpi and start_date and end_date:
+                # exclude the current instance if we're editing
+                existing_kpis = EmployeeKpi.objects.filter(
+                    employee=employee,
+                    kpi=kpi
                 )
 
-            if progress_date > employee_kpi.end_date:
-                raise forms.ValidationError(
-                    f"Progress date cannot be after the KPI end date ({employee_kpi.end_date})."
-                )
+                if self.instance.pk:
+                    existing_kpis = existing_kpis.exclude(pk=self.instance.pk)
 
-        # check if adding this value would exceed the target
-        if employee_kpi and value:
-            current_progress = employee_kpi.total_progress()
-            new_total = current_progress + value
+                # check for overlapping date ranges
+                for existing_kpi in existing_kpis:
+                    # check if dates overlap
+                    if not (end_date < existing_kpi.start_date or start_date > existing_kpi.end_date):
+                        raise forms.ValidationError(
+                            f"This employee already has the KPI '{kpi.title}' assigned for an overlapping period "
+                            f"({existing_kpi.start_date} to {existing_kpi.end_date}). "
+                            f"Please choose different dates or a different KPI."
+                        )
 
-            if new_total > employee_kpi.target_value:
-                self.add_error('value',
-                    f"Adding {value} would exceed the target value of {employee_kpi.target_value}. "
-                    f"Current progress: {current_progress}. Maximum you can add: {employee_kpi.target_value - current_progress}."
-                )
-
-        return cleaned_data
+            return cleaned_data
 
 
 class KpiProgressForm(forms.ModelForm):
