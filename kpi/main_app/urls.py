@@ -1,6 +1,7 @@
 from django.urls import path, include
 from . import views
 
+
 urlpatterns = [
     path("", views.home, name="home"),
     path('kpis/', views.kpis_index , name='index'),
@@ -27,4 +28,5 @@ urlpatterns = [
     # reports urls for admin and manager portal
     path('reports/', views.manager_reports, name='reports'),
     path('reports/export-pdf/', views.export_pdf, name='export_pdf'),
+    path('reports/export-excel/', views.export_excel, name='export_excel'),
 ]

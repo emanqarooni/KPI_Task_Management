@@ -16,6 +16,8 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from datetime import datetime
+from openpyxl import Workbook
+from openpyxl import Font, Alignment, PatternFill
 
 # Employee dashboard'
 def dashboard(request):
