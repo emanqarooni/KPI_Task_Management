@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .models import EmployeeProfile, Kpi, EmployeeKpi, ProgressEntry
 from django.contrib.auth.models import User
+from .models import EmployeeProfile, Kpi, EmployeeKpi, ProgressEntry, ActivityLog
 from django import forms
 
 
@@ -34,6 +34,23 @@ class EmployeeProfileAdmin(admin.ModelAdmin):
             kwargs["queryset"] = User.objects.filter(employeeprofile__role="manager")
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+
+@admin.register(ActivityLog)
+class ActivityLogAdmin(admin.ModelAdmin):
+    list_display = ['user', 'action', 'description', 'related_user', 'timestamp']
+    list_filter = ['action', 'timestamp', 'user']
+    search_fields = ['user__username', 'description', 'related_user__username']
+    readonly_fields = ['user', 'action', 'description', 'related_user', 'timestamp']
+    date_hierarchy = 'timestamp'
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
 
 # Register your models here.
 admin.site.register(Kpi)

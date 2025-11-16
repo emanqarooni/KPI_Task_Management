@@ -16,17 +16,12 @@ urlpatterns = [
     path("kpis/progress/", views.add_progress, name="progress"),
     path("kpis/employee/", views.employee_kpi, name="employee_kpi"),
     # kpi assignments urls from manager portal
-    path("assign-kpi/", views.assign_kpi, name="assign_kpi"),
-    path("employee-kpis/", views.employee_kpi_list, name="employee_kpi_list"),
-    path(
-        "employee-kpi/<int:pk>/edit/", views.employee_kpi_edit, name="employee_kpi_edit"
-    ),
-    path(
-        "employee-kpi/<int:pk>/delete/",
-        views.employee_kpi_delete,
-        name="employee_kpi_delete",
-    ),
-    path(
-        "employee-kpi/<int:pk>/", views.employee_kpi_detail, name="employee_kpi_detail"
-    ),
+    path('assign-kpi/', views.assign_kpi, name='assign_kpi'),
+    path('employee-kpis/', views.employee_kpi_list, name='employee_kpi_list'),
+    path('employee-kpi/<int:pk>/edit/', views.employee_kpi_edit, name='employee_kpi_edit'),
+    path('employee-kpi/<int:pk>/delete/', views.employee_kpi_delete, name='employee_kpi_delete'),
+    path('employee-kpi/<int:pk>/', views.employee_kpi_detail, name='employee_kpi_detail'),
+
+    # for admin only
+    path('activity-logs/', views.activity_logs, name='activity_logs'),
 ]
