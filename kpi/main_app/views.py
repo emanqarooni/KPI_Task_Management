@@ -361,5 +361,98 @@ def manager_reports(request):
     }
     return render(request, "reports/manager_reports.html", context)
 
+# exporting pdfs from manager side
+@login_required
+@role_required(['manager'])
+def export_pdf(request):
+    dept = request.user.employeeprofile.department
 
+    # get filtered kpis same logic as manager_reports
+    kpis = EmployeeKpi.objects.filter(
+        employee__department=dept
+    ).select_related('employee__user', 'kpi').order_by('-id')
 
+    # apply filters
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        kpis = kpis.filter(
+            Q(employee__user__username__icontains=search_query) |
+            Q(employee__user__first_name__icontains=search_query) |
+            Q(employee__user__last_name__icontains=search_query)
+        )
+
+    kpi_filter = request.GET.get('kpi', '')
+    if kpi_filter:
+        kpis = kpis.filter(kpi__id=kpi_filter)
+
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+
+    if start_date:
+        kpis = kpis.filter(start_date__gte=start_date)
+    if end_date:
+        kpis = kpis.filter(end_date__lte=end_date)
+
+    # create PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename=KPI_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+
+    # create PDF document
+    doc = SimpleDocTemplate(response, pagesize=landscape(A4))
+    elements = []
+
+    # Styles
+    styles = getSampleStyleSheet()
+
+    # Title
+    title = Paragraph(
+        f"<b>KPI Performance Report</b><br/>{datetime.now().strftime('%B %d, %Y')}",
+        styles['Title']
+    )
+    elements.append(title)
+    elements.append(Spacer(1, 0.3*inch))
+
+    # table data
+    data = [['KPI', 'Employee', 'Target', 'Current', 'Progress', 'Status', 'Period']]
+
+    for kpi in kpis:
+        data.append([
+            kpi.kpi.title,
+            kpi.employee.user.username,
+            str(kpi.target_value),
+            str(kpi.total_progress()),
+            f"{kpi.progress_percentage()}%",
+            kpi.status(),
+            f"{kpi.start_date}\n - {kpi.end_date}"
+        ])
+
+    # Create table
+    table = Table(data, repeatRows=1)
+    table.setStyle(TableStyle([
+        # Header styling
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0F172A')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+
+        # Body styling
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 8),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+
+        # Alternating rows
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+    ]))
+
+    elements.append(table)
+
+    # Build PDF
+    doc.build(elements)
+
+    return response
