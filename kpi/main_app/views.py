@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponse
-from .models import EmployeeKpi, ProgressEntry, Kpi, EmployeeProfile, DEPARTMENT
+from .models import EmployeeKpi, ProgressEntry, Kpi, EmployeeProfile, DEPARTMENT, ActivityLog
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, UpdateView, View
@@ -19,6 +19,10 @@ from datetime import datetime
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 
+from .utils import log_activity
+from django.contrib.admin.views.decorators import staff_member_required
+
+
 # Employee dashboard'
 def dashboard(request):
     # return render(request, "dashboards/dashboard_home.html")
@@ -33,12 +37,18 @@ def dashboard(request):
 
 
 def admin_dashboard(request):
-    total_users = 8
-    total_employees = 5
+    from .models import ActivityLog
+
+    total_users = User.objects.count()
+    total_employees = EmployeeProfile.objects.filter(role="employee").count()
+
+    # Add recent activity logs
+    recent_logs = ActivityLog.objects.select_related('user', 'related_user')[:10]
 
     context = {
         "total_users": total_users,
         "total_employees": total_employees,
+        "recent_logs": recent_logs,
     }
     return render(request, "dashboards/admin_dashboard.html", context)
     # total_users = User.objects.count()
@@ -154,9 +164,16 @@ def add_progress(request):
                 messages.error(request, "This KPI is already complete. You cannot add more progress.")
                 return redirect('employee_kpi')
 
-            form.save()
-            messages.success(request, "Progress added successfully!")
 
+            progress = form.save()
+
+            log_activity(
+                user=request.user,
+                action='PROGRESS_ADDED',
+                description=f"Added progress for '{progress.employee_kpi.kpi.title}' - Value: {progress.value}",
+                related_user=None
+            )
+            messages.success(request, "Progress added successfully!")
             return redirect('employee_kpi')
 
     else:
@@ -199,7 +216,15 @@ def assign_kpi(request):
     )
     if request.method == "POST":
         if form.is_valid():
-            form.save()
+            kpi_assignment=form.save()
+
+            log_activity(
+                user=request.user,
+                action='KPI_ASSIGNED',
+                description=f"Assigned '{kpi_assignment.kpi.title}' to {kpi_assignment.employee.user.username} (Target: {kpi_assignment.target_value}, Weight: {kpi_assignment.weight}%)",
+                related_user=kpi_assignment.employee.user
+            )
+
             messages.success(request, "KPI assigned successfully.")
             return redirect("employee_kpi_list")
     return render(request, "main_app/assign_kpi.html", {"form": form})
@@ -285,7 +310,15 @@ def employee_kpi_edit(request, pk):
         user=(request.user if request.user.is_authenticated else None),
     )
     if request.method == "POST" and form.is_valid():
-        form.save()
+        kpi_assignment = form.save()
+
+        log_activity(
+            user=request.user,
+            action='KPI_UPDATED',
+            description=f"Updated KPI '{kpi_assignment.kpi.title}' for {kpi_assignment.employee.user.username}",
+            related_user=kpi_assignment.employee.user
+        )
+
         messages.success(request, "KPI updated successfully.")
         return redirect("employee_kpi_list")
 
@@ -302,6 +335,17 @@ def employee_kpi_delete(request, pk):
         return redirect("employee_kpi_list")
 
     if request.method == "POST":
+        employee_name = kpi_assign.employee.user.username
+        kpi_title = kpi_assign.kpi.title
+        related_user = kpi_assign.employee.user
+
+        log_activity(
+            user=request.user,
+            action='KPI_DELETED',
+            description=f"Deleted KPI assignment '{kpi_title}' from {employee_name}",
+            related_user=related_user
+        )
+
         kpi_assign.delete()
         messages.success(request, "KPI assignment deleted.")
         return redirect("employee_kpi_list")
@@ -838,3 +882,39 @@ def admin_export_excel(request):
 
     wb.save(response)
     return response
+
+@role_required(['admin'])
+def activity_logs(request):
+    # get url values form filter form
+    selected_action = request.GET.get('action', '')
+    selected_user = request.GET.get('user', '')
+
+    all_logs = ActivityLog.objects.all()
+    all_logs = all_logs.select_related('user', 'related_user')
+
+
+    if selected_action:
+        all_logs = all_logs.filter(action=selected_action)
+
+    if selected_user:
+        all_logs = all_logs.filter(user__username=selected_user)
+
+    recent_logs = all_logs[:50]
+
+    action_choices = ActivityLog.ACTION_CHOICES
+
+    users_with_logs = User.objects.filter(activity_logs__isnull=False)
+    users_with_logs = users_with_logs.select_related('employeeprofile')
+    users_with_logs = users_with_logs.distinct()
+    users_with_logs = users_with_logs.order_by('username')
+
+
+
+    template_data = {
+        'logs': recent_logs,
+        'available_actions': action_choices,
+        'active_users': users_with_logs,
+        'current_action_filter': selected_action,
+        'current_user_filter': selected_user,
+    }
+    return render(request, 'activity/admin_logs.html', template_data)

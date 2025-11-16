@@ -11,8 +11,8 @@
 
   <body>
     <div class="flex">
-      <!-- Sidebar -->
-      <aside id="sidebar" class="sidebar-purple sidebar-collapsed min-h-screen flex flex-col items-center py-6 fixed lg:relative z-50">
+      <!-- Sidebar - FIXED CLASSES -->
+      <aside id="sidebar" class="sidebar-purple sidebar-collapsed min-h-screen flex flex-col items-center py-6">
         <!-- Hamburger Menu Toggle -->
         <button id="sidebar-toggle" class="btn btn-ghost btn-square text-white hover:bg-white/20 mb-6">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,6 +51,13 @@
           </svg>
           <span class="sidebar-text ml-3 text-lg">Reports</span>
         </a>
+
+        <a href="{% url 'activity_logs' %}" class="btn btn-ghost hover:bg-white/20 mb-4 text-white flex items-center justify-start w-full px-4" title="Activity Logs">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span class="sidebar-text ml-3 text-lg">Activity Logs</span>
+        </a>
         {% endif %}
 
         <!-- Manager Section -->
@@ -87,8 +94,11 @@
         {% endif %}
       </aside>
 
-      <!-- Main Content Wrapper -->
-      <div class="flex-1 flex flex-col ml-16 lg:ml-0" id="main-content">
+      <!-- Backdrop overlay for mobile - ADDED -->
+      <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+      <!-- Main Content Wrapper - REMOVED ml-16 lg:ml-0 -->
+      <div class="flex-1 flex flex-col" id="main-content">
         <!-- Top Navbar -->
         <header class="navbar bg-base-100 border-b border-base-300">
           <!-- Brand/Title -->
@@ -169,25 +179,35 @@
     </div>
 
     <script>
-      // Sidebar toggle functionality
       document.addEventListener('DOMContentLoaded', () => {
         const sidebar = document.getElementById('sidebar')
         const sidebarToggle = document.getElementById('sidebar-toggle')
         const mainContent = document.getElementById('main-content')
+        const backdrop = document.getElementById('sidebar-backdrop')
 
-        sidebarToggle.addEventListener('click', () => {
+        // Toggle sidebar
+        sidebarToggle.addEventListener('click', (e) => {
+          e.stopPropagation()
           sidebar.classList.toggle('sidebar-collapsed')
           sidebar.classList.toggle('sidebar-expanded')
+          backdrop.classList.toggle('active')
+        })
 
-          // Adjust main content margin
-          if (sidebar.classList.contains('sidebar-expanded')) {
-            mainContent.classList.remove('ml-16')
-            mainContent.classList.add('ml-64')
-          } else {
-            mainContent.classList.remove('ml-64')
-            mainContent.classList.add('ml-16')
+        // Close sidebar when clicking backdrop
+        backdrop.addEventListener('click', () => {
+          sidebar.classList.remove('sidebar-expanded')
+          sidebar.classList.add('sidebar-collapsed')
+          backdrop.classList.remove('active')
+        })
+
+        // Close sidebar on escape key
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && sidebar.classList.contains('sidebar-expanded')) {
+            sidebar.classList.remove('sidebar-expanded')
+            sidebar.classList.add('sidebar-collapsed')
+            backdrop.classList.remove('active')
           }
-        });
+        })
 
         // Add active state to current page
         const currentPath = window.location.pathname
