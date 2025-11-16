@@ -14,19 +14,19 @@
       <h2 class="text-xl font-semibold mb-4">Filter and Search</h2>
 
       <form method="get" class="space-y-4">
-        <!-- Search and Filters Row -->
+        <!-- Search and Filters Row 1 -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <!-- Search Employee -->
           <div class="form-control w-full">
             <label class="label">
-              <span class="label-text font-semibold">Search Employee</span>
+              <span class="label-text font-semibold">Search Employee/Manager</span>
             </label>
             <div class="relative">
               <input
                 type="text"
                 name="search"
                 value="{{ search_query }}"
-                placeholder="Search employee..."
+                placeholder="Search employee or manager..."
                 class="input input-bordered w-full pr-10"
               />
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 absolute right-3 top-3.5 text-base-content/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -65,27 +65,46 @@
             </select>
           </div>
 
-          <!-- Date Range -->
+          <!-- Status Filter -->
           <div class="form-control w-full">
             <label class="label">
-              <span class="label-text font-semibold">Date Range</span>
+              <span class="label-text font-semibold">Status</span>
             </label>
-            <div class="flex gap-2">
-              <input
-                type="date"
-                name="start_date"
-                value="{{ start_date }}"
-                class="input input-bordered w-full"
-                placeholder="Start"
-              />
-              <input
-                type="date"
-                name="end_date"
-                value="{{ end_date }}"
-                class="input input-bordered w-full"
-                placeholder="End"
-              />
-            </div>
+            <select name="status" class="select select-bordered w-full">
+              <option value="">All Status</option>
+              <option value="complete" {% if status_filter == 'complete' %}selected{% endif %}>Complete</option>
+              <option value="in_progress" {% if status_filter == 'in_progress' %}selected{% endif %}>In Progress</option>
+              <option value="no_progress" {% if status_filter == 'no_progress' %}selected{% endif %}>No Progress</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Date Range Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Start Date -->
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text font-semibold">Start Date</span>
+            </label>
+            <input
+              type="date"
+              name="start_date"
+              value="{{ start_date }}"
+              class="input input-bordered w-full"
+            />
+          </div>
+
+          <!-- End Date -->
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text font-semibold">End Date</span>
+            </label>
+            <input
+              type="date"
+              name="end_date"
+              value="{{ end_date }}"
+              class="input input-bordered w-full"
+            />
           </div>
         </div>
 
@@ -116,7 +135,7 @@
       </svg>
       Export Excel
     </a>
-    <a href="" class="btn btn-primary btn-ghost">
+    <a href="" class="btn btn-outline btn-primary">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
       </svg>
@@ -128,19 +147,20 @@
   <div class="card bg-base-100 shadow-xl">
     <div class="card-body p-0">
       <div class="overflow-x-auto">
-        <table class="table table-zebra w-full">
+        <table class="table w-full">
           <!-- Table Header -->
           <thead>
-            <tr class="kpi-table-header">
-              <th>KPI</th>
-              <th>Employee</th>
-              <th>Department</th>
-              <th>Target</th>
-              <th>Current Value</th>
-              <th>Progress</th>
-              <th>Weight</th>
-              <th>Status</th>
-              <th>Period</th>
+            <tr class="bg-base-300">
+              <th class="bg-base-300">KPI</th>
+              <th class="bg-base-300">Employee</th>
+              <th class="bg-base-300">Manager</th>
+              <th class="bg-base-300">Department</th>
+              <th class="bg-base-300">Target</th>
+              <th class="bg-base-300">Current</th>
+              <th class="bg-base-300">Progress</th>
+              <th class="bg-base-300">Weight</th>
+              <th class="bg-base-300">Status</th>
+              <th class="bg-base-300">Period</th>
             </tr>
           </thead>
 
@@ -152,20 +172,25 @@
                 <div class="font-medium">{{ k.kpi.title }}</div>
               </td>
               <td>
-                <div class="flex items-center gap-3">
-                  <div class="avatar placeholder">
-                    <div class="bg-primary text-primary-content rounded-full w-10">
-                      <span class="text-sm">{{ k.employee.user.username|slice:":2"|upper }}</span>
-                    </div>
-                  </div>
-                  <div>
-                    <div class="font-semibold">{{ k.employee.user.username }}</div>
-                    <div class="text-xs text-base-content/50">{{ k.employee.job_role }}</div>
-                  </div>
+                <div>
+                  <div class="font-semibold">{{ k.employee.user.first_name }} {{ k.employee.user.last_name }}</div>
+                  <div class="text-xs text-base-content/50">{{ k.employee.job_role }}</div>
                 </div>
               </td>
               <td>
-                <span class="badge badge-secondary">{{ k.employee.get_department_display }}</span>
+                {% if k.employee.manager %}
+                  <div class="flex items-center gap-2">
+                    <div>
+                      <div class="font-semibold">{{ k.employee.manager.first_name }} {{ k.employee.manager.last_name }}</div>
+                      <div class="text-xs text-base-content/50">{{ k.employee.manager.employeeprofile.job_role }}</div>
+                    </div>
+                  </div>
+                {% else %}
+                  <span class="text-sm text-base-content/50 italic">No Manager</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge badge-secondary badge-sm">{{ k.employee.get_department_display }}</span>
               </td>
               <td>
                 <span class="font-mono text-sm">{{ k.target_value }}</span>
@@ -180,21 +205,27 @@
                 </div>
               </td>
               <td>
-                <div class="badge badge-accent">{{ k.weight }}%</div>
+                <div class="badge badge-accent badge-sm">{{ k.weight }}%</div>
               </td>
               <td>
-                <span class="badge kpi-status-{{ k.status|lower|cut:' ' }}">{{ k.status }}</span>
+                {% if k.status == 'Complete' %}
+                  <span class="badge badge-success badge-sm">Complete</span>
+                {% elif k.status == 'In Progress' %}
+                  <span class="badge badge-warning badge-sm">In Progress</span>
+                {% else %}
+                  <span class="badge badge-ghost badge-sm">No Progress</span>
+                {% endif %}
               </td>
               <td>
                 <div class="text-sm">
-                  <div>{{ k.start_date }}</div>
-                  <div class="text-base-content/50">→ {{ k.end_date }}</div>
+                  <div>{{ k.start_date|date:"M d, Y" }}</div>
+                  <div class="text-base-content/50">→ {{ k.end_date|date:"M d, Y" }}</div>
                 </div>
               </td>
             </tr>
             {% empty %}
             <tr>
-              <td colspan="9" class="text-center py-12">
+              <td colspan="10" class="text-center py-12">
                 <div class="flex flex-col items-center gap-4">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-base-content/30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -212,3 +243,5 @@
       </div>
     </div>
   </div>
+</div>
+{% endblock %}

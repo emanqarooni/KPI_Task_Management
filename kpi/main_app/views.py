@@ -374,7 +374,7 @@ def manager_reports(request):
 @role_required(['admin'])
 def admin_reports(request):
     # get all kpis across all departments
-    kpis = EmployeeKpi.objects.select_related('employee__user', 'kpi', 'employee').order_by('-id')
+    kpis = EmployeeKpi.objects.select_related('employee__user', 'kpi', 'employee', 'employee__manager','employee__manager__employeeprofile').order_by('-id')
 
     # apply filters from get parameters
     search_query = request.GET.get('search', '').strip()
@@ -382,7 +382,10 @@ def admin_reports(request):
         kpis = kpis.filter(
             Q(employee__user__username__icontains=search_query) |
             Q(employee__user__first_name__icontains=search_query) |
-            Q(employee__user__last_name__icontains=search_query)
+            Q(employee__user__last_name__icontains=search_query) |
+            Q(employee__manager__username__icontains=search_query) |
+            Q(employee__manager__first_name__icontains=search_query) |
+            Q(employee__manager__last_name__icontains=search_query)
         )
 
     # dept filterations
