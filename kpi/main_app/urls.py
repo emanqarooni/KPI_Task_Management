@@ -29,4 +29,5 @@ urlpatterns = [
     path('reports/', views.manager_reports, name='reports'),
     path('reports/export-pdf/', views.export_pdf, name='export_pdf'),
     path('reports/export-excel/', views.export_excel, name='export_excel'),
+    path('admin-reports/', views.admin_reports, name='admin_reports'),
 ]

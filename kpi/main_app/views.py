@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponse
-from .models import EmployeeKpi, ProgressEntry, Kpi, EmployeeProfile
+from .models import EmployeeKpi, ProgressEntry, Kpi, EmployeeProfile, DEPARTMENT
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, UpdateView, View
@@ -368,6 +368,56 @@ def manager_reports(request):
         'end_date': end_date,
     }
     return render(request, "reports/manager_reports.html", context)
+
+# admin reports view with filtering across all departments
+@login_required
+@role_required(['admin'])
+def admin_reports(request):
+    # get all kpis across all departments
+    kpis = EmployeeKpi.objects.select_related('employee__user', 'kpi', 'employee').order_by('-id')
+
+    # apply filters from get parameters
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        kpis = kpis.filter(
+            Q(employee__user__username__icontains=search_query) |
+            Q(employee__user__first_name__icontains=search_query) |
+            Q(employee__user__last_name__icontains=search_query)
+        )
+
+    # dept filterations
+    department_filter = request.GET.get('department', '')
+    if department_filter:
+        kpis = kpis.filter(employee__department=department_filter)
+
+    kpi_filter = request.GET.get('kpi', '')
+    if kpi_filter:
+        kpis = kpis.filter(kpi__id=kpi_filter)
+
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+
+    if start_date:
+        kpis = kpis.filter(start_date__gte=start_date)
+    if end_date:
+        kpis = kpis.filter(end_date__lte=end_date)
+
+    # get all kpis for the filter dropdown (all departments)
+    all_kpis = Kpi.objects.all()
+
+    # get all departments for filter
+    all_departments = DEPARTMENT
+    context = {
+        'kpis': kpis,
+        'all_kpis': all_kpis,
+        'all_departments': all_departments,
+        'search_query': search_query,
+        'kpi_filter': kpi_filter,
+        'department_filter': department_filter,
+        'start_date': start_date,
+        'end_date': end_date,
+    }
+    return render(request, "reports/admin_reports.html", context)
 
 # exporting pdfs from manager side
 @login_required
