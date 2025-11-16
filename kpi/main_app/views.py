@@ -17,7 +17,7 @@ from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from datetime import datetime
 from openpyxl import Workbook
-from openpyxl import Font, Alignment, PatternFill
+from openpyxl.styles import Font, Alignment, PatternFill
 
 # Employee dashboard'
 def dashboard(request):
@@ -464,3 +464,105 @@ def export_pdf(request):
     doc.build(elements)
 
     return response
+
+# exporting excel from manager side
+@login_required
+@role_required(['manager'])
+def export_excel(request):
+    dept = request.user.employeeprofile.department
+
+    # get filtered kpis same logic as manager_reports
+    kpis = EmployeeKpi.objects.filter(
+        employee__department=dept
+    ).select_related('employee__user', 'kpi').order_by('-id')
+
+    # apply filters from get parameter
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        kpis = kpis.filter(
+            Q(employee__user__username__icontains=search_query) |
+            Q(employee__user__first_name__icontains=search_query) |
+            Q(employee__user__last_name__icontains=search_query)
+        )
+
+    kpi_filter = request.GET.get('kpi', '')
+    if kpi_filter:
+        kpis = kpis.filter(kpi__id=kpi_filter)
+
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+
+    if start_date:
+        kpis = kpis.filter(start_date__gte=start_date)
+    if end_date:
+        kpis = kpis.filter(end_date__lte=end_date)
+
+    # createing workbook
+    wb = Workbook()
+
+    # select the active sheet
+    sheet = wb.active
+    sheet.title = "KPI Report"
+
+    # header styling
+    header_fill = PatternFill(start_color="0F172A", end_color="0F172A", fill_type="solid")
+    header_font = Font(color="FFFFFF", bold=True, size=12)
+
+    # title
+    sheet.merge_cells('A1:G1')
+    title_cell = sheet['A1']
+    title_cell.value = f"KPI Performance Report - {datetime.now().strftime('%Y-%m-%d')}"
+    title_cell.font = Font(bold=True, size=14)
+    title_cell.alignment = Alignment(horizontal='center')
+
+    # headers
+    headers = ['KPI', 'Employee', 'Target', 'Current Value', 'Progress %', 'Status', 'Period']
+    for col_num, header in enumerate(headers, 1):
+        cell = sheet.cell(row=3, column=col_num)
+        cell.value = header
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal='center')
+
+    # data
+    for row_num, kpi in enumerate(kpis, 4):
+        sheet.cell(row=row_num, column=1).value = kpi.kpi.title
+        sheet.cell(row=row_num, column=2).value = kpi.employee.user.username
+        sheet.cell(row=row_num, column=3).value = kpi.target_value
+        sheet.cell(row=row_num, column=4).value = kpi.total_progress()
+        sheet.cell(row=row_num, column=5).value = f"{kpi.progress_percentage()}%"
+        sheet.cell(row=row_num, column=6).value = kpi.status()
+        sheet.cell(row=row_num, column=7).value = f"{kpi.start_date} → {kpi.end_date}"
+
+    # auto-adjust column widths
+    for column_cells in sheet.columns:
+        max_length = 0
+        column_letter = None
+
+        for cell in column_cells:
+            # skip merged cells
+            if hasattr(cell, 'column_letter'):
+                if column_letter is None:
+                    column_letter = cell.column_letter
+                try:
+                    if cell.value:
+                        cell_length = len(str(cell.value))
+                        if cell_length > max_length:
+                            max_length = cell_length
+                except:
+                    pass
+
+        if column_letter and max_length > 0:
+            adjusted_width = min(max_length + 2, 50)  # here capping at 50 to avoid overly wide columns
+            sheet.column_dimensions[column_letter].width = adjusted_width
+
+    # prepare response
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename=KPI_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+
+    wb.save(response)
+    return response
+
+
