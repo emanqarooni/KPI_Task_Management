@@ -1,1 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    h1 { color: #0F172A; border-bottom: 3px solid #0F172A; padding-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th { background-color: #0F172A; color: white; padding: 12px; text-align: left; }
+    td { padding: 10px; border-bottom: 1px solid #ddd; }
+    tr:nth-child(even) { background-color: #f9fafb; }
+    .badge {
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .status-complete { background-color: #3B82F6; color: white; }
+    .status-inprogress { background-color: #10B981; color: white; }
+    .status-noprogress { background-color: #F59E0B; color: white; }
+  </style>
+</head>
+<body>
+  <h1>KPI Performance Report</h1>
+  <p>Generated: {{ date|date:"F d, Y" }}</p>
 
+  <table>
+    <thead>
+      <tr>
+        <th>KPI</th>
+        <th>Employee</th>
+        <th>Target</th>
+        <th>Current</th>
+        <th>Progress</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for kpi in kpis %}
+      <tr>
+        <td>{{ kpi.kpi.title }}</td>
+        <td>{{ kpi.employee.user.username }}</td>
+        <td>{{ kpi.target_value }}</td>
+        <td>{{ kpi.total_progress }}</td>
+        <td>{{ kpi.progress_percentage }}%</td>
+        <td>
+          <span class="badge status-{{ kpi.status|lower|cut:' ' }}">
+            {{ kpi.status }}
+          </span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
