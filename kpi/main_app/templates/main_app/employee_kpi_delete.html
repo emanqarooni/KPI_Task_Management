@@ -1,12 +1,129 @@
 {% extends 'base.html' %}
+
 {% block content %}
-<h2>Confirm Delete</h2>
+<div class="max-w-2xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-3 mb-2">
+      <a href="{% url 'employee_kpi_list' %}" class="btn btn-ghost btn-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </a>
+      <div>
+        <h1 class="text-3xl font-bold text-base-content">Confirm Delete</h1>
+        <p class="text-base-content/70">This action cannot be undone</p>
+      </div>
+    </div>
+  </div>
 
-<p>Delete KPI for <strong>{{ kpi.employee.user.username }} - {{ kpi.kpi.title }}</strong>?</p>
+  <!-- Warning Alert -->
+  <div class="alert alert-warning shadow-lg mb-6">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+    <div>
+      <h3 class="font-bold">Warning: Permanent Deletion</h3>
+      <div class="text-sm">Once deleted, this KPI assignment cannot be recovered. Please confirm your action.</div>
+    </div>
+  </div>
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Yes, Delete</button>
-    <a href="{% url 'employee_kpi_list' %}">Cancel</a>
-</form>
+  <!-- Delete Confirmation Card -->
+  <div class="card bg-base-100 shadow-xl border-2 border-error/20">
+    <div class="card-body">
+      <div class="flex items-start gap-4 mb-6">
+        <div class="bg-error/10 p-4 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </div>
+        <div class="flex-1">
+          <h2 class="text-xl font-bold mb-2">Delete KPI Assignment</h2>
+          <p class="text-base-content/70">
+            Are you sure you want to delete the KPI assignment for:
+          </p>
+        </div>
+      </div>
+
+      <!-- KPI Details to be Deleted -->
+      <div class="bg-base-200 rounded-lg p-6 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-xs text-base-content/70 mb-1">Employee</p>
+            <div class="flex items-center gap-2">
+              <div class="avatar placeholder">
+                <div class="bg-error text-error-content rounded-full w-8">
+                  <span class="text-xs">{{ kpi.employee.user.username|slice:":2"|upper }}</span>
+                </div>
+              </div>
+              <p class="font-semibold">{{ kpi.employee.user.username }}</p>
+            </div>
+          </div>
+
+          <div>
+            <p class="text-xs text-base-content/70 mb-1">KPI Title</p>
+            <p class="font-semibold">{{ kpi.kpi.title }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs text-base-content/70 mb-1">Target Value</p>
+            <p class="font-semibold">{{ kpi.target_value }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs text-base-content/70 mb-1">Weight</p>
+            <p class="font-semibold">{{ kpi.weight }}%</p>
+          </div>
+
+          <div>
+            <p class="text-xs text-base-content/70 mb-1">Start Date</p>
+            <p class="font-semibold">{{ kpi.start_date }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs text-base-content/70 mb-1">End Date</p>
+            <p class="font-semibold">{{ kpi.end_date }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Confirmation Form -->
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+
+        <div class="divider"></div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-3 justify-between">
+          <a href="{% url 'employee_kpi_list' %}" class="btn btn-ghost order-2 sm:order-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Cancel
+          </a>
+
+          <button type="submit" class="btn btn-error order-1 sm:order-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Yes, Delete Permanently
+          </button>
+        </div>
+      </form>
+
+      <!-- Additional Info -->
+      <div class="mt-6 p-4 bg-info/10 rounded-lg">
+        <div class="flex gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-info flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div class="text-sm text-info">
+            <p class="font-semibold mb-1">Note:</p>
+            <p>This KPI can only be deleted if there are no progress entries associated with it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

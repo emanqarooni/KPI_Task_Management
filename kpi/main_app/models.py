@@ -106,7 +106,7 @@ class EmployeeKpi(models.Model):
         if self.target_value == 0:
             return 0
         percentage = (total / self.target_value) * 100
-        return round(percentage)
+        return int(round(percentage))
 
     # func for status: so if the total entries is 0 then no progress, and if the total entires is more than zero then and if the target value reach the total then the status will be complete
     def status(self):
