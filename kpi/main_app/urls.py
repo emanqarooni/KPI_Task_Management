@@ -26,4 +26,5 @@ urlpatterns = [
 
     # reports urls for admin and manager portal
     path('reports/', views.manager_reports, name='reports'),
+    path('reports/export-pdf/', views.export_pdf, name='export_pdf'),
 ]
