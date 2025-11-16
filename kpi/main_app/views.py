@@ -883,6 +883,7 @@ def admin_export_excel(request):
     wb.save(response)
     return response
 
+@login_required
 @role_required(['admin'])
 def activity_logs(request):
     # get url values form filter form
