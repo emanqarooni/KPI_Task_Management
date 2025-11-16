@@ -619,3 +619,222 @@ def export_excel(request):
     return response
 
 
+# Admin export to PDF
+@login_required
+@role_required(['admin'])
+def admin_export_pdf(request):
+    # get filtered kpis - same logic as admin_reports
+    kpis = EmployeeKpi.objects.select_related(
+        'employee__user',
+        'kpi',
+        'employee__manager'
+    ).order_by('-id')
+
+    # apply filters
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        kpis = kpis.filter(
+            Q(employee__user__username__icontains=search_query) |
+            Q(employee__user__first_name__icontains=search_query) |
+            Q(employee__user__last_name__icontains=search_query) |
+            Q(employee__manager__username__icontains=search_query) |
+            Q(employee__manager__first_name__icontains=search_query) |
+            Q(employee__manager__last_name__icontains=search_query)
+        )
+
+    department_filter = request.GET.get('department', '')
+    if department_filter:
+        kpis = kpis.filter(employee__department=department_filter)
+
+    kpi_filter = request.GET.get('kpi', '')
+    if kpi_filter:
+        kpis = kpis.filter(kpi__id=kpi_filter)
+
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+
+    if start_date:
+        kpis = kpis.filter(start_date__gte=start_date)
+    if end_date:
+        kpis = kpis.filter(end_date__lte=end_date)
+
+    # create PDF
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename=Admin_KPI_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+
+    # create PDF document
+    doc = SimpleDocTemplate(response, pagesize=landscape(A4))
+    elements = []
+
+    # Styles
+    styles = getSampleStyleSheet()
+
+    # Title
+    title = Paragraph(
+        f"<b>Admin KPI Performance Report</b><br/>{datetime.now().strftime('%B %d, %Y')}",
+        styles['Title']
+    )
+    elements.append(title)
+    elements.append(Spacer(1, 0.3*inch))
+
+    # table data
+    data = [['KPI', 'Employee', 'Manager', 'Dept', 'Target', 'Current', 'Progress', 'Status', 'Period']]
+
+    for kpi in kpis:
+        manager_name = f"{kpi.employee.manager.first_name} {kpi.employee.manager.last_name}" if kpi.employee.manager else 'N/A'
+        employee_name = f"{kpi.employee.user.first_name} {kpi.employee.user.last_name}"
+        data.append([
+            kpi.kpi.title[:20],
+            employee_name,
+            manager_name,
+            kpi.employee.get_department_display()[:35],
+            str(kpi.target_value),
+            str(kpi.total_progress()),
+            f"{kpi.progress_percentage()}%",
+            kpi.status(),
+            f"{kpi.start_date}\n{kpi.end_date}"
+        ])
+
+    # Create table
+    table = Table(data, repeatRows=1)
+    table.setStyle(TableStyle([
+        # Header styling
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0F172A')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 9),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+
+        # Body styling
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 7),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+
+        # Alternating rows
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+    ]))
+
+    elements.append(table)
+
+    # Build PDF
+    doc.build(elements)
+
+    return response
+
+
+# Admin export to Excel
+@login_required
+@role_required(['admin'])
+def admin_export_excel(request):
+    # get filtered kpis - same logic as admin_reports
+    kpis = EmployeeKpi.objects.select_related(
+        'employee__user',
+        'kpi',
+        'employee__manager'
+    ).order_by('-id')
+
+    # apply filters from get parameter
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        kpis = kpis.filter(
+            Q(employee__user__username__icontains=search_query) |
+            Q(employee__user__first_name__icontains=search_query) |
+            Q(employee__user__last_name__icontains=search_query) |
+            Q(employee__manager__username__icontains=search_query) |
+            Q(employee__manager__first_name__icontains=search_query) |
+            Q(employee__manager__last_name__icontains=search_query)
+        )
+
+    department_filter = request.GET.get('department', '')
+    if department_filter:
+        kpis = kpis.filter(employee__department=department_filter)
+
+    kpi_filter = request.GET.get('kpi', '')
+    if kpi_filter:
+        kpis = kpis.filter(kpi__id=kpi_filter)
+
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+
+    if start_date:
+        kpis = kpis.filter(start_date__gte=start_date)
+    if end_date:
+        kpis = kpis.filter(end_date__lte=end_date)
+
+    # creating workbook
+    wb = Workbook()
+
+    # select the active sheet
+    sheet = wb.active
+    sheet.title = "Admin KPI Report"
+
+    # header styling
+    header_fill = PatternFill(start_color="0F172A", end_color="0F172A", fill_type="solid")
+    header_font = Font(color="FFFFFF", bold=True, size=12)
+
+    # title
+    sheet.merge_cells('A1:J1')
+    title_cell = sheet['A1']
+    title_cell.value = f"Admin KPI Performance Report - {datetime.now().strftime('%Y-%m-%d')}"
+    title_cell.font = Font(bold=True, size=14)
+    title_cell.alignment = Alignment(horizontal='center')
+
+    # headers
+    headers = ['KPI', 'Employee', 'Manager', 'Department', 'Target', 'Current Value', 'Progress %', 'Weight %', 'Status', 'Period']
+    for col_num, header in enumerate(headers, 1):
+        cell = sheet.cell(row=3, column=col_num)
+        cell.value = header
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal='center')
+
+    # data
+    for row_num, kpi in enumerate(kpis, 4):
+        manager_name = f"{kpi.employee.manager.first_name} {kpi.employee.manager.last_name}" if kpi.employee.manager else 'No Manager'
+        employee_name = f"{kpi.employee.user.first_name} {kpi.employee.user.last_name}"
+
+        sheet.cell(row=row_num, column=1).value = kpi.kpi.title
+        sheet.cell(row=row_num, column=2).value = employee_name
+        sheet.cell(row=row_num, column=3).value = manager_name
+        sheet.cell(row=row_num, column=4).value = kpi.employee.get_department_display()
+        sheet.cell(row=row_num, column=5).value = kpi.target_value
+        sheet.cell(row=row_num, column=6).value = kpi.total_progress()
+        sheet.cell(row=row_num, column=7).value = f"{kpi.progress_percentage()}%"
+        sheet.cell(row=row_num, column=8).value = f"{kpi.weight}%"
+        sheet.cell(row=row_num, column=9).value = kpi.status()
+        sheet.cell(row=row_num, column=10).value = f"{kpi.start_date} → {kpi.end_date}"
+
+    # auto-adjust column widths
+    for column_cells in sheet.columns:
+        max_length = 0
+        column_letter = None
+
+        for cell in column_cells:
+            if hasattr(cell, 'column_letter'):
+                if column_letter is None:
+                    column_letter = cell.column_letter
+                try:
+                    if cell.value:
+                        cell_length = len(str(cell.value))
+                        if cell_length > max_length:
+                            max_length = cell_length
+                except:
+                    pass
+
+        if column_letter and max_length > 0:
+            adjusted_width = min(max_length + 2, 50)
+            sheet.column_dimensions[column_letter].width = adjusted_width
+
+    # prepare response
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename=Admin_KPI_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+
+    wb.save(response)
+    return response
