@@ -479,7 +479,7 @@ def export_pdf(request):
     for kpi in kpis:
         data.append([
             kpi.kpi.title,
-            kpi.employee.user.username,
+            kpi.employee.user.first_name + " " + kpi.employee.user.last_name,
             str(kpi.target_value),
             str(kpi.total_progress()),
             f"{kpi.progress_percentage()}%",
@@ -580,7 +580,7 @@ def export_excel(request):
     # data
     for row_num, kpi in enumerate(kpis, 4):
         sheet.cell(row=row_num, column=1).value = kpi.kpi.title
-        sheet.cell(row=row_num, column=2).value = kpi.employee.user.username
+        sheet.cell(row=row_num, column=2).value = kpi.employee.user.first_name + " " + kpi.employee.user.last_name
         sheet.cell(row=row_num, column=3).value = kpi.target_value
         sheet.cell(row=row_num, column=4).value = kpi.total_progress()
         sheet.cell(row=row_num, column=5).value = f"{kpi.progress_percentage()}%"
