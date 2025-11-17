@@ -4,6 +4,7 @@
 
 <div class="dashboard-container">
 
+  <!-- Sidebar -->
   <div class="sidebar">
     <h3>Company</h3>
     <ul>
@@ -13,9 +14,11 @@
     </ul>
   </div>
 
+  <!-- Content -->
   <div class="dashboard-content">
 
     <h2>Manager Dashboard</h2>
+
     <p>Manager: {{ manager_name }}</p>
     <p>Department: {{ department }}</p>
     <p>Total Employees: {{ employees_count }}</p>
@@ -45,10 +48,13 @@
 </div>
 
 <script>
-const managerData = {{ employee_rows|safe }};
+const managerLabels = [
+{% for row in employee_rows %}"{{ row.name }}",{% endfor %}
+];
 
-const managerLabels = managerData.map(item => item.name);
-const managerValues = managerData.map(item => item.completion);
+const managerValues = [
+{% for row in employee_rows %}{{ row.completion }},{% endfor %}
+];
 
 new Chart(document.getElementById("managerChart"), {
     type: "bar",
