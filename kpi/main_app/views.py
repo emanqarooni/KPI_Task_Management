@@ -1065,6 +1065,14 @@ def notifications(request):
     }
     return render(request, 'notifications/notifications.html', context)
 
+@login_required
+def mark_notification_read(request, notification_id):
+    # marking a single notification as read
+    notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+    notification.is_read = True
+    notification.save()
+    return redirect('notifications')
+
 ## AI feature for Manager View
 @login_required
 @role_required(["manager"])
