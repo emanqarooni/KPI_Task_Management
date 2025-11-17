@@ -33,6 +33,7 @@ class EmployeeProfile(models.Model):
         max_length=2, choices=DEPARTMENT, default=DEPARTMENT[0][0]
     )
     image = models.ImageField(upload_to="profile_images/", blank=True, null=True)
+
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="employee")
 
     manager = models.ForeignKey(
@@ -42,6 +43,12 @@ class EmployeeProfile(models.Model):
         blank=True,
         related_name="managed_employees",
     )
+
+    def save(self, *args, **kwargs):
+        # automatically assign admin role to superusers
+        if self.user.is_superuser:
+            self.role = "admin"
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user.username} - {self.job_role}"
@@ -92,23 +99,23 @@ class EmployeeKpi(models.Model):
     def progress_count(self):
         return self.progressentry_set.count()
 
-
     # func to calculate and return the percentage of completion
     def progress_percentage(self):
         total = self.total_progress()
         if self.target_value == 0:
             return 0
         percentage = (total / self.target_value) * 100
-        return round(percentage)
+        return int(round(percentage))
 
     # func for status: so if the total entries is 0 then no progress, and if the total entires is more than zero then and if the target value reach the total then the status will be complete
     def status(self):
         total = self.total_progress()
         if total == 0:
             return "No Progress"
-        if total == self.target_value:
+        elif total == self.target_value:
             return "Complete"
-        return "In Progress"
+        else:
+            return "In Progress"
 
 
 class ProgressEntry(models.Model):
@@ -117,7 +124,40 @@ class ProgressEntry(models.Model):
     note = models.TextField(max_length=250)
     date = models.DateField()
 
-
-
     def __str__(self):
         return f"{self.employee_kpi.employee.user.username} - {self.value}"
+
+
+class ActivityLog(models.Model):
+    ACTION_CHOICES = [
+        ("PROGRESS_ADDED", "Added Progress"),
+        ("KPI_ASSIGNED", "Assigned KPI"),
+        ("KPI_UPDATED", "Updated KPI Assignment"),
+        ("KPI_DELETED", "Deleted KPI Assignment"),
+    ]
+
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, related_name="activity_logs"
+    )
+    
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    description = models.TextField()
+
+    related_user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="related_activities",
+        help_text="Employee affected by the action"
+    )
+
+
+    class Meta:
+        ordering = ["-timestamp"]
+        verbose_name = "Activity Log"
+        verbose_name_plural = "Activity Logs"
+
+    def __str__(self):
+        return f"{self.user.username if self.user else 'Unknown'} - {self.get_action_display()} - {self.timestamp.strftime('%Y-%m-%d %H:%M')}"

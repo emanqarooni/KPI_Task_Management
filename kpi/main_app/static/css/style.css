@@ -1,168 +1,665 @@
-/* .dashboard-container {
-  display: flex;
-  min-height: 80vh;
-  font-family: Arial, sans-serif;
-} */
+/* ===================================
+   KPI Dashboard Custom Styles
+   =================================== */
 
-/* Sidebar */
-/* .sidebar {
-  width: 220px;
-  background-color: #ce3f7f;
-  color: white;
-  padding: 20px;
-} */
+/* Sidebar Styles */
+.sidebar-purple {
+  background-color: #0F172A;
+  transition: all 0.3s ease;
+  overflow-x: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 50;
+}
 
-/* .sidebar h3 {
-  font-size: 16px;
-  margin-bottom: 20px;
-} */
+.sidebar-collapsed {
+  width: 4rem; /* 64px - Shows only icons */
+}
 
-/* .sidebar ul {
+.sidebar-expanded {
+  width: 16rem; /* 256px - Shows icons + text */
+}
+
+/* Sidebar Text Animation */
+.sidebar-text {
+  opacity: 0;
+  max-width: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease, max-width 0.3s ease;
+  white-space: nowrap;
+}
+
+.sidebar-expanded .sidebar-text {
+  opacity: 1;
+  max-width: 200px;
+}
+
+/* Main content spacing */
+#main-content {
+  margin-left: 4rem; /* Space for collapsed sidebar */
+  transition: margin-left 0.3s ease;
+  width: calc(100% - 4rem);
+}
+
+.sidebar-expanded ~ #main-content {
+  margin-left: 16rem; /* Space for expanded sidebar */
+  width: calc(100% - 16rem);
+}
+
+/* Backdrop for mobile */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-backdrop.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Button Styles */
+.btn-purple {
+  background-color: #0F172A;
+  border-color: #0F172A;
+}
+
+.btn-purple:hover {
+  background-color: #1E293B;
+}
+
+/* Active Link State */
+.sidebar-link-active {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Smooth Transitions */
+.sidebar-purple * {
+  transition: all 0.3s ease;
+}
+
+/* Custom Scrollbar for Sidebar */
+.sidebar-purple::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-purple::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-purple::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+.sidebar-purple::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive Sidebar - Tablets and Mobile */
+/* Sidebar always visible on all screen sizes */
+@media (max-width: 1024px) {
+  /* Keep sidebar fixed and always visible */
+  .sidebar-collapsed {
+    transform: none !important;
+    width: 4rem !important;
+  }
+
+  .sidebar-expanded {
+    transform: none !important;
+    width: 16rem !important;
+    box-shadow: none !important;
+  }
+
+  /* Main content shifts normally */
+  #main-content {
+    margin-left: 4rem !important;
+    width: calc(100% - 4rem) !important;
+  }
+
+  .sidebar-expanded ~ #main-content {
+    margin-left: 16rem !important;
+    width: calc(100% - 16rem) !important;
+  }
+
+  /* Hide backdrop on tablets & small screens since sidebar is always visible */
+  .sidebar-backdrop {
+    display: none !important;
+  }
+}
+
+
+/* Optional: Dashboard Card Styles */
+.dashboard-card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.dashboard-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* KPI Status Colors */
+.kpi-success {
+  color: #10B981;
+}
+
+.kpi-warning {
+  color: #F59E0B;
+}
+
+.kpi-error {
+  color: #EF4444;
+}
+
+.kpi-info {
+  color: #3B82F6;
+}
+
+/* ===================================
+   Django Form Field Styling
+   =================================== */
+
+/* Select dropdowns */
+#id_employee,
+#id_kpi {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background-color: white;
+  transition: all 0.2s;
+}
+
+#id_employee:focus,
+#id_kpi:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Text and number inputs */
+#id_target_value,
+#id_weight,
+#id_start_date,
+#id_end_date {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background-color: white;
+  transition: all 0.2s;
+}
+
+#id_target_value:focus,
+#id_weight:focus,
+#id_start_date:focus,
+#id_end_date:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* General input focus states */
+select:focus,
+input:focus {
+  outline: none;
+}
+
+/* Error state styling */
+.errorlist {
   list-style: none;
   padding: 0;
+  margin: 0.5rem 0 0 0;
+  color: #ef4444;
+  font-size: 0.875rem;
 }
 
-.sidebar ul li {
-  margin: 15px 0;
-} */
+/* ===================================
+   KPI Table Styling
+   =================================== */
 
-/* .sidebar ul li a {
+/* Table Header */
+.kpi-table-header {
+  background-color: #0F172A;
   color: white;
-  text-decoration: none;
-  font-size: 15px;
 }
 
-.sidebar ul li a:hover {
-  text-decoration: underline;
-} */
-
-/* Main area */
-/* .dashboard-content {
-  flex-grow: 1;
-  background-color: #f6f6f6;
-  padding: 30px;
+.kpi-table-header th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 1rem;
 }
 
-.kpi-box {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-} */
-
-/* .kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-}
-
-.kpi-item {
-  background-color: white;
-  padding: 15px;
-  border-radius: 8px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-} */
-
-
-/* body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  margin: 0;
-  padding: 20px;
-}
-
-header {
-  background: #2c3e50;
+/* KPI Status Badges */
+.kpi-status-active,
+.kpi-status-inprogress {
+  background-color: #10B981;
   color: white;
-  padding: 15px;
-  text-align: center;
-}
-
-nav a {
-  color: white;
-  text-decoration: none;
-  margin: 0 10px;
-}
-
-.dashboard-box {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 15px;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-}
-.navbar-fixed {
-  background-color: gray;
-} */
-
-
-table {
-  border-collapse: collapse;
-  width: 600px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 12px 15px;
-  text-align: left;
-}
-
-th {
-  background-color: #f5f5f5;
   font-weight: 600;
 }
 
-tr:hover {
-  background-color: #f9f9f9;
+.kpi-status-pending,
+.kpi-status-noprogress {
+  background-color: #F59E0B;
+  color: white;
+  font-weight: 600;
 }
 
-button {
-  background-color: rgb(5, 5, 67);
+.kpi-status-completed,
+.kpi-status-complete {
+  background-color: #3B82F6;
   color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 13px;
+  font-weight: 600;
+}
+
+.kpi-status-overdue {
+  background-color: #EF4444;
+  color: white;
+  font-weight: 600;
+}
+
+.kpi-status-inactive {
+  background-color: #6B7280;
+  color: white;
+  font-weight: 600;
+}
+
+/* Table Row Hover Effect */
+.table tbody tr.hover:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* Action Buttons */
+.btn-xs {
+  transition: all 0.2s ease;
+}
+
+.btn-xs:hover {
+  transform: translateY(-1px);
+}
+
+/* Progress Indicator */
+.radial-progress {
+  font-weight: 600;
+}
+
+/* Empty State */
+.table tbody tr td[colspan] {
+  background-color: transparent;
+}
+
+/* Responsive Table */
+@media (max-width: 768px) {
+  .kpi-table-header th {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* ===================================
+   Progress Timeline Styling
+   =================================== */
+
+.progress-timeline {
+  position: relative;
+  padding: 1rem 0;
+}
+
+.progress-entry {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.progress-entry:last-child {
+  margin-bottom: 0;
+}
+
+.progress-entry:last-child .progress-line {
+  display: none;
+}
+
+.progress-marker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.progress-dot {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background-color: #3B82F6;
+  border: 3px solid #DBEAFE;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.progress-line {
+  width: 2px;
+  flex: 1;
+  background: linear-gradient(to bottom, #3B82F6, #93C5FD);
+  margin-top: 0.5rem;
+  min-height: 3rem;
+}
+
+.progress-content {
+  flex: 1;
+  background-color: var(--color-base-100);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.progress-content:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Dark mode support for progress timeline */
+@media (prefers-color-scheme: dark) {
+  .progress-content {
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .progress-dot {
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+}
+
+/* Stats card styling */
+.stats .stat-figure {
+  color: inherit;
+}
+
+/* Radial progress in stats */
+.stat .radial-progress {
+  --thickness: 4px;
+}
+
+/* Empty state styling */
+.empty-state-icon {
+  opacity: 0.3;
+}
+
+/* Badge size adjustments */
+.badge {
+    height: auto !important;       /* Allow it to grow normally */
+    line-height: 1.2 !important;   /* Fix text overflow */
+    padding-top: 0.35rem !important;
+    padding-bottom: 0.35rem !important;
+    white-space: nowrap !important; /* Force one line */
+  }
+.badge-lg {
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* ===================================
+   Delete Confirmation Page Styling
+   =================================== */
+
+/* Error state card border */
+.card.border-error\/20 {
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* Delete icon container */
+.bg-error\/10 {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Info box styling */
+.bg-info\/10 {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Hover effect for delete button */
+.btn-error:hover {
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+
+/* Alert warning animation */
+.alert-warning {
+  animation: pulse-warning 2s ease-in-out infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+/* Mobile responsive adjustments for delete page */
+@media (max-width: 640px) {
+  .card-body {
+    padding: 1rem;
+  }
+
+  .grid.grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===================================
+   Activity Logs Page Styling
+   =================================== */
+
+/* Action Badge Colors with Gradients */
+.badge-activity-progress {
+  background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
+  color: white;
+  font-weight: 600;
+  border: 2px solid #F59E0B;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+.badge-activity-assign {
+  background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+  color: white;
+  font-weight: 600;
+  border: 2px solid #3B82F6;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.badge-activity-update {
+  background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);
+  color: white;
+  font-weight: 600;
+  border: 2px solid #8B5CF6;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+}
+
+.badge-activity-delete {
+  background: linear-gradient(135deg, #F87171 0%, #EF4444 100%);
+  color: white;
+  font-weight: 600;
+  border: 2px solid #EF4444;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+/* Badge Hover Effect */
+.badge-activity-progress:hover,
+.badge-activity-assign:hover,
+.badge-activity-update:hover,
+.badge-activity-delete:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* Activity Table Row Animation */
+.activity-table-row {
+  transition: all 0.3s ease;
+}
+
+.activity-table-row:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+  transform: translateX(4px);
+  box-shadow: -4px 0 0 0 #3B82F6;
+}
+
+/* Filter Card Animation */
+.filter-card {
+  transition: all 0.3s ease;
+}
+
+.filter-card:hover {
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Avatar with Activity Color Border */
+.avatar-progress {
+  border: 3px solid #F59E0B !important;
+}
+
+.avatar-assign {
+  border: 3px solid #3B82F6 !important;
+}
+
+.avatar-update {
+  border: 3px solid #8B5CF6 !important;
+}
+
+.avatar-delete {
+  border: 3px solid #EF4444 !important;
+}
+
+/* Activity Description Tooltip Effect */
+.activity-description {
+  position: relative;
   cursor: pointer;
-  transition: background 0.2s ease;
 }
 
-button:hover {
-  background-color: rgb(42, 42, 106);
+.activity-description:hover {
+  color: #3B82F6;
 }
 
-.add-user-container {
-  background: #fafafa;
-  padding: 2rem;
-  border-radius: 10px;
-  max-width: 800px;
-  margin: 2rem auto;
+/* Empty State Animation */
+.empty-state-animation {
+  animation: float 3s ease-in-out infinite;
 }
 
-.add-user-container label {
-  display: block;
-  margin-top: 1rem;
-  font-weight: 600;
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
-.add-user-container input,
-.add-user-container select {
-  width: 100%;
-  padding: 0.6rem;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+/* Filter Button Pulse Effect */
+.filter-btn-pulse {
+  animation: pulse-blue 2s ease-in-out infinite;
 }
 
-.add-user-container button {
-  background-color: #2e026d;
+@keyframes pulse-blue {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+  }
+}
+
+/* Timestamp Styling */
+.activity-timestamp {
+  color: #6B7280;
+  font-size: 0.875rem;
+}
+
+.activity-timestamp:hover {
+  color: #3B82F6;
+  transition: color 0.2s ease;
+}
+
+/* Table Header Gradient for Activity Logs */
+.activity-table-header {
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
   color: white;
-  border: none;
-  padding: 10px 25px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Loading State */
+.activity-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.activity-loading-spinner {
+  border: 4px solid rgba(59, 130, 246, 0.3);
+  border-top: 4px solid #3B82F6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .activity-table-row:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .badge-activity-progress,
+  .badge-activity-assign,
+  .badge-activity-update,
+  .badge-activity-delete {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Print styles for activity logs */
+@media print {
+  .filter-card,
+  .btn {
+    display: none;
+  }
+
+  .activity-table-row {
+    page-break-inside: avoid;
+  }
 }
