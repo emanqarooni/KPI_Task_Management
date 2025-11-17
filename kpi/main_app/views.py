@@ -9,8 +9,9 @@ from .forms import AssignKpiForm, KpiProgressForm
 from django.contrib import messages
 from .decorators import RoleRequiredMixin, role_required
 from django.contrib.auth.models import User
-from django.db.models import Sum
-from django.db.models import Q
+from django.db.models import Sum, Q, Count
+# from django.db.models import Sum
+# from django.db.models import Q
 from .services.ai import generate_kpi_insights
 import markdown
 from django.utils.timezone import now
@@ -26,6 +27,7 @@ import json
 from .utils import log_activity
 from django.contrib.admin.views.decorators import staff_member_required
 from decimal import Decimal
+
 
 
 # Employee dashboard'
