@@ -1,27 +1,225 @@
-{% extends "base.html" %} {% block content %}
-<div class="container">
-  <h2>Welcome, {{ request.user.username }}</h2>
-  <p><strong>Email:</strong> {{ request.user.email }}</p>
-  <p><strong>First Name:</strong> {{ request.user.first_name }}</p>
-  <p><strong>Last Name:</strong> {{ request.user.last_name }}</p>
+{% extends "base.html" %}
+{% block content %}
 
-  {% if request.user.employeeprofile %}
-  <p><strong>Department:</strong>
-    {{ request.user.employeeprofile.get_department_display }}</p>
+<div class="profile-container">
+  <!-- Profile Header with Avatar -->
+  <div class="profile-header">
+    <div class="profile-avatar-section">
+      <!-- Avatar -->
+      <div class="profile-avatar-wrapper">
+        <div class="profile-avatar">
+          {% if request.user.employeeprofile.image %}
+            <img src="{{ request.user.employeeprofile.image.url }}" alt="{{ request.user.username }}'s profile picture">
+          {% else %}
+            <svg xmlns="http://www.w3.org/2000/svg" class="profile-avatar-default" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" />
+            </svg>
+          {% endif %}
+        </div>
+        <div class="profile-status-badge" title="Online"></div>
+      </div>
 
-  <p>
-    <strong>Role:</strong> {{request.user.employeeprofile.get_role_display}}
-  </p>
-  <p>
-    <strong>Gender:</strong> {{request.user.employeeprofile.get_gender_display}}
-  </p>
+      <!-- User Info -->
+      <div style="text-align: center;">
+        <h1 class="profile-name">
+          {% if request.user.first_name and request.user.last_name %}
+            {{ request.user.first_name }} {{ request.user.last_name }}
+          {% else %}
+            {{ request.user.username }}
+          {% endif %}
+        </h1>
+        <p class="profile-username">@{{ request.user.username }}</p>
 
-  {% if request.user.employeeprofile.image %}
-  <img
-    src="{{ request.user.employeeprofile.image.url }}"
-    alt="Profile Image"
-    style="height: 120px; border-radius: 8px"
-  />
-  {% endif %} {% endif %}
+        {% if request.user.employeeprofile %}
+          <span class="profile-role-badge">
+            {{ request.user.employeeprofile.get_role_display }}
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Content Grid -->
+  <div class="profile-content-grid">
+
+    <!-- Personal Information Card -->
+    <div class="profile-card">
+      <div class="profile-card-header">
+        <div class="profile-card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+          </svg>
+        </div>
+        <h2 class="profile-card-title">Personal Information</h2>
+      </div>
+
+      <div class="profile-info-list">
+        <!-- Full Name -->
+        <div class="profile-info-item">
+          <div class="profile-info-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+          </div>
+          <div class="profile-info-content">
+            <div class="profile-info-label">Full Name</div>
+            <div class="profile-info-value">
+              {% if request.user.first_name and request.user.last_name %}
+                {{ request.user.first_name }} {{ request.user.last_name }}
+              {% else %}
+                <span class="profile-empty-value">Not provided</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="profile-info-item">
+          <div class="profile-info-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+            </svg>
+          </div>
+          <div class="profile-info-content">
+            <div class="profile-info-label">Email Address</div>
+            <div class="profile-info-value">
+              {% if request.user.email %}
+                {{ request.user.email }}
+              {% else %}
+                <span class="profile-empty-value">Not provided</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Gender -->
+        {% if request.user.employeeprofile %}
+        <div class="profile-info-item" data-gender="{{ request.user.employeeprofile.gender|lower }}">
+          <div class="profile-info-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+            </svg>
+          </div>
+          <div class="profile-info-content">
+            <div class="profile-info-label">Gender</div>
+            <div class="profile-info-value">{{ request.user.employeeprofile.get_gender_display }}</div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Professional Information Card -->
+    {% if request.user.employeeprofile %}
+    <div class="profile-card">
+      <div class="profile-card-header">
+        <div class="profile-card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
+          </svg>
+        </div>
+        <h2 class="profile-card-title">Professional Details</h2>
+      </div>
+
+      <div class="profile-info-list">
+        <!-- Department -->
+        <div class="profile-info-item">
+          <div class="profile-info-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+            </svg>
+          </div>
+          <div class="profile-info-content">
+            <div class="profile-info-label">Department</div>
+            <div class="profile-info-value">{{ request.user.employeeprofile.get_department_display }}</div>
+          </div>
+        </div>
+
+        <!-- Role -->
+        <div class="profile-info-item">
+          <div class="profile-info-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
+            </svg>
+          </div>
+          <div class="profile-info-content">
+            <div class="profile-info-label">Role</div>
+            <div class="profile-info-value">{{ request.user.employeeprofile.get_role_display }}</div>
+          </div>
+        </div>
+
+        <!-- Job Role -->
+        {% if request.user.employeeprofile.job_role %}
+        <div class="profile-info-item">
+          <div class="profile-info-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0M12 12.75h.008v.008H12v-.008z" />
+            </svg>
+          </div>
+          <div class="profile-info-content">
+            <div class="profile-info-label">Job Title</div>
+            <div class="profile-info-value">{{ request.user.employeeprofile.job_role }}</div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Statistics Card (Full Width) -->
+    {% if request.user.employeeprofile.role == 'employee' %}
+    <div class="profile-stats-card profile-card">
+      <div class="profile-card-header">
+        <div class="profile-card-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+          </svg>
+        </div>
+        <h2 class="profile-card-title">Performance Overview</h2>
+      </div>
+
+      <div class="profile-stats-grid">
+        <div class="profile-stat-item">
+          <div class="profile-stat-icon">📊</div>
+          <div class="profile-stat-value">5</div>
+          <div class="profile-stat-label">Active KPIs</div>
+        </div>
+        <div class="profile-stat-item">
+          <div class="profile-stat-icon">✅</div>
+          <div class="profile-stat-value">12</div>
+          <div class="profile-stat-label">Completed</div>
+        </div>
+        <div class="profile-stat-item">
+          <div class="profile-stat-icon">🎯</div>
+          <div class="profile-stat-value">78%</div>
+          <div class="profile-stat-label">Avg Progress</div>
+        </div>
+        <div class="profile-stat-item">
+          <div class="profile-stat-icon">⭐</div>
+          <div class="profile-stat-value">4.5</div>
+          <div class="profile-stat-label">Performance</div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Profile Actions -->
+  <div class="profile-actions">
+    <a href="{% url 'dashboard' %}" class="profile-action-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+      Back to Dashboard
+    </a>
+    <button class="profile-action-btn profile-action-btn-secondary">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+      </svg>
+      Edit Profile
+    </button>
+  </div>
 </div>
+
 {% endblock %}
