@@ -11,6 +11,9 @@ from .decorators import RoleRequiredMixin, role_required
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.db.models import Q
+from .services.ai import generate_kpi_insights
+import markdown
+from django.utils.timezone import now
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
@@ -19,9 +22,6 @@ from reportlab.lib.units import inch
 from datetime import datetime, date
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
-from .services.ai import generate_kpi_insights
-import markdown
-from django.utils.timezone import now
 import json
 from .utils import log_activity
 from django.contrib.admin.views.decorators import staff_member_required
@@ -50,6 +50,8 @@ def admin_dashboard(request):
 
     all_kpis = Kpi.objects.all()
 
+    # Add recent activity logs
+    recent_logs = ActivityLog.objects.select_related("user", "related_user")[:10]
     chart_labels_list = []
     chart_values_list = []
 
@@ -74,7 +76,7 @@ def admin_dashboard(request):
         "chart_labels": json.dumps(chart_labels_list),
         "chart_values": json.dumps([float(v) for v in chart_values_list]),
     }
-    
+
     return render(request, "dashboards/admin_dashboard.html", context)
 
 
