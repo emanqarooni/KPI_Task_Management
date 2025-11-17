@@ -45,54 +45,57 @@ def dashboard(request):
 @login_required
 @role_required(["admin"])
 def admin_dashboard(request):
-    from django.db.models import Sum
-
     total_users_count = User.objects.count()
 
+    # Employees & managers
     all_employees = EmployeeProfile.objects.filter(role="employee").select_related('user')
     total_employees_count = all_employees.count()
 
     all_managers = EmployeeProfile.objects.filter(role="manager").select_related('user')
     total_managers_count = all_managers.count()
 
-    all_kpis = Kpi.objects.all()
+    # Department counts
+    department_counts = EmployeeProfile.objects.values('department').annotate(count=models.Count('id'))
 
+    department_data = {
+        "Sales & Marketing": 0,
+        "Information Technology": 0,
+        "Human Resources": 0,
+        "Project Management": 0,
+    }
+
+    # Convert short codes (SM, IT, HR, PM) into full names
+    department_map = dict(DEPARTMENT)
+
+    for dept in department_counts:
+        dept_code = dept['department']
+        dept_name = department_map.get(dept_code, dept_code)
+        department_data[dept_name] = dept['count']
+
+    # KPI data
+    all_kpis = Kpi.objects.all()
     employee_kpi_assignments = EmployeeKpi.objects.select_related(
-        'employee__user',
-        'employee__manager',
-        'kpi'
+        'employee__user', 'employee__manager', 'kpi'
     ).all()
 
     employee_kpi_data = []
-    employee_total_scores = {}  # NEW – total weighted score per employee
-
     for assignment in employee_kpi_assignments:
         progress_percentage = assignment.progress_percentage()
-
-        # Weighted KPI score
         weighted_score = (progress_percentage * float(assignment.weight)) / 100
 
-        employee_name = assignment.employee.user.get_full_name() or assignment.employee.user.username
-
-        # Accumulate weighted score per employee
-        if employee_name not in employee_total_scores:
-            employee_total_scores[employee_name] = 0
-
-        employee_total_scores[employee_name] += weighted_score
-
         employee_kpi_data.append({
-            'employee_name': employee_name,
+            'employee_name': assignment.employee.user.get_full_name() or assignment.employee.user.username,
             'manager_name': assignment.employee.manager.get_full_name() if assignment.employee.manager else 'No Manager',
             'kpi_title': assignment.kpi.title,
             'target_value': assignment.target_value,
             'current_progress': assignment.total_progress(),
             'progress_percentage': progress_percentage,
-            'weight': float(assignment.weight),
+            'weight': assignment.weight,
             'status': assignment.status(),
-            'weighted_score': round(weighted_score, 2)
+            'weighted_score': round(weighted_score, 2),
         })
 
-    # Chart data
+    # Chart lists
     chart_labels_list = []
     chart_values_list = []
 
@@ -101,7 +104,7 @@ def admin_dashboard(request):
 
         total_progress_for_kpi = ProgressEntry.objects.filter(
             employee_kpi__kpi=kpi
-        ).aggregate(total=Sum('value'))['total'] or 0
+        ).aggregate(total=Sum("value"))["total"] or 0
 
         chart_values_list.append(float(total_progress_for_kpi))
 
@@ -109,11 +112,12 @@ def admin_dashboard(request):
         "total_users": total_users_count,
         "total_employees": total_employees_count,
         "total_managers": total_managers_count,
+        "department_data": department_data,
+
         "employees": all_employees,
         "managers": all_managers,
-        "kpis": all_kpis,
+
         "employee_kpi_data": employee_kpi_data,
-        "employee_total_scores": employee_total_scores,   # NEW
         "chart_labels": json.dumps(chart_labels_list),
         "chart_values": json.dumps([float(v) for v in chart_values_list]),
     }
