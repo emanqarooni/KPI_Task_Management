@@ -11,11 +11,23 @@
 
     <h2>Admin Dashboard</h2>
 
-    <div>
-      <p>Total Users: <strong>{{ total_users }}</strong></p>
+    
+    <div class="kpi-box">
+        <h3>System Overview</h3>
+
+        <p><strong>Total Users:</strong> {{ total_users }}</p>
+        <p><strong>Total Employees:</strong> {{ total_employees }}</p>
+        <p><strong>Total Managers:</strong> {{ total_managers }}</p>
+
+        <h4>Departments</h4>
+        <ul>
+            <li>Sales & Marketing: {{ department_data."Sales & Marketing" }}</li>
+            <li>Information Technology: {{ department_data."Information Technology" }}</li>
+            <li>Human Resources: {{ department_data."Human Resources" }}</li>
+            <li>Project Management: {{ department_data."Project Management" }}</li>
+        </ul>
     </div>
 
-    <!-- Employees Section -->
     <h3>Employees ({{ total_employees }})</h3>
     <div>
       {% if employees %}
@@ -48,7 +60,7 @@
       {% endif %}
     </div>
 
-    <!-- Managers Section -->
+
     <h3>Managers ({{ total_managers }})</h3>
     <div>
       {% if managers %}
