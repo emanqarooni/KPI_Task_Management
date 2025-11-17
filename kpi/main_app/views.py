@@ -167,6 +167,28 @@ def add_progress(request):
 
             progress = form.save()
 
+            # check if the kpi is complete
+            is_completed = employee_kpi.status() == "Complete"
+
+            # send notification to manager
+            if employee_kpi.employee.manager:
+                notification_title = 'KPI Completed!' if is_completed else 'Progress Updated'
+                notification_message = (
+                    f'{request.user.get_full_name() or request.user.username} has completed the KPI: {employee_kpi.kpi.title}'
+                    if is_completed else
+                    f'{request.user.get_full_name() or request.user.username} added progress to "{employee_kpi.kpi.title}". '
+                    f'Current progress: {employee_kpi.progress_percentage()}%'
+                )
+
+                create_notification(
+                    recipient=employee_kpi.employee.manager,
+                    sender=request.user,
+                    notification_type='kpi_completed' if is_completed else 'progress_added',
+                    title=notification_title,
+                    message=notification_message,
+                    employee_kpi=employee_kpi
+                )
+
             log_activity(
                 user=request.user,
                 action='PROGRESS_ADDED',
@@ -223,6 +245,16 @@ def assign_kpi(request):
                 action='KPI_ASSIGNED',
                 description=f"Assigned '{kpi_assignment.kpi.title}' to {kpi_assignment.employee.user.username} (Target: {kpi_assignment.target_value}, Weight: {kpi_assignment.weight}%)",
                 related_user=kpi_assignment.employee.user
+            )
+
+            # send notification to employees
+            create_notification(
+                recipient=employee_kpi.employee.user,
+                sender=request.user,
+                notification_type='kpi_assigned',
+                title='New KPI Assigned',
+                message=f'You have been assigned a new KPI: {employee_kpi.kpi.title}. Target: {employee_kpi.target_value}',
+                employee_kpi=employee_kpi
             )
 
             messages.success(request, "KPI assigned successfully.")
@@ -317,6 +349,16 @@ def employee_kpi_edit(request, pk):
             action='KPI_UPDATED',
             description=f"Updated KPI '{kpi_assignment.kpi.title}' for {kpi_assignment.employee.user.username}",
             related_user=kpi_assignment.employee.user
+        )
+
+        # send notification to employee
+        create_notification(
+            recipient=employee_kpi.employee.user,
+            sender=request.user,
+            notification_type='kpi_updated',
+            title='KPI Updated',
+            message=f'Your KPI "{employee_kpi.kpi.title}" has been updated by your manager.',
+            employee_kpi=employee_kpi
         )
 
         messages.success(request, "KPI updated successfully.")
@@ -930,3 +972,22 @@ def create_notification(recipient, sender, notification_type, title, message, em
         message=message,
         employee_kpi=employee_kpi
     )
+
+# view all notifications for current user
+@login_required
+def notifications(request):
+    profile = EmployeeProfile.objects.get(user=request.user)
+
+    # exclude admin from notifications
+    if profile.role == 'admin':
+        return redirect('dashboard')
+
+    user_notifications = Notification.objects.filter(recipient=request.user)
+    unread_count = user_notifications.filter(is_read=False).count()
+
+    context = {
+        'notifications': user_notifications,
+        'unread_count': unread_count,
+    }
+    return render(request, 'notifications/notifications.html', context)
+
