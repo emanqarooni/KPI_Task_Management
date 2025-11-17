@@ -15,15 +15,9 @@
 
   <div class="dashboard-content">
 
-    <div class="dashboard-header">
-      <h2>Employee Dashboard</h2>
-      <span class="employee-name">{{ employee_name }}</span>
-    </div>
-
-    <div class="kpi-box">
-      <h3>Welcome, {{ employee_name }}</h3>
-      <p>Role: {{ role }}</p>
-    </div>
+    <h2>Employee Dashboard</h2>
+    <p>Welcome, {{ employee_name }}</p>
+    <p>Role: {{ role }}</p>
 
     <h3>KPI Overview</h3>
 
@@ -31,12 +25,10 @@
       {% for kpi in kpi_cards %}
       <div class="kpi-item">
         <h4>{{ kpi.title }}</h4>
-        <p><strong>Target:</strong> {{ kpi.target }}</p>
-        <p><strong>Progress:</strong> {{ kpi.progress }}</p>
-        <p><strong>Deadline:</strong> {{ kpi.days_left }} days left</p>
-        <a href="{% url 'progress' %}">
-          <button>Add Update</button>
-        </a>
+        <p>Target: {{ kpi.target }}</p>
+        <p>Progress: {{ kpi.progress }}</p>
+        <p>Deadline: {{ kpi.days_left }} days left</p>
+        <a href="{% url 'progress' %}"><button>Add Update</button></a>
       </div>
       {% endfor %}
     </div>
@@ -47,5 +39,23 @@
 
   </div>
 </div>
+
+<script>
+const employeeLabels = {{ chart_labels|safe }};
+const employeeValues = {{ chart_values|safe }};
+
+new Chart(document.getElementById("employeeChart"), {
+    type: "line",
+    data: {
+        labels: employeeLabels,
+        datasets: [{
+            label: "Progress (%)",
+            data: employeeValues,
+            borderWidth: 2,
+            tension: 0.3
+        }]
+    }
+});
+</script>
 
 {% endblock %}
