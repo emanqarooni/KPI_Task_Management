@@ -137,6 +137,90 @@
   }
 }
 
+/* ===================================
+   Chart.js Styling
+   =================================== */
+
+/* Chart Container Sizing */
+.kpi-box {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+  padding: 1.5rem;
+  background-color: var(--color-base-100);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 1.5rem 0;
+}
+
+.kpi-box canvas {
+  max-height: 400px !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Individual Chart Styling */
+#adminChart,
+#managerChart,
+#employeeChart {
+  min-height: 350px;
+  max-height: 450px;
+}
+
+/* Chart responsive behavior */
+@media (max-width: 768px) {
+  .kpi-box {
+    min-height: 300px;
+    padding: 1rem;
+  }
+
+  .kpi-box canvas {
+    max-height: 300px !important;
+  }
+
+  #adminChart,
+  #managerChart,
+  #employeeChart {
+    min-height: 250px;
+    max-height: 350px;
+  }
+}
+
+/* Chart Loading State */
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: var(--color-base-content);
+  font-size: 1rem;
+}
+
+.chart-loading::after {
+  content: "Loading chart...";
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Chart Error State */
+.chart-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #EF4444;
+  font-size: 1rem;
+  text-align: center;
+  padding: 2rem;
+}
 
 /* Optional: Dashboard Card Styles */
 .dashboard-card {
@@ -413,12 +497,13 @@ input:focus {
 
 /* Badge size adjustments */
 .badge {
-    height: auto !important;       /* Allow it to grow normally */
-    line-height: 1.2 !important;   /* Fix text overflow */
-    padding-top: 0.35rem !important;
-    padding-bottom: 0.35rem !important;
-    white-space: nowrap !important; /* Force one line */
-  }
+  height: auto !important;
+  line-height: 1.2 !important;
+  padding-top: 0.35rem !important;
+  padding-bottom: 0.35rem !important;
+  white-space: nowrap !important;
+}
+
 .badge-lg {
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
