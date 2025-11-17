@@ -1,8 +1,7 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block content %}
 
 <div class="dashboard-container">
+  <a href="{% url 'ai_employee_coach' %}" class="btn blue">AI KPI Coach</a>
 
   <div class="sidebar">
     <ul>
@@ -14,7 +13,6 @@
   </div>
 
   <div class="dashboard-content">
-
     <h2>Employee Dashboard</h2>
     <p>Welcome, {{ employee_name }}</p>
     <p>Role: {{ role }}</p>
@@ -36,26 +34,25 @@
     <div class="kpi-box">
       <canvas id="employeeChart"></canvas>
     </div>
-
   </div>
 </div>
 
 <script>
-const employeeLabels = {{ chart_labels|safe }};
-const employeeValues = {{ chart_values|safe }};
+  const employeeLabels = {{ chart_labels|safe }};
+  const employeeValues = {{ chart_values|safe }};
 
-new Chart(document.getElementById("employeeChart"), {
-    type: "line",
-    data: {
-        labels: employeeLabels,
-        datasets: [{
-            label: "Progress (%)",
-            data: employeeValues,
-            borderWidth: 2,
-            tension: 0.3
-        }]
-    }
-});
+  new Chart(document.getElementById("employeeChart"), {
+      type: "line",
+      data: {
+          labels: employeeLabels,
+          datasets: [{
+              label: "Progress (%)",
+              data: employeeValues,
+              borderWidth: 2,
+              tension: 0.3
+          }]
+      }
+  });
 </script>
 
 {% endblock %}

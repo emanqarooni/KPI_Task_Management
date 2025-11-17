@@ -33,8 +33,13 @@ urlpatterns = [
 
     # for admin only
     path("activity-logs/", views.activity_logs, name="activity_logs"),
+
+    # notifications for manager and employee only
+    path('notifications/', views.notifications, name='notifications'),
+
     # for ai feature
     path("ai/kpi-insights/", views.ai_kpi_insights, name="ai_kpi_insights"),
     path("admin-dashboard/ai-insights/", views.ai_admin_insights, name="ai_admin_insights"),
+    path("employee/ai-coach/", views.ai_employee_coach, name="ai_employee_coach"),
 
 ]

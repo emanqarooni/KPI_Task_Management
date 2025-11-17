@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3>AI KPI Coach</h3>
+
+<div class="card-panel white" style="padding: 20px;">
+    {{ ai_output_html|safe }}
+</div>
+
+<a href="{% url 'employee_dashboard' %}" class="btn blue">Back</a>
+
+{% endblock %}
