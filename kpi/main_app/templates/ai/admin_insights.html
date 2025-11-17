@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h3 style="margin-bottom: 25px; font-weight: 600;">AI Organizational KPI Insights</h3>
+
+<div style="
+    background: white;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    border: 1px solid #eee;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #333;
+">
+    {{ ai_output_html|safe }}
+</div>
+
+<a href="{% url 'admin_dashboard' %}"
+   class="btn blue"
+   style="margin-top: 20px; border-radius: 8px; padding: 10px 20px;">
+    Back
+</a>
+
+{% endblock %}

@@ -1,9 +1,11 @@
-{% extends 'base.html' %}
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <h2>Admin Dashboard</h2>
+
+<a href="{% url 'ai_admin_insights' %}" class="btn blue">AI Organizational Insights</a>
+
 
 <div class="dashboard-box">
   <p><strong>Total Users:</strong> {{ total_users }}</p>
-  <p><strong>Total Employees:</strong> {{ total_employees }}</p>
+  <p><strong>Total Employees:</strong> {{ total_employees }}</p>`
 </div>
 {% endblock %}
