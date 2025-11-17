@@ -3,17 +3,7 @@
 {% block content %}
 
 <div class="dashboard-container">
-
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h3>Company</h3>
-    <ul>
-      <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
-      <li><a href="#">Accounts</a></li>
-      <li><a href="#">KPI Catalog</a></li>
-      <li><a href="#">Reports</a></li>
-    </ul>
-  </div>
+<a href="{% url 'ai_admin_insights' %}" class="btn blue">AI Organizational Insights</a>
 
   <!-- Content -->
   <div class="dashboard-content">
@@ -44,17 +34,40 @@
 </div>
 
 <script>
-const adminLabels = {{ chart_labels|safe }};
-const adminValues = {{ chart_values|safe }};
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('adminChart');
+    if (ctx) {
+        const adminLabels = {{ chart_labels|safe }};
+        const adminValues = {{ chart_values|safe }};
 
-new Chart(document.getElementById("adminChart"), {
-    type: "pie",
-    data: {
-        labels: adminLabels,
-        datasets: [{
-            data: adminValues,
-            borderWidth: 1
-        }]
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: adminLabels,
+                datasets: [{
+                    data: adminValues,
+                    backgroundColor: [
+                        '#3B82F6',
+                        '#10B981',
+                        '#F59E0B',
+                        '#EF4444',
+                        '#8B5CF6',
+                        '#EC4899'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
     }
 });
 </script>

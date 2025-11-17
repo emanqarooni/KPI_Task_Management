@@ -4,17 +4,6 @@
 
 <div class="dashboard-container">
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h3>Company</h3>
-    <ul>
-      <li><a href="{% url 'manager_dashboard' %}">Dashboard</a></li>
-      <li><a href="{% url 'assign_kpi' %}">Assign KPI</a></li>
-      <li><a href="#">Report</a></li>
-    </ul>
-  </div>
-
-  <!-- Content -->
   <div class="dashboard-content">
 
     <h2>Manager Dashboard</h2>
@@ -47,6 +36,11 @@
   </div>
 </div>
 
+<div>
+  <a href="{% url 'ai_kpi_insights' %}" class="btn blue">
+    Generate AI KPI Insights
+  </a>
+</div>
 <script>
 const managerLabels = [
 {% for row in employee_rows %}"{{ row.name }}",{% endfor %}
