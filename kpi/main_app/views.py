@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponse
-from .models import EmployeeKpi, ProgressEntry, Kpi, EmployeeProfile, DEPARTMENT, ActivityLog
+from .models import EmployeeKpi, ProgressEntry, Kpi, EmployeeProfile, DEPARTMENT, ActivityLog, Notification
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, UpdateView, View
@@ -919,3 +919,14 @@ def activity_logs(request):
         'current_user_filter': selected_user,
     }
     return render(request, 'activity/admin_logs.html', template_data)
+
+#  this is the helper function to create notifications
+def create_notification(recipient, sender, notification_type, title, message, employee_kpi=None):
+    Notification.objects.create(
+        recipient=recipient,
+        sender=sender,
+        notification_type=notification_type,
+        title=title,
+        message=message,
+        employee_kpi=employee_kpi
+    )
