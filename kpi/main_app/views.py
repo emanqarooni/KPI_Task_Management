@@ -50,11 +50,30 @@ def admin_dashboard(request):
 
     all_kpis = Kpi.objects.all()
 
-    # Add recent activity logs
-    recent_logs = ActivityLog.objects.select_related("user", "related_user")[:10]
+
+    employee_kpi_assignments = EmployeeKpi.objects.select_related(
+        'employee__user',
+        'employee__manager',
+        'kpi'
+    ).all()
+
+    employee_kpi_data = []
+    for assignment in employee_kpi_assignments:
+        progress_percentage = assignment.progress_percentage()
+        employee_kpi_data.append({
+            'employee_name': assignment.employee.user.get_full_name() or assignment.employee.user.username,
+            'manager_name': assignment.employee.manager.get_full_name() if assignment.employee.manager else 'No Manager',
+            'kpi_title': assignment.kpi.title,
+            'target_value': assignment.target_value,
+            'current_progress': assignment.total_progress(),
+            'progress_percentage': progress_percentage,
+            'weight': assignment.weight,
+            'status': assignment.status()
+        })
+
+    
     chart_labels_list = []
     chart_values_list = []
-
 
     for kpi in all_kpis:
         chart_labels_list.append(kpi.title)
@@ -73,6 +92,7 @@ def admin_dashboard(request):
         "total_users": total_users_count,
         "total_employees": total_employees_count,
         "kpis": all_kpis,
+        "employee_kpi_data": employee_kpi_data,
         "chart_labels": json.dumps(chart_labels_list),
         "chart_values": json.dumps([float(v) for v in chart_values_list]),
     }
