@@ -221,7 +221,7 @@
       Back to List
     </a>
 
-    {% if kpi.progress_count == 0 %}
+    {% if kpi.progress_count == 0 and user.employeeprofile.role == 'manager' %}
     <div class="flex gap-2">
       <a href="{% url 'employee_kpi_edit' kpi.pk %}" class="btn btn-primary">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
