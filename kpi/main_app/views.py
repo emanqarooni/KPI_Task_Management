@@ -1073,6 +1073,13 @@ def mark_notification_read(request, notification_id):
     notification.save()
     return redirect('notifications')
 
+@login_required
+def mark_all_notifications_read(request):
+    # marking all notifications as read
+    Notification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
+    messages.success(request, "All notifications marked as read.")
+    return redirect('notifications')
+
 ## AI feature for Manager View
 @login_required
 @role_required(["manager"])
