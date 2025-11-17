@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
-from datetime import date
+from datetime import datetime
 from django.db.models import Sum
 
 DEPARTMENT = (
@@ -179,11 +179,10 @@ class Notification(models.Model):
     employee_kpi = models.ForeignKey(EmployeeKpi, on_delete=models.CASCADE, null=True, blank=True)
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
     class Meta:
         ordering = ['-created_at']
+
     def __str__(self):
         return f"{self.recipient.username} - {self.title}"
-
-
-
 
