@@ -46,10 +46,16 @@ def dashboard(request):
 @role_required(["admin"])
 def admin_dashboard(request):
     total_users_count = User.objects.count()
-    total_employees_count = EmployeeProfile.objects.filter(role="employee").count()
+
+    # Get all employees with their profiles
+    all_employees = EmployeeProfile.objects.filter(role="employee").select_related('user')
+    total_employees_count = all_employees.count()
+
+    # Get all managers with their profiles
+    all_managers = EmployeeProfile.objects.filter(role="manager").select_related('user')
+    total_managers_count = all_managers.count()
 
     all_kpis = Kpi.objects.all()
-
 
     employee_kpi_assignments = EmployeeKpi.objects.select_related(
         'employee__user',
@@ -71,7 +77,6 @@ def admin_dashboard(request):
             'status': assignment.status()
         })
 
-    
     chart_labels_list = []
     chart_values_list = []
 
@@ -91,6 +96,9 @@ def admin_dashboard(request):
     context = {
         "total_users": total_users_count,
         "total_employees": total_employees_count,
+        "total_managers": total_managers_count,
+        "employees": all_employees,  # New: list of employee profiles
+        "managers": all_managers,    # New: list of manager profiles
         "kpis": all_kpis,
         "employee_kpi_data": employee_kpi_data,
         "chart_labels": json.dumps(chart_labels_list),
