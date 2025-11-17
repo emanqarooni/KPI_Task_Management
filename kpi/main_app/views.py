@@ -9,13 +9,14 @@ from .forms import AssignKpiForm, KpiProgressForm
 from django.contrib import messages
 from .decorators import RoleRequiredMixin, role_required
 from django.contrib.auth.models import User
+from django.db.models import Sum
 from django.db.models import Q
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
-from datetime import datetime
+from datetime import datetime, date
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 
@@ -24,98 +25,165 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 
 # Employee dashboard'
+@login_required
 def dashboard(request):
-    # return render(request, "dashboards/dashboard_home.html")
-    profile = EmployeeProfile.objects.get(user=request.user)
+    employee_profile = EmployeeProfile.objects.get(user=request.user)
 
-    if profile.role == "admin":
-        return admin_dashboard(request)
-    elif profile.role == "manager":
-        return manager_dashboard(request)
+    if employee_profile.role == "admin":
+        return redirect("admin_dashboard")
+    elif employee_profile.role == "manager":
+        return redirect("manager_dashboard")
     else:
-        return employee_dashboard(request)
+        return redirect("employee_dashboard")
 
 
+# Admin dashboard
+@login_required
+@role_required(["admin"])
 def admin_dashboard(request):
-    from .models import ActivityLog
+    total_users_count = User.objects.count()
+    total_employees_count = EmployeeProfile.objects.filter(role="employee").count()
 
-    total_users = User.objects.count()
-    total_employees = EmployeeProfile.objects.filter(role="employee").count()
+    all_kpis = Kpi.objects.all()
 
-    # Add recent activity logs
-    recent_logs = ActivityLog.objects.select_related('user', 'related_user')[:10]
+    chart_labels_list = []
+    chart_values_list = []
+
+
+    for kpi in all_kpis:
+        chart_labels_list.append(kpi.title)
+
+        total_progress_for_kpi = 0
+        employee_kpis_for_this_kpi = EmployeeKpi.objects.filter(kpi=kpi)
+
+        for employee_kpi in employee_kpis_for_this_kpi:
+            progress_entries = ProgressEntry.objects.filter(employee_kpi=employee_kpi)
+            for progress_entry in progress_entries:
+                total_progress_for_kpi += progress_entry.value
+
+        chart_values_list.append(total_progress_for_kpi)
 
     context = {
-        "total_users": total_users,
-        "total_employees": total_employees,
-        "recent_logs": recent_logs,
+        "total_users": total_users_count,
+        "total_employees": total_employees_count,
+        "kpis": all_kpis,
+        "chart_labels": chart_labels_list,
+        "chart_values": chart_values_list,
     }
+
     return render(request, "dashboards/admin_dashboard.html", context)
-    # total_users = User.objects.count()
-    # total_employees = EmployeeProfile.objects.filter(role="employee").count()
-
-    # context = {
-    #     "total_users": total_users,
-    #     "total_employees": total_employees,
-    # }
-    # kpis = EmployeeKpi.objects.all()
-    # return render(request, "dashboards/admin_dashboard.html", {
-    #     "profiles": profiles,
-    #     "kpis": kpis,
 
 
+# Manager dashboard
+@login_required
+@role_required(["manager"])
 def manager_dashboard(request):
-    manager_name = "Shooq"
-    department = "Information Technology"
-    employees_count = 3
+    manager_profile = EmployeeProfile.objects.get(user=request.user)
+    manager_department = manager_profile.department
+
+    employees_in_department = EmployeeProfile.objects.filter(
+        department=manager_department,
+        role="employee"
+    )
+
+    employee_dashboard_rows = []
+
+
+    for employee in employees_in_department:
+        employee_kpis = EmployeeKpi.objects.filter(employee=employee)
+
+        if employee_kpis.exists():
+            total_progress_value = 0
+            total_target_value = 0
+
+
+            for employee_kpi in employee_kpis:
+                progress_entries = employee_kpi.progressentry_set.all()
+                for entry in progress_entries:
+                    total_progress_value += entry.value
+
+                total_target_value += employee_kpi.target_value
+
+            if total_target_value == 0:
+                completion_percentage = 0
+            else:
+                completion_percentage = round((total_progress_value / total_target_value) * 100)
+
+            if completion_percentage == 0:
+                status_text = "No Progress"
+            elif completion_percentage >= 100:
+                status_text = "Complete"
+            else:
+                status_text = "Moderate"
+
+        else:
+            completion_percentage = 0
+            status_text = "No KPI Assigned"
+
+        employee_dashboard_rows.append({
+            "name": employee.user.username,
+            "completion": completion_percentage,
+            "status": status_text,
+        })
 
     context = {
-        "manager_name": manager_name,
-        "department": department,
-        "employees_count": employees_count,
+        "manager_name": manager_profile.user.username,
+        "department": manager_profile.get_department_display(),
+        "employees_count": employees_in_department.count(),
+        "employee_rows": employee_dashboard_rows,
     }
+
     return render(request, "dashboards/manager_dashboard.html", context)
-    # profile = EmployeeProfile.objects.get(user=request.user)
-    # department = profile.department
-
-    # employees_in_department = EmployeeProfile.objects.filter(department=department, role="employee").count()
-
-    # context = {
-    #     "manager": profile,
-    #     "department": profile.get_department_display(),
-    #     "employees_count": employees_in_department,
-    # }
-
-    # team = profile.team_members.all()
-    # team_kpis = EmployeeKpi.objects.filter(employee__in=team)
-    # return render(request, "dashboards/manager_dashboard.html", {
-    #     "profile": profile,
-    #     "team": team,
-    #     "team_kpis": team_kpis,
-    # })
 
 
+# Employee dashboard
+@login_required
+@role_required(["employee"])
 def employee_dashboard(request):
-    employee_name = "Maryam"
-    department = "Sales & Marketing"
-    role = "Employee"
+    employee_profile = EmployeeProfile.objects.get(user=request.user)
+    assigned_kpis = EmployeeKpi.objects.filter(employee=employee_profile)
+
+    chart_labels_list = []
+    chart_values_list = []
+    kpi_cards_list = []
+
+
+    for employee_kpi in assigned_kpis:
+        kpi_title = employee_kpi.kpi.title
+        total_progress_value = 0
+
+        progress_entries = employee_kpi.progressentry_set.all()
+        for entry in progress_entries:
+            total_progress_value += entry.value
+
+        if employee_kpi.target_value == 0:
+            progress_percentage = 0
+        else:
+            progress_percentage = round((total_progress_value / employee_kpi.target_value) * 100)
+
+        days_remaining = (employee_kpi.end_date - date.today()).days
+
+        chart_labels_list.append(kpi_title)
+        chart_values_list.append(progress_percentage)
+
+        kpi_cards_list.append({
+            "title": kpi_title,
+            "target": employee_kpi.target_value,
+            "progress": total_progress_value,
+            "percentage": progress_percentage,
+            "days_left": days_remaining,
+            "id": employee_kpi.id,
+        })
 
     context = {
-        "employee_name": employee_name,
-        "department": department,
-        "role": role,
+        "employee_name": employee_profile.user.username,
+        "role": employee_profile.job_role,
+        "kpi_cards": kpi_cards_list,
+        "chart_labels": chart_labels_list,
+        "chart_values": chart_values_list,
     }
+
     return render(request, "dashboards/employee_dashboard.html", context)
-
-    # profile = EmployeeProfile.objects.get(user=request.user)
-    # return render(request, "dashboards/employee_dashboard.html", {"profile": profile})
-
-    # profile = EmployeeProfile.objects.get(user=request.user)
-    # kpis = profile.assigned_kpis.select_related("kpi").all()
-    # return render(request, "dashboards/employee_dashboard.html", {
-    #     "profile": profile,
-    #     "kpis": kpis,
-    # })
 
 
 # Manager Dashboard

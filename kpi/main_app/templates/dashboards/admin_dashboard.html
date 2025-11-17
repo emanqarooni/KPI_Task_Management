@@ -1,9 +1,59 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
-<h2>Admin Dashboard</h2>
 
-<div class="dashboard-box">
-  <p><strong>Total Users:</strong> {{ total_users }}</p>
-  <p><strong>Total Employees:</strong> {{ total_employees }}</p>
+<div class="dashboard-container">
+
+  <div class="sidebar">
+    <h3>Company</h3>
+    <ul>
+      <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+      <li><a href="#">Accounts</a></li>
+      <li><a href="#">KPI Catalog</a></li>
+      <li><a href="#">Reports</a></li>
+    </ul>
+  </div>
+
+  <div class="dashboard-content">
+    <h2>Admin Dashboard</h2>
+
+    <div class="kpi-box">
+      <p>Total Users: {{ total_users }}</p>
+      <p>Total Employees: {{ total_employees }}</p>
+    </div>
+
+    <h3>KPI Library</h3>
+
+    <div class="kpi-grid">
+      {% for kpi, value in admin_kpi_data %}
+      <div class="kpi-item">
+        <h4>{{ kpi.title }}</h4>
+        <p>Total Value: {{ value }}</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="kpi-box">
+      <canvas id="adminChart"></canvas>
+    </div>
+
+  </div>
 </div>
+
+<script>
+const adminLabels = {{ chart_labels|safe }};
+const adminValues = {{ chart_values|safe }};
+
+new Chart(document.getElementById("adminChart"), {
+    type: "pie",
+    data: {
+        labels: adminLabels,
+        datasets: [{
+            data: adminValues,
+            borderWidth: 1
+        }]
+    }
+});
+</script>
+
 {% endblock %}

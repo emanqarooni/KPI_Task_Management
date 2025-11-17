@@ -30,7 +30,10 @@ urlpatterns = [
     path('admin-reports/', views.admin_reports, name='admin_reports'),
     path('reports/admin_export-pdf/', views.admin_export_pdf, name='admin_export_pdf'),
     path('reports/admin_export-excel/', views.admin_export_excel, name='admin_export_excel'),
-  
+
     # for admin only
     path('activity-logs/', views.activity_logs, name='activity_logs'),
+
+    # notifications for manager and employee only
+    path('notifications/', views.notifications, name='notifications'),
 ]
