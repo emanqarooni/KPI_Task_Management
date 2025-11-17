@@ -36,7 +36,8 @@ urlpatterns = [
 
     # notifications for manager and employee only
     path('notifications/', views.notifications, name='notifications'),
-    
+    path('notifications/<int:notification_id>/read/', views.mark_notification_read, name='mark_notification_read'),
+
     # for ai feature
     path("ai/kpi-insights/", views.ai_kpi_insights, name="ai_kpi_insights"),
     path("admin-dashboard/ai-insights/", views.ai_admin_insights, name="ai_admin_insights"),
