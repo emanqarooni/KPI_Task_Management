@@ -1,14 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponse
-from .models import (
-    EmployeeKpi,
-    ProgressEntry,
-    Kpi,
-    EmployeeProfile,
-    ActivityLog,
-    DEPARTMENT,
-)
+from .models import EmployeeKpi, ProgressEntry, Kpi, EmployeeProfile, DEPARTMENT, ActivityLog, Notification
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, UpdateView, View
@@ -21,7 +14,6 @@ from django.db.models import Q
 from .services.ai import generate_kpi_insights
 import markdown
 from django.utils.timezone import now
-
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
@@ -30,9 +22,10 @@ from reportlab.lib.units import inch
 from datetime import datetime, date
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
-
+import json
 from .utils import log_activity
 from django.contrib.admin.views.decorators import staff_member_required
+from decimal import Decimal
 
 
 # Employee dashboard'
@@ -72,16 +65,16 @@ def admin_dashboard(request):
         for employee_kpi in employee_kpis_for_this_kpi:
             progress_entries = ProgressEntry.objects.filter(employee_kpi=employee_kpi)
             for progress_entry in progress_entries:
-                total_progress_for_kpi += progress_entry.value
+                total_progress_for_kpi += float(progress_entry.value)
 
-        chart_values_list.append(total_progress_for_kpi)
+        chart_values_list.append(float(total_progress_for_kpi))
 
     context = {
         "total_users": total_users_count,
         "total_employees": total_employees_count,
         "kpis": all_kpis,
-        "chart_labels": chart_labels_list,
-        "chart_values": chart_values_list,
+        "chart_labels": json.dumps(chart_labels_list),
+        "chart_values": json.dumps([float(v) for v in chart_values_list]),
     }
 
     return render(request, "dashboards/admin_dashboard.html", context)
@@ -192,8 +185,8 @@ def employee_dashboard(request):
         "employee_name": employee_profile.user.username,
         "role": employee_profile.job_role,
         "kpi_cards": kpi_cards_list,
-        "chart_labels": chart_labels_list,
-        "chart_values": chart_values_list,
+        "chart_labels": json.dumps(chart_labels_list),
+        "chart_values": json.dumps(chart_values_list),
     }
 
     return render(request, "dashboards/employee_dashboard.html", context)
@@ -210,16 +203,18 @@ def home(request):
 
 
 @login_required
-@role_required(["admin"])
+@role_required(['admin'])
 def kpis_index(request):
     kpis = Kpi.objects.all()
     return render(request, "kpi/index.html", {"kpis": kpis})
+
 
 
 @login_required
 def kpis_detail(request, kpi_id):
     kpi = Kpi.objects.get(id=kpi_id)
     return render(request, "kpi/detail.html", {"kpi": kpi})
+
 
 
 class KpiCreate(RoleRequiredMixin, CreateView):
@@ -229,41 +224,63 @@ class KpiCreate(RoleRequiredMixin, CreateView):
     allowed_roles = ["admin"]
 
 
+
 @login_required
-@role_required(["employee"])
+@role_required(['employee'])
 def add_progress(request):
-    if request.method == "POST":
+    if request.method == 'POST':
         form = KpiProgressForm(request.POST, user=request.user)
 
         if form.is_valid():
-            employee_kpi = form.cleaned_data["employee_kpi"]
+            employee_kpi = form.cleaned_data['employee_kpi']
 
             if employee_kpi.status() == "Complete":
-                messages.error(
-                    request,
-                    "This KPI is already complete. You cannot add more progress.",
-                )
-                return redirect("employee_kpi")
+                messages.error(request, "This KPI is already complete. You cannot add more progress.")
+                return redirect('employee_kpi')
+
 
             progress = form.save()
 
+            # check if the kpi is complete
+            is_completed = employee_kpi.status() == "Complete"
+
+            # send notification to manager
+            if employee_kpi.employee.manager:
+                notification_title = 'KPI Completed!' if is_completed else 'Progress Updated'
+                notification_message = (
+                    f'{request.user.get_full_name() or request.user.username} has completed the KPI: {employee_kpi.kpi.title}'
+                    if is_completed else
+                    f'{request.user.get_full_name() or request.user.username} added progress to "{employee_kpi.kpi.title}". '
+                    f'Current progress: {employee_kpi.progress_percentage()}%'
+                )
+
+                create_notification(
+                    recipient=employee_kpi.employee.manager,
+                    sender=request.user,
+                    notification_type='kpi_completed' if is_completed else 'progress_added',
+                    title=notification_title,
+                    message=notification_message,
+                    employee_kpi=employee_kpi
+                )
+
             log_activity(
                 user=request.user,
-                action="PROGRESS_ADDED",
+                action='PROGRESS_ADDED',
                 description=f"Added progress for '{progress.employee_kpi.kpi.title}' - Value: {progress.value}",
-                related_user=None,
+                related_user=None
             )
             messages.success(request, "Progress added successfully!")
-            return redirect("employee_kpi")
+            return redirect('employee_kpi')
 
     else:
         form = KpiProgressForm(user=request.user)
 
-    return render(request, "kpi/progress.html", {"form": form})
+    return render(request, 'kpi/progress.html', {'form': form})
+
 
 
 @login_required
-@role_required(["employee"])
+@role_required(['employee'])
 def employee_kpi(request):
     employee_kpi = EmployeeKpi.objects.all()
     return render(request, "kpi/employee_kpi.html", {"employee_kpi": employee_kpi})
@@ -284,10 +301,9 @@ def unauthorized(request):
 def profile(request):
     return render(request, "users/profile.html")
 
-
 # Assign KPI: managers assign employees to KPI; KPIs & employees filtered by manager's department
 @login_required
-@role_required(["manager"])
+@role_required(['manager'])
 def assign_kpi(request):
     # pass request.user into the form so it filters by department if user is manager
     form = AssignKpiForm(
@@ -296,22 +312,31 @@ def assign_kpi(request):
     )
     if request.method == "POST":
         if form.is_valid():
-            kpi_assignment = form.save()
+            kpi_assignment=form.save()
 
             log_activity(
                 user=request.user,
-                action="KPI_ASSIGNED",
+                action='KPI_ASSIGNED',
                 description=f"Assigned '{kpi_assignment.kpi.title}' to {kpi_assignment.employee.user.username} (Target: {kpi_assignment.target_value}, Weight: {kpi_assignment.weight}%)",
-                related_user=kpi_assignment.employee.user,
+                related_user=kpi_assignment.employee.user
+            )
+
+            # send notification to employees
+            create_notification(
+                recipient=employee_kpi.employee.user,
+                sender=request.user,
+                notification_type='kpi_assigned',
+                title='New KPI Assigned',
+                message=f'You have been assigned a new KPI: {employee_kpi.kpi.title}. Target: {employee_kpi.target_value}',
+                employee_kpi=employee_kpi
             )
 
             messages.success(request, "KPI assigned successfully.")
             return redirect("employee_kpi_list")
     return render(request, "main_app/assign_kpi.html", {"form": form})
 
-
 @login_required
-@role_required(["manager"])
+@role_required(['manager'])
 def employee_kpi_list(request):
     if (
         request.user.is_authenticated
@@ -320,38 +345,36 @@ def employee_kpi_list(request):
     ):
         dept = request.user.employeeprofile.department
         # show only assignments where employee is in manager's department
-        kpis = (
-            EmployeeKpi.objects.filter(employee__department=dept)
-            .select_related("employee__user", "kpi")
-            .order_by("-id")
-        )
+        kpis = EmployeeKpi.objects.filter(employee__department=dept).select_related(
+            "employee__user", "kpi"
+        ).order_by('-id')
     else:
         kpis = EmployeeKpi.objects.select_related("employee__user", "kpi").all()
 
     # search functionality
-    search_query = request.GET.get("search", "").strip()
+    search_query = request.GET.get('search', '').strip()
     if search_query:
         kpis = kpis.filter(
-            Q(employee__user__username__icontains=search_query)
-            | Q(employee__user__first_name__icontains=search_query)
-            | Q(employee__user__last_name__icontains=search_query)
-            | Q(employee__job_role__icontains=search_query)
+            Q(employee__user__username__icontains=search_query) |
+            Q(employee__user__first_name__icontains=search_query) |
+            Q(employee__user__last_name__icontains=search_query) |
+            Q(employee__job_role__icontains=search_query)
         )
 
     # filter by KPI
-    kpi_filter = request.GET.get("kpi", "")
+    kpi_filter = request.GET.get('kpi', '')
     if kpi_filter:
         kpis = kpis.filter(kpi__id=kpi_filter)
 
     # order by newest first
-    kpis = kpis.order_by("-id")
+    kpis = kpis.order_by('-id')
 
-    status_filter = request.GET.get("status", "")
+    status_filter = request.GET.get('status', '')
     if status_filter:
         # convert the queryset to a list and filter by status since status is a method
         filtered_kpis = []
         for kpi in kpis:
-            kpi_status = kpi.status().lower().replace(" ", "_")
+            kpi_status = kpi.status().lower().replace(' ', '_')
             if kpi_status == status_filter:
                 filtered_kpis.append(kpi)
         kpis = filtered_kpis
@@ -371,17 +394,16 @@ def employee_kpi_list(request):
         all_kpis = Kpi.objects.all()
 
     context = {
-        "kpis": kpis,
-        "all_kpis": all_kpis,
-        "search_query": search_query,
-        "kpi_filter": kpi_filter,
-        "status_filter": status_filter,
+        'kpis': kpis,
+        'all_kpis': all_kpis,
+        'search_query': search_query,
+        'kpi_filter': kpi_filter,
+        'status_filter': status_filter,
     }
     return render(request, "main_app/employee_kpi_list.html", context)
 
-
 @login_required
-@role_required(["manager"])
+@role_required(['manager'])
 def employee_kpi_edit(request, pk):
     kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
     if kpi_assign.progressentry_set.exists():
@@ -398,9 +420,19 @@ def employee_kpi_edit(request, pk):
 
         log_activity(
             user=request.user,
-            action="KPI_UPDATED",
+            action='KPI_UPDATED',
             description=f"Updated KPI '{kpi_assignment.kpi.title}' for {kpi_assignment.employee.user.username}",
-            related_user=kpi_assignment.employee.user,
+            related_user=kpi_assignment.employee.user
+        )
+
+        # send notification to employee
+        create_notification(
+            recipient=employee_kpi.employee.user,
+            sender=request.user,
+            notification_type='kpi_updated',
+            title='KPI Updated',
+            message=f'Your KPI "{employee_kpi.kpi.title}" has been updated by your manager.',
+            employee_kpi=employee_kpi
         )
 
         messages.success(request, "KPI updated successfully.")
@@ -410,9 +442,8 @@ def employee_kpi_edit(request, pk):
         request, "main_app/employee_kpi_edit.html", {"form": form, "kpi": kpi_assign}
     )
 
-
 @login_required
-@role_required(["manager"])
+@role_required(['manager'])
 def employee_kpi_delete(request, pk):
     kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
     if kpi_assign.progressentry_set.exists():
@@ -426,9 +457,9 @@ def employee_kpi_delete(request, pk):
 
         log_activity(
             user=request.user,
-            action="KPI_DELETED",
+            action='KPI_DELETED',
             description=f"Deleted KPI assignment '{kpi_title}' from {employee_name}",
-            related_user=related_user,
+            related_user=related_user
         )
 
         kpi_assign.delete()
@@ -437,9 +468,8 @@ def employee_kpi_delete(request, pk):
 
     return render(request, "main_app/employee_kpi_delete.html", {"kpi": kpi_assign})
 
-
 @login_required
-@role_required(["manager"])
+@role_required(['manager'])
 def employee_kpi_detail(request, pk):
     kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
     progress_entries = kpi_assign.progressentry_set.order_by("date")
@@ -454,174 +484,6 @@ def employee_kpi_detail(request, pk):
 
 # reports views
 
-## AI feature for Manager View
-@login_required
-@role_required(["manager"])
-def ai_kpi_insights(request):
-    manager_user = request.user
-
-    employees = EmployeeProfile.objects.filter(manager=manager_user)
-    data = ""
-
-    for emp in employees:
-        data += f"\n=== Employee: {emp.user.get_full_name() or emp.user.username} ===\n"
-
-        emp_kpis = EmployeeKpi.objects.filter(employee=emp)
-
-        active_kpis = []
-        previous_kpis = []
-
-        for ek in emp_kpis:
-            if ek.status() == "Complete":
-                previous_kpis.append(ek)
-            else:
-                active_kpis.append(ek)
-
-        # current active KPI (latest valid progress entry)
-        current_kpi = None
-        current_last_progress = None
-
-        for ek in active_kpis:
-            last_progress = (
-                ProgressEntry.objects.filter(employee_kpi=ek, date__lte=now().date())
-                .order_by("-date")
-                .first()
-            )
-            if not last_progress:
-                continue
-
-            if (
-                current_last_progress is None
-                or last_progress.date > current_last_progress.date
-            ):
-                current_last_progress = last_progress
-                current_kpi = ek
-
-        # the current kpi the emloyee is working on
-        if current_kpi and current_last_progress:
-            data += "\n-- Current Task (Detailed) --\n"
-            data += (
-                f"KPI: {current_kpi.kpi.title}\n"
-                f"Progress: {current_last_progress.value}%\n"
-                f"Last Update: {current_last_progress.date}\n"
-                f"Notes: {current_last_progress.note}\n\n"
-            )
-
-        # Add all other active KPIs to "previous" section
-        for ek in active_kpis:
-            if current_kpi and ek.id != current_kpi.id:
-                previous_kpis.append(ek)
-
-        # if previous tasks are completed then dont give detail insights of it.
-        if previous_kpis:
-            data += "\n-- Previous Tasks (Summary Only) --\n"
-            for ok in previous_kpis:
-                data += f"KPI: {ok.kpi.title} — Completed or previously worked on.\n"
-
-        data += "\n----------------------------\n"
-
-    ai_output = generate_kpi_insights(data, mode="manager")
-    ai_output_html = markdown.markdown(ai_output)
-
-    return render(request, "ai/kpi_insights.html", {"ai_output_html": ai_output_html})
-
-
-## AI feature for admin to get insights of Manager, Department and Employee like a detail insight of each thing.
-@login_required
-@role_required(["admin"])
-def ai_admin_insights(request):
-    import markdown
-
-    data = "=== ORGANIZATION-WIDE KPI REPORT ===\n"
-
-    data += "\n## DEPARTMENT OVERVIEW\n"
-
-    for dep_code, dep_name in DEPARTMENT:
-        employees = EmployeeProfile.objects.filter(department=dep_code, role="employee")
-
-        total_employees = employees.count()
-        emp_kpis = EmployeeKpi.objects.filter(employee__in=employees)
-
-        total_kpis = emp_kpis.count()
-        active_kpis = [ek for ek in emp_kpis if ek.status() != "Complete"]
-        completed_kpis = [ek for ek in emp_kpis if ek.status() == "Complete"]
-
-        # average progress
-        progress_values = [ek.progress_percentage() for ek in active_kpis]
-        avg_progress = (
-            sum(progress_values) / len(progress_values) if progress_values else 0
-        )
-
-        #risky KPIs (low progress)
-        risky_kpis = [ek for ek in active_kpis if ek.progress_percentage() < 40]
-
-        data += f"""
-### {dep_name}
-Employees: {total_employees}
-Total KPIs: {total_kpis}
-Active KPIs: {len(active_kpis)}
-Completed KPIs: {len(completed_kpis)}
-Average Progress: {avg_progress:.1f}%
-At-Risk KPIs: {len(risky_kpis)}
-"""
-##manager summary
-    data += "\n## MANAGER PERFORMANCE SUMMARY\n"
-
-    managers = EmployeeProfile.objects.filter(role="manager")
-
-    for mgr in managers:
-        team = EmployeeProfile.objects.filter(manager=mgr.user)
-
-        total_team = team.count()
-        team_kpis = EmployeeKpi.objects.filter(employee__in=team)
-
-        active_kpis = [ek for ek in team_kpis if ek.status() != "Complete"]
-        progress_values = [ek.progress_percentage() for ek in active_kpis]
-
-        avg_progress = (
-            sum(progress_values) / len(progress_values) if progress_values else 0
-        )
-
-        data += f"""
-### Manager: {mgr.user.get_full_name()}
-Team Size: {total_team}
-Active KPIs: {len(active_kpis)}
-Average Team Progress: {avg_progress:.1f}%
-"""
-
-    data += "\n## EMPLOYEE CURRENT TASK SNAPSHOT\n"
-
-    all_employees = EmployeeProfile.objects.filter(role="employee")
-
-    for emp in all_employees:
-        latest_entry = (
-            ProgressEntry.objects.filter(
-                employee_kpi__employee=emp, date__lte=now().date()
-            )
-            .order_by("-date")
-            .first()
-        )
-
-        if latest_entry:
-            current_kpi = latest_entry.employee_kpi
-            data += (
-                f"\nEmployee: {emp.user.get_full_name()}\n"
-                f"Current KPI: {current_kpi.kpi.title}\n"
-                f"Progress: {latest_entry.value}%\n"
-                f"Last Update: {latest_entry.date}\n"
-                f"Notes: {latest_entry.note}\n"
-            )
-        else:
-            data += f"\nEmployee: {emp.user.get_full_name()}\nNo active KPI.\n"
-
-    # AI processing
-    ai_output = generate_kpi_insights(data, mode="admin")
-    ai_output_html = markdown.markdown(ai_output)
-
-    return render(request, "ai/admin_insights.html", {"ai_output_html": ai_output_html})
-
-
-@role_required(["admin"])
 # manager reports view with filtering
 @login_required
 @role_required(['manager'])
@@ -1141,11 +1003,12 @@ def admin_export_excel(request):
 @role_required(['admin'])
 def activity_logs(request):
     # get url values form filter form
-    selected_action = request.GET.get("action", "")
-    selected_user = request.GET.get("user", "")
+    selected_action = request.GET.get('action', '')
+    selected_user = request.GET.get('user', '')
 
     all_logs = ActivityLog.objects.all()
-    all_logs = all_logs.select_related("user", "related_user")
+    all_logs = all_logs.select_related('user', 'related_user')
+
 
     if selected_action:
         all_logs = all_logs.filter(action=selected_action)
@@ -1158,15 +1021,211 @@ def activity_logs(request):
     action_choices = ActivityLog.ACTION_CHOICES
 
     users_with_logs = User.objects.filter(activity_logs__isnull=False)
-    users_with_logs = users_with_logs.select_related("employeeprofile")
+    users_with_logs = users_with_logs.select_related('employeeprofile')
     users_with_logs = users_with_logs.distinct()
-    users_with_logs = users_with_logs.order_by("username")
+    users_with_logs = users_with_logs.order_by('username')
+
+
 
     template_data = {
-        "logs": recent_logs,
-        "available_actions": action_choices,
-        "active_users": users_with_logs,
-        "current_action_filter": selected_action,
-        "current_user_filter": selected_user,
+        'logs': recent_logs,
+        'available_actions': action_choices,
+        'active_users': users_with_logs,
+        'current_action_filter': selected_action,
+        'current_user_filter': selected_user,
     }
-    return render(request, "activity/admin_logs.html", template_data)
+    return render(request, 'activity/admin_logs.html', template_data)
+
+#  this is the helper function to create notifications
+def create_notification(recipient, sender, notification_type, title, message, employee_kpi=None):
+    Notification.objects.create(
+        recipient=recipient,
+        sender=sender,
+        notification_type=notification_type,
+        title=title,
+        message=message,
+        employee_kpi=employee_kpi
+    )
+
+# view all notifications for current user
+@login_required
+def notifications(request):
+    profile = EmployeeProfile.objects.get(user=request.user)
+
+    # exclude admin from notifications
+    if profile.role == 'admin':
+        return redirect('dashboard')
+
+    user_notifications = Notification.objects.filter(recipient=request.user)
+    unread_count = user_notifications.filter(is_read=False).count()
+
+    context = {
+        'notifications': user_notifications,
+        'unread_count': unread_count,
+    }
+    return render(request, 'notifications/notifications.html', context)
+
+## AI feature for Manager View
+@login_required
+@role_required(["manager"])
+def ai_kpi_insights(request):
+    manager_user = request.user
+
+    employees = EmployeeProfile.objects.filter(manager=manager_user)
+    data = ""
+
+    for emp in employees:
+        data += f"\n=== Employee: {emp.user.get_full_name() or emp.user.username} ===\n"
+
+        emp_kpis = EmployeeKpi.objects.filter(employee=emp)
+
+        active_kpis = []
+        previous_kpis = []
+
+        for ek in emp_kpis:
+            if ek.status() == "Complete":
+                previous_kpis.append(ek)
+            else:
+                active_kpis.append(ek)
+
+        # current active KPI (latest valid progress entry)
+        current_kpi = None
+        current_last_progress = None
+
+        for ek in active_kpis:
+            last_progress = (
+                ProgressEntry.objects.filter(employee_kpi=ek, date__lte=now().date())
+                .order_by("-date")
+                .first()
+            )
+            if not last_progress:
+                continue
+
+            if (
+                current_last_progress is None
+                or last_progress.date > current_last_progress.date
+            ):
+                current_last_progress = last_progress
+                current_kpi = ek
+
+        # the current kpi the emloyee is working on
+        if current_kpi and current_last_progress:
+            data += "\n-- Current Task (Detailed) --\n"
+            data += (
+                f"KPI: {current_kpi.kpi.title}\n"
+                f"Progress: {current_last_progress.value}%\n"
+                f"Last Update: {current_last_progress.date}\n"
+                f"Notes: {current_last_progress.note}\n\n"
+            )
+
+        # Add all other active KPIs to "previous" section
+        for ek in active_kpis:
+            if current_kpi and ek.id != current_kpi.id:
+                previous_kpis.append(ek)
+
+        # if previous tasks are completed then dont give detail insights of it.
+        if previous_kpis:
+            data += "\n-- Previous Tasks (Summary Only) --\n"
+            for ok in previous_kpis:
+                data += f"KPI: {ok.kpi.title} — Completed or previously worked on.\n"
+
+        data += "\n----------------------------\n"
+
+    ai_output = generate_kpi_insights(data, mode="manager")
+    ai_output_html = markdown.markdown(ai_output)
+
+    return render(request, "ai/kpi_insights.html", {"ai_output_html": ai_output_html})
+
+
+## AI feature for admin to get insights of Manager, Department and Employee like a detail insight of each thing.
+@login_required
+@role_required(["admin"])
+def ai_admin_insights(request):
+
+    data = "=== ORGANIZATION-WIDE KPI REPORT ===\n"
+
+    data += "\n## DEPARTMENT OVERVIEW\n"
+
+    for dep_code, dep_name in DEPARTMENT:
+        employees = EmployeeProfile.objects.filter(department=dep_code, role="employee")
+
+        total_employees = employees.count()
+        emp_kpis = EmployeeKpi.objects.filter(employee__in=employees)
+
+        total_kpis = emp_kpis.count()
+        active_kpis = [ek for ek in emp_kpis if ek.status() != "Complete"]
+        completed_kpis = [ek for ek in emp_kpis if ek.status() == "Complete"]
+
+        # average progress
+        progress_values = [ek.progress_percentage() for ek in active_kpis]
+        avg_progress = (
+            sum(progress_values) / len(progress_values) if progress_values else 0
+        )
+
+        #risky KPIs (low progress)
+        risky_kpis = [ek for ek in active_kpis if ek.progress_percentage() < 40]
+
+        data += f"""
+### {dep_name}
+Employees: {total_employees}
+Total KPIs: {total_kpis}
+Active KPIs: {len(active_kpis)}
+Completed KPIs: {len(completed_kpis)}
+Average Progress: {avg_progress:.1f}%
+At-Risk KPIs: {len(risky_kpis)}
+"""
+##manager summary
+    data += "\n## MANAGER PERFORMANCE SUMMARY\n"
+
+    managers = EmployeeProfile.objects.filter(role="manager")
+
+    for mgr in managers:
+        team = EmployeeProfile.objects.filter(manager=mgr.user)
+
+        total_team = team.count()
+        team_kpis = EmployeeKpi.objects.filter(employee__in=team)
+
+        active_kpis = [ek for ek in team_kpis if ek.status() != "Complete"]
+        progress_values = [ek.progress_percentage() for ek in active_kpis]
+
+        avg_progress = (
+            sum(progress_values) / len(progress_values) if progress_values else 0
+        )
+
+        data += f"""
+### Manager: {mgr.user.get_full_name()}
+Team Size: {total_team}
+Active KPIs: {len(active_kpis)}
+Average Team Progress: {avg_progress:.1f}%
+"""
+
+    data += "\n## EMPLOYEE CURRENT TASK SNAPSHOT\n"
+
+    all_employees = EmployeeProfile.objects.filter(role="employee")
+
+    for emp in all_employees:
+        latest_entry = (
+            ProgressEntry.objects.filter(
+                employee_kpi__employee=emp, date__lte=now().date()
+            )
+            .order_by("-date")
+            .first()
+        )
+
+        if latest_entry:
+            current_kpi = latest_entry.employee_kpi
+            data += (
+                f"\nEmployee: {emp.user.get_full_name()}\n"
+                f"Current KPI: {current_kpi.kpi.title}\n"
+                f"Progress: {latest_entry.value}%\n"
+                f"Last Update: {latest_entry.date}\n"
+                f"Notes: {latest_entry.note}\n"
+            )
+        else:
+            data += f"\nEmployee: {emp.user.get_full_name()}\nNo active KPI.\n"
+
+    # AI processing
+    ai_output = generate_kpi_insights(data, mode="admin")
+    ai_output_html = markdown.markdown(ai_output)
+
+    return render(request, "ai/admin_insights.html", {"ai_output_html": ai_output_html})

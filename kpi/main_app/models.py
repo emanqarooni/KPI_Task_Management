@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
-from datetime import date
+from datetime import datetime
 from django.db.models import Sum
 
 DEPARTMENT = (
@@ -161,3 +161,29 @@ class ActivityLog(models.Model):
 
     def __str__(self):
         return f"{self.user.username if self.user else 'Unknown'} - {self.get_action_display()} - {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = [
+        ('kpi_assigned', 'KPI Assigned'),
+        ('kpi_updated', 'KPI Updated'),
+        ('kpi_deleted', 'KPI Deleted'),
+        ('progress_added', 'Progress Added'),
+        ('kpi_completed', 'KPI Completed'),
+        ('kpi_approaching_deadline', 'Approaching Deadline'),
+    ]
+
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_notifications', null=True, blank=True)
+    notification_type = models.CharField(max_length=30, choices=NOTIFICATION_TYPES)
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    employee_kpi = models.ForeignKey(EmployeeKpi, on_delete=models.CASCADE, null=True, blank=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.recipient.username} - {self.title}"
+

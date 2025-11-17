@@ -32,7 +32,11 @@ urlpatterns = [
     path('reports/admin_export-excel/', views.admin_export_excel, name='admin_export_excel'),
 
     # for admin only
-    path("activity-logs/", views.activity_logs, name="activity_logs"),
+    path('activity-logs/', views.activity_logs, name='activity_logs'),
+
+    # notifications for manager and employee only
+    path('notifications/', views.notifications, name='notifications'),
+    
     # for ai feature
     path("ai/kpi-insights/", views.ai_kpi_insights, name="ai_kpi_insights"),
     path("admin-dashboard/ai-insights/", views.ai_admin_insights, name="ai_admin_insights"),
