@@ -11,9 +11,83 @@
 
     <div class="kpi-box">
       <p>Total Users: <strong>{{ total_users }}</strong></p>
-      <p>Total Employees: <strong>{{ total_employees }}</strong></p>
     </div>
 
+    <!-- Employees Section -->
+    <h3>Employees ({{ total_employees }})</h3>
+    <div class="kpi-box">
+      {% if employees %}
+        <div class="admin-table-container">
+          <table class="table table-zebra admin-kpi-table">
+            <thead>
+              <tr class="admin-table-header">
+                <th>#</th>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Job Role</th>
+                <th>Department</th>
+                <th>Manager</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for employee in employees %}
+              <tr class="admin-table-row">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ employee.user.get_full_name|default:"-" }}</td>
+                <td>{{ employee.user.username }}</td>
+                <td>{{ employee.job_role }}</td>
+                <td>{{ employee.get_department_display }}</td>
+                <td>{{ employee.manager.get_full_name|default:"No Manager" }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="empty-state-cell">No employees found</p>
+      {% endif %}
+    </div>
+
+    <!-- Managers Section -->
+    <h3>Managers ({{ total_managers }})</h3>
+    <div class="kpi-box">
+      {% if managers %}
+        <div class="admin-table-container">
+          <table class="table table-zebra admin-kpi-table">
+            <thead>
+              <tr class="admin-table-header">
+                <th>#</th>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Job Role</th>
+                <th>Department</th>
+                <th>Team Size</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for manager in managers %}
+              <tr class="admin-table-row">
+                <td>{{ forloop.counter }}</td>
+                <td>{{ manager.user.get_full_name|default:"-" }}</td>
+                <td>{{ manager.user.username }}</td>
+                <td>{{ manager.job_role }}</td>
+                <td>{{ manager.get_department_display }}</td>
+                <td>
+                  {% with team_count=manager.user.managed_employees.count %}
+                    {{ team_count }} employee{{ team_count|pluralize }}
+                  {% endwith %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p class="empty-state-cell">No managers found</p>
+      {% endif %}
+    </div>
+
+    <!-- KPI Assignments Section -->
     <h3>Employee KPI Assignments</h3>
 
     <div class="admin-table-container">
