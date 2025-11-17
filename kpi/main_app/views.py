@@ -471,7 +471,25 @@ def employee_kpi_delete(request, pk):
 @login_required
 @role_required(['manager'])
 def employee_kpi_detail(request, pk):
-    kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
+    profile = request.user.employeeprofile
+
+    # managers can view any kpi in their department
+    if profile.role == 'manager':
+        kpi_assign = get_object_or_404(
+            EmployeeKpi,
+            pk=pk,
+            employee__department=profile.department
+        )
+    # employees can only view their own KPIs
+    elif profile.role == 'employee':
+        kpi_assign = get_object_or_404(
+            EmployeeKpi,
+            pk=pk,
+            employee__user=request.user
+        )
+    else:
+        return redirect('unauthorized')
+
     progress_entries = kpi_assign.progressentry_set.order_by("date")
     return render(
         request,
