@@ -2,47 +2,147 @@
 {% load static %}
 
 {% block content %}
-  <div>
-      <h2>Assign KPI</h2>
+  <div class="max-w-4xl mx-auto">
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-base-content mb-2">Assign KPI</h1>
+      <p class="text-base-content/70">Assign key performance indicators to employees</p>
+    </div>
 
-      <hr>
-
-      <form method="post">
+    <!-- Form Card -->
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <form method="post" class="space-y-6">
           {% csrf_token %}
-          <div>
-              {{ form.employee.label_tag }}<br>
-              {{ form.employee }}
-          </div><br>
+            <!-- validation error message for fields -->
+            {% if form.non_field_errors %}
+            <div class="alert alert-error shadow-lg mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                {{ form.non_field_errors.0 }}
+                </div>
+            </div>
+            {% endif %}
 
-          <div>
-              {{ form.kpi.label_tag }}<br>
-              {{ form.kpi }}
-          </div><br>
+          <!-- Employee Selection -->
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text font-semibold">{{ form.employee.label }}</span>
+              <span class="label-text-alt text-error">*</span>
+            </label>
+            {{ form.employee }}
+            {% if form.employee.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.employee.errors.0 }}</span>
+              </label>
+            {% endif %}
+          </div>
 
-          <div>
-              {{ form.target_value.label_tag }}<br>
+          <!-- KPI Selection -->
+          <div class="form-control w-full">
+            <label class="label">
+              <span class="label-text font-semibold">{{ form.kpi.label }}</span>
+              <span class="label-text-alt text-error">*</span>
+            </label>
+            {{ form.kpi }}
+            {% if form.kpi.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.kpi.errors.0 }}</span>
+              </label>
+            {% endif %}
+          </div>
+
+          <!-- Target Value and Weight Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Target Value -->
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text font-semibold">{{ form.target_value.label }}</span>
+                <span class="label-text-alt text-error">*</span>
+              </label>
               {{ form.target_value }}
-          </div><br>
+              {% if form.target_value.errors %}
+                <label class="label">
+                  <span class="label-text-alt text-error">{{ form.target_value.errors.0 }}</span>
+                </label>
+              {% endif %}
+            </div>
 
-          <div>
-              {{ form.weight.label_tag }}<br>
+            <!-- Weight -->
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text font-semibold">{{ form.weight.label }}</span>
+                <span class="label-text-alt text-error">*</span>
+              </label>
               {{ form.weight }}
-          </div><br>
+              {% if form.weight.errors %}
+                <label class="label">
+                  <span class="label-text-alt text-error">{{ form.weight.errors.0 }}</span>
+                </label>
+              {% endif %}
+            </div>
+          </div>
 
-          <div>
-              {{ form.start_date.label_tag }}<br>
+          <!-- Date Range Row -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Start Date -->
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text font-semibold">{{ form.start_date.label }}</span>
+                <span class="label-text-alt text-error">*</span>
+              </label>
               {{ form.start_date }}
-          </div><br>
+              {% if form.start_date.errors %}
+                <label class="label">
+                  <span class="label-text-alt text-error">{{ form.start_date.errors.0 }}</span>
+                </label>
+              {% endif %}
+            </div>
 
-          <div>
-              {{ form.end_date.label_tag }}<br>
+            <!-- End Date -->
+            <div class="form-control w-full">
+              <label class="label">
+                <span class="label-text font-semibold">{{ form.end_date.label }}</span>
+                <span class="label-text-alt text-error">*</span>
+              </label>
               {{ form.end_date }}
-          </div><br>
+              {% if form.end_date.errors %}
+                <label class="label">
+                  <span class="label-text-alt text-error">{{ form.end_date.errors.0 }}</span>
+                </label>
+              {% endif %}
+            </div>
+          </div>
 
-          <button type="submit">
+          <!-- Form Actions -->
+          <div class="divider"></div>
+
+          <div class="card-actions justify-end gap-3">
+            <a href="{% url 'employee_kpi_list' %}" class="btn btn-ghost">
+              Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               Assign KPI
-          </button>
-      </form>
-  </div>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
+    <!-- Help Text Card -->
+    <div class="alert alert-info shadow-lg mt-6">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <div>
+        <h3 class="font-bold">Tips for assigning KPIs</h3>
+        <div class="text-xs">Make sure the target value is realistic and achievable. The weight should reflect the importance of this KPI (total weights should add up to 100).</div>
+      </div>
+    </div>
+  </div>
 {% endblock %}
