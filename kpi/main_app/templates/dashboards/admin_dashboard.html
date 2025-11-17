@@ -1,145 +1,145 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
 
 <div class="dashboard-container">
+
   <a href="{% url 'ai_admin_insights' %}" class="btn blue">AI Organizational Insights</a>
 
   <div class="dashboard-content">
 
     <h2>Admin Dashboard</h2>
 
-    <div class="kpi-box">
+    <div>
       <p>Total Users: <strong>{{ total_users }}</strong></p>
     </div>
 
     <!-- Employees Section -->
     <h3>Employees ({{ total_employees }})</h3>
-    <div class="kpi-box">
+    <div>
       {% if employees %}
-        <div class="admin-table-container">
-          <table class="table table-zebra admin-kpi-table">
-            <thead>
-              <tr class="admin-table-header">
-                <th>#</th>
-                <th>Name</th>
-                <th>Username</th>
-                <th>Job Role</th>
-                <th>Department</th>
-                <th>Manager</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for employee in employees %}
-              <tr class="admin-table-row">
-                <td>{{ forloop.counter }}</td>
-                <td>{{ employee.user.get_full_name|default:"-" }}</td>
-                <td>{{ employee.user.username }}</td>
-                <td>{{ employee.job_role }}</td>
-                <td>{{ employee.get_department_display }}</td>
-                <td>{{ employee.manager.get_full_name|default:"No Manager" }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Username</th>
+              <th>Job Role</th>
+              <th>Department</th>
+              <th>Manager</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for employee in employees %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ employee.user.get_full_name|default:"-" }}</td>
+              <td>{{ employee.user.username }}</td>
+              <td>{{ employee.job_role }}</td>
+              <td>{{ employee.get_department_display }}</td>
+              <td>{{ employee.manager.get_full_name|default:"No Manager" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       {% else %}
-        <p class="empty-state-cell">No employees found</p>
+        <p>No employees found</p>
       {% endif %}
     </div>
 
     <!-- Managers Section -->
     <h3>Managers ({{ total_managers }})</h3>
-    <div class="kpi-box">
+    <div>
       {% if managers %}
-        <div class="admin-table-container">
-          <table class="table table-zebra admin-kpi-table">
-            <thead>
-              <tr class="admin-table-header">
-                <th>#</th>
-                <th>Name</th>
-                <th>Username</th>
-                <th>Job Role</th>
-                <th>Department</th>
-                <th>Team Size</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for manager in managers %}
-              <tr class="admin-table-row">
-                <td>{{ forloop.counter }}</td>
-                <td>{{ manager.user.get_full_name|default:"-" }}</td>
-                <td>{{ manager.user.username }}</td>
-                <td>{{ manager.job_role }}</td>
-                <td>{{ manager.get_department_display }}</td>
-                <td>
-                  {% with team_count=manager.user.managed_employees.count %}
-                    {{ team_count }} employee{{ team_count|pluralize }}
-                  {% endwith %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Username</th>
+              <th>Job Role</th>
+              <th>Department</th>
+              <th>Team Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for manager in managers %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ manager.user.get_full_name|default:"-" }}</td>
+              <td>{{ manager.user.username }}</td>
+              <td>{{ manager.job_role }}</td>
+              <td>{{ manager.get_department_display }}</td>
+              <td>{{ manager.user.managed_employees.count }} employees</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
       {% else %}
-        <p class="empty-state-cell">No managers found</p>
+        <p>No managers found</p>
       {% endif %}
     </div>
 
     <!-- KPI Assignments Section -->
     <h3>Employee KPI Assignments</h3>
 
-    <div class="admin-table-container">
-      <table class="table table-zebra admin-kpi-table">
-        <thead>
-          <tr class="admin-table-header">
-            <th>Employee</th>
-            <th>Manager</th>
-            <th>KPI</th>
-            <th>Target</th>
-            <th>Progress</th>
-            <th>Weight</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for data in employee_kpi_data %}
-          <tr class="admin-table-row">
-            <td class="employee-name-cell">{{ data.employee_name }}</td>
-            <td class="manager-name-cell">{{ data.manager_name }}</td>
-            <td class="kpi-title-cell">{{ data.kpi_title }}</td>
-            <td class="target-cell">{{ data.target_value }}</td>
-            <td class="progress-cell">
-              <div class="progress-info">
-                <span class="progress-value">{{ data.current_progress }} / {{ data.target_value }}</span>
-                <span class="progress-percentage">({{ data.progress_percentage }}%)</span>
-              </div>
-            </td>
-            <td class="weight-cell">{{ data.weight }}%</td>
-            <td class="status-cell">
-              <span class="badge
-                {% if data.status == 'Complete' %}badge-status-complete
-                {% elif data.status == 'In Progress' %}badge-status-progress
-                {% else %}badge-status-none{% endif %}">
-                {{ data.status }}
-              </span>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="7" class="empty-state-cell">No KPI assignments found</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Manager</th>
+          <th>KPI</th>
+          <th>Target</th>
+          <th>Progress</th>
+          <th>Weight</th>
+          <th>Status</th>
+          <th>Weighted Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for data in employee_kpi_data %}
+        <tr>
+          <td>{{ data.employee_name }}</td>
+          <td>{{ data.manager_name }}</td>
+          <td>{{ data.kpi_title }}</td>
+          <td>{{ data.target_value }}</td>
+          <td>{{ data.current_progress }} / {{ data.target_value }}</td>
+          <td>{{ data.weight }}%</td>
+          <td>{{ data.status }}</td>
+          <td>{{ data.weighted_score }}%</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8">No KPI assignments found</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
+    <!-- Final Weighted Score per Employee -->
+    <h3>Final Weighted KPI Score (Total)</h3>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Total Weighted Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for name, score in employee_total_scores.items %}
+        <tr>
+          <td>{{ name }}</td>
+          <td>{{ score|floatformat:2 }}%</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- KPI Overview Chart -->
     <h3>KPI Overview Chart</h3>
-
-    <div class="kpi-box">
-      <canvas id="adminChart"></canvas>
-    </div>
+    <canvas id="adminChart"></canvas>
 
   </div>
 </div>
@@ -147,6 +147,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('adminChart');
+
     if (ctx) {
         const adminLabels = {{ chart_labels|safe }};
         const adminValues = {{ chart_values|safe }};
@@ -173,9 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        position: 'bottom'
-                    }
+                    legend: { position: 'bottom' }
                 }
             }
         });
