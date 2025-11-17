@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponse
-<<<<<<< HEAD
 from .models import (
     EmployeeKpi,
     ProgressEntry,
@@ -10,9 +9,6 @@ from .models import (
     ActivityLog,
     DEPARTMENT,
 )
-=======
-from .models import EmployeeKpi, ProgressEntry, Kpi, EmployeeProfile, DEPARTMENT, ActivityLog
->>>>>>> main
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, UpdateView, View
@@ -22,12 +18,10 @@ from .decorators import RoleRequiredMixin, role_required
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.db.models import Q
-<<<<<<< HEAD
 from .services.ai import generate_kpi_insights
 import markdown
 from django.utils.timezone import now
 
-=======
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
@@ -36,7 +30,6 @@ from reportlab.lib.units import inch
 from datetime import datetime, date
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
->>>>>>> main
 
 from .utils import log_activity
 from django.contrib.admin.views.decorators import staff_member_required
@@ -64,10 +57,8 @@ def admin_dashboard(request):
 
     all_kpis = Kpi.objects.all()
 
-<<<<<<< HEAD
     # Add recent activity logs
     recent_logs = ActivityLog.objects.select_related("user", "related_user")[:10]
-=======
     chart_labels_list = []
     chart_values_list = []
 
@@ -84,7 +75,6 @@ def admin_dashboard(request):
                 total_progress_for_kpi += progress_entry.value
 
         chart_values_list.append(total_progress_for_kpi)
->>>>>>> main
 
     context = {
         "total_users": total_users_count,
