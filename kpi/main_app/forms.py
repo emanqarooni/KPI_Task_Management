@@ -41,21 +41,44 @@ class AssignKpiForm(forms.ModelForm):
         # validate that start date is not in the past
         start_date = self.cleaned_data.get('start_date')
 
-        if start_date and start_date < date.today():
-            raise forms.ValidationError(
-                "Start date cannot be in the past. Please select today or a future date."
-            )
-
+        # if editing (instance exists), allow the original start date even if it's in the past
+        if self.instance.pk:
+            # if they're not changing the start date, keep it
+            if start_date == self.instance.start_date:
+                return start_date
+            # if they're changing it, it must be today or future
+            elif start_date < date.today():
+                raise forms.ValidationError(
+                    "When changing the start date, it cannot be in the past. Please select today or a future date."
+                )
+        else:
+            # creating a new assign the start date must be today or future
+            if start_date and start_date < date.today():
+                raise forms.ValidationError(
+                    "Start date cannot be in the past. Please select today or a future date."
+                )
         return start_date
 
     def clean_end_date(self):
         # validate that end_date is not in the past
         end_date = self.cleaned_data.get('end_date')
 
-        if end_date and end_date < date.today():
-            raise forms.ValidationError(
-                "End date cannot be in the past. Please select today or a future date."
-            )
+        # if editing (instance exists), allow the original end date even if it's in the past
+        if self.instance.pk:
+            # if they're not changing the end date, keep it
+            if end_date == self.instance.end_date:
+                return end_date
+            # if they're changing it, it must be today or future
+            elif end_date < date.today():
+                raise forms.ValidationError(
+                    "When changing the end date, it cannot be in the past. Please select today or a future date."
+                )
+        else:
+            # creating a new assign the end date must be today or later
+            if end_date and end_date < date.today():
+                raise forms.ValidationError(
+                    "End date cannot be in the past. Please select today or a future date."
+                )
 
         return end_date
 

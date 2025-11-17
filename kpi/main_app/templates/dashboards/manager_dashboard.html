@@ -1,10 +1,47 @@
-{% extends 'base.html' %} {% block content %}
-<h2>Manager Dashboard</h2>
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
 
-<div class="dashboard-box">
-  <p><strong>Manager Name:</strong> {{ manager_name }}</p>
-  <p><strong>Department:</strong> {{ department }}</p>
-  <p><strong>Total Employees in Department:</strong> {{ employees_count }}</p>
+<div class="dashboard-container">
+
+  <div class="sidebar">
+    <h3>Company</h3>
+    <ul>
+      <li><a href="{% url 'manager_dashboard' %}">Dashboard</a></li>
+      <li><a href="{% url 'assign_kpi' %}">Assign KPI</a></li>
+      <li><a href="#">Report</a></li>
+    </ul>
+  </div>
+
+  <div class="dashboard-content">
+
+    <h2>Manager Dashboard</h2>
+    <p>Manager: {{ manager_name }}</p>
+    <p>Department: {{ department }}</p>
+    <p>Total Employees: {{ employees_count }}</p>
+
+    <h3>Team KPI Summary</h3>
+
+    <table>
+      <tr>
+        <th>Employee</th>
+        <th>KPI Completion</th>
+        <th>Status</th>
+      </tr>
+      {% for row in employee_rows %}
+      <tr>
+        <td>{{ row.name }}</td>
+        <td>{{ row.completion }}%</td>
+        <td>{{ row.status }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <div class="kpi-box">
+      <canvas id="managerChart"></canvas>
+    </div>
+
+  </div>
 </div>
 
 <div>
@@ -12,4 +49,23 @@
     Generate AI KPI Insights
   </a>
 </div>
+<script>
+const managerData = {{ employee_rows|safe }};
+
+const managerLabels = managerData.map(item => item.name);
+const managerValues = managerData.map(item => item.completion);
+
+new Chart(document.getElementById("managerChart"), {
+    type: "bar",
+    data: {
+        labels: managerLabels,
+        datasets: [{
+            label: "Team KPI Completion (%)",
+            data: managerValues,
+            borderWidth: 1
+        }]
+    }
+});
+</script>
+
 {% endblock %}
