@@ -13,29 +13,21 @@
     </ul>
   </div>
 
-
   <div class="dashboard-content">
 
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h2>Manager Dashboard</h2>
-      <span style="font-size:16px;">{{ manager_name }}</span>
-    </div>
-
-    <div class="kpi-box">
-      <p><strong>Department:</strong> {{ department }}</p>
-      <p><strong>Total Employees:</strong> {{ employees_count }}</p>
-    </div>
+    <h2>Manager Dashboard</h2>
+    <p>Manager: {{ manager_name }}</p>
+    <p>Department: {{ department }}</p>
+    <p>Total Employees: {{ employees_count }}</p>
 
     <h3>Team KPI Summary</h3>
 
-    <div class="kpi-box">
-    <table style="width:100%;">
+    <table>
       <tr>
         <th>Employee</th>
         <th>KPI Completion</th>
         <th>Status</th>
       </tr>
-
       {% for row in employee_rows %}
       <tr>
         <td>{{ row.name }}</td>
@@ -43,11 +35,32 @@
         <td>{{ row.status }}</td>
       </tr>
       {% endfor %}
-
     </table>
+
+    <div class="kpi-box">
+      <canvas id="managerChart"></canvas>
     </div>
 
   </div>
 </div>
+
+<script>
+const managerData = {{ employee_rows|safe }};
+
+const managerLabels = managerData.map(item => item.name);
+const managerValues = managerData.map(item => item.completion);
+
+new Chart(document.getElementById("managerChart"), {
+    type: "bar",
+    data: {
+        labels: managerLabels,
+        datasets: [{
+            label: "Team KPI Completion (%)",
+            data: managerValues,
+            borderWidth: 1
+        }]
+    }
+});
+</script>
 
 {% endblock %}
