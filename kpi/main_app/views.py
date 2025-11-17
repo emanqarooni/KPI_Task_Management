@@ -57,7 +57,7 @@ def admin_dashboard(request):
     total_managers_count = all_managers.count()
 
     # Department counts
-    department_counts = EmployeeProfile.objects.values('department').annotate(count=models.Count('id'))
+    department_counts = EmployeeProfile.objects.values('department').annotate(count=Count('id'))
 
     department_data = {
         "Sales & Marketing": 0,
