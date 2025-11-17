@@ -469,7 +469,6 @@ def employee_kpi_delete(request, pk):
     return render(request, "main_app/employee_kpi_delete.html", {"kpi": kpi_assign})
 
 @login_required
-@role_required(['manager'])
 def employee_kpi_detail(request, pk):
     profile = request.user.employeeprofile
 
