@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load json_script %}
 {% block content %}
 
 <div class="dashboard-container">
 
   <div class="sidebar">
-    <h3>COMPANY NAME</h3>
+    <h3>Company</h3>
     <ul>
       <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
       <li><a href="#">Accounts</a></li>
@@ -16,26 +15,20 @@
   </div>
 
   <div class="dashboard-content">
-    <div class="dashboard-header">
-      <h2>Admin Dashboard</h2>
-    </div>
+    <h2>Admin Dashboard</h2>
 
     <div class="kpi-box">
-      <p><strong>Total Users:</strong> {{ total_users }}</p>
-      <p><strong>Total Employees:</strong> {{ total_employees }}</p>
+      <p>Total Users: {{ total_users }}</p>
+      <p>Total Employees: {{ total_employees }}</p>
     </div>
 
     <h3>KPI Library</h3>
 
     <div class="kpi-grid">
-      {% for kpi in kpis %}
+      {% for kpi, value in admin_kpi_data %}
       <div class="kpi-item">
         <h4>{{ kpi.title }}</h4>
-        <p>Value:
-          {% if chart_values|length > forloop.counter0 %}
-            {{ chart_values|index:forloop.counter0 }}
-          {% endif %}
-        </p>
+        <p>Total Value: {{ value }}</p>
       </div>
       {% endfor %}
     </div>
@@ -46,5 +39,21 @@
 
   </div>
 </div>
+
+<script>
+const adminLabels = {{ chart_labels|safe }};
+const adminValues = {{ chart_values|safe }};
+
+new Chart(document.getElementById("adminChart"), {
+    type: "pie",
+    data: {
+        labels: adminLabels,
+        datasets: [{
+            data: adminValues,
+            borderWidth: 1
+        }]
+    }
+});
+</script>
 
 {% endblock %}
