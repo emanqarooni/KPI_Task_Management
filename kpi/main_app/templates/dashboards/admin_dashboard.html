@@ -3,28 +3,65 @@
 {% block content %}
 
 <div class="dashboard-container">
-<a href="{% url 'ai_admin_insights' %}" class="btn blue">AI Organizational Insights</a>
+  <a href="{% url 'ai_admin_insights' %}" class="btn blue">AI Organizational Insights</a>
 
-  <!-- Content -->
   <div class="dashboard-content">
 
     <h2>Admin Dashboard</h2>
 
     <div class="kpi-box">
-      <p>Total Users: {{ total_users }}</p>
-      <p>Total Employees: {{ total_employees }}</p>
+      <p>Total Users: <strong>{{ total_users }}</strong></p>
+      <p>Total Employees: <strong>{{ total_employees }}</strong></p>
     </div>
 
-    <h3>KPI Library</h3>
+    <h3>Employee KPI Assignments</h3>
 
-    <div class="kpi-grid">
-      {% for kpi, value in admin_kpi_data %}
-      <div class="kpi-item">
-        <h4>{{ kpi.title }}</h4>
-        <p>Total Value: {{ value }}</p>
-      </div>
-      {% endfor %}
+    <div class="admin-table-container">
+      <table class="table table-zebra admin-kpi-table">
+        <thead>
+          <tr class="admin-table-header">
+            <th>Employee</th>
+            <th>Manager</th>
+            <th>KPI</th>
+            <th>Target</th>
+            <th>Progress</th>
+            <th>Weight</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for data in employee_kpi_data %}
+          <tr class="admin-table-row">
+            <td class="employee-name-cell">{{ data.employee_name }}</td>
+            <td class="manager-name-cell">{{ data.manager_name }}</td>
+            <td class="kpi-title-cell">{{ data.kpi_title }}</td>
+            <td class="target-cell">{{ data.target_value }}</td>
+            <td class="progress-cell">
+              <div class="progress-info">
+                <span class="progress-value">{{ data.current_progress }} / {{ data.target_value }}</span>
+                <span class="progress-percentage">({{ data.progress_percentage }}%)</span>
+              </div>
+            </td>
+            <td class="weight-cell">{{ data.weight }}%</td>
+            <td class="status-cell">
+              <span class="badge
+                {% if data.status == 'Complete' %}badge-status-complete
+                {% elif data.status == 'In Progress' %}badge-status-progress
+                {% else %}badge-status-none{% endif %}">
+                {{ data.status }}
+              </span>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7" class="empty-state-cell">No KPI assignments found</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+
+    <h3>KPI Overview Chart</h3>
 
     <div class="kpi-box">
       <canvas id="adminChart"></canvas>
