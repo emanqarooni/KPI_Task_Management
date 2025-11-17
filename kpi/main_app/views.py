@@ -323,12 +323,12 @@ def assign_kpi(request):
 
             # send notification to employees
             create_notification(
-                recipient=employee_kpi.employee.user,
+                recipient=kpi_assignment.employee.user,
                 sender=request.user,
                 notification_type='kpi_assigned',
                 title='New KPI Assigned',
-                message=f'You have been assigned a new KPI: {employee_kpi.kpi.title}. Target: {employee_kpi.target_value}',
-                employee_kpi=employee_kpi
+                message=f'You have been assigned a new KPI: {kpi_assignment.kpi.title}. Target: {kpi_assignment.target_value}',
+                employee_kpi=kpi_assignment
             )
 
             messages.success(request, "KPI assigned successfully.")
@@ -427,12 +427,12 @@ def employee_kpi_edit(request, pk):
 
         # send notification to employee
         create_notification(
-            recipient=employee_kpi.employee.user,
+            recipient=kpi_assignment.employee.user,
             sender=request.user,
             notification_type='kpi_updated',
             title='KPI Updated',
-            message=f'Your KPI "{employee_kpi.kpi.title}" has been updated by your manager.',
-            employee_kpi=employee_kpi
+            message=f'Your KPI "{kpi_assignment.kpi.title}" has been updated by your manager.',
+            employee_kpi=kpi_assignment
         )
 
         messages.success(request, "KPI updated successfully.")
