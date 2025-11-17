@@ -132,14 +132,14 @@ class ActivityLog(models.Model):
     ACTION_CHOICES = [
         ("PROGRESS_ADDED", "Added Progress"),
         ("KPI_ASSIGNED", "Assigned KPI"),
-        ("KPI_UPDATED", "Updated KPI Assignment"),
+        ("KPI_UPDATED", "Updated KPI Assiganment"),
         ("KPI_DELETED", "Deleted KPI Assignment"),
     ]
 
     user = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="activity_logs"
     )
-    
+
     action = models.CharField(max_length=20, choices=ACTION_CHOICES)
     timestamp = models.DateTimeField(auto_now_add=True)
     description = models.TextField()
