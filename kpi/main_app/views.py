@@ -1325,7 +1325,7 @@ Average Team Progress: {avg_progress:.1f}%
         else:
             data += f"\nEmployee: {emp.user.get_full_name()}\nNo active KPI.\n"
 
-    # AI processing
+    
     ai_output = generate_kpi_insights(data, mode="admin")
     ai_output_html = markdown.markdown(ai_output)
 
@@ -1334,7 +1334,7 @@ Average Team Progress: {avg_progress:.1f}%
 
 
 
-
+#ai feature for employee
 @login_required
 @role_required(["employee"])
 def ai_employee_coach(request):
@@ -1344,7 +1344,7 @@ def ai_employee_coach(request):
     data = f"=== KPI DATA FOR {employee.user.get_full_name()} ===\n"
 
     for ek in assignments:
-        # latest valid progress
+        # the recent progress
         last = (
             ProgressEntry.objects
             .filter(employee_kpi=ek, date__lte=now().date())
@@ -1365,7 +1365,7 @@ Last Update: {last.date if last else 'No updates yet'}
 Notes: {last.note if last else 'No notes available'}
 """
 
-    # Send to AI with personal coaching mode
+
     ai_output = generate_kpi_insights(data, mode="employee")
     ai_output_html = markdown.markdown(ai_output)
 
