@@ -1,5 +1,104 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% block content %}
-  <h1>home</h1>
+
+  <div class="body">
+    <div class="home-container">
+      <!-- HERO SECTION -->
+      <section class="hero-section">
+        <div class="hero-content">
+          <h1 class="hero-title">
+            Welcome to SEEF – Your KPI Management System
+          </h1>
+          <p class="hero-subtitle">
+            A smart, scalable, and intuitive platform built to help
+            organizations monitor performance, improve accountability, and
+            enhance workplace transparency. Manage KPIs, track progress, and
+            empower your team – all in one place.
+          </p>
+        </div>
+      </section>
+
+      <!-- FEATURES SECTION -->
+      <section>
+        <h2 class="section-title">Why SEEF?</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon">🔐</div>
+            <h3 class="feature-title">Role-Based Access</h3>
+            <p class="feature-description">
+              Separate portals for Admins, Managers, and Employees – ensuring
+              clarity, security, and relevant tools for every role.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3 class="feature-title">Smart KPI Management</h3>
+            <p class="feature-description">
+              Create KPIs, assign them, and track performance with real-time
+              insights and progress monitoring.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon">📈</div>
+            <h3 class="feature-title">Progress Tracking</h3>
+            <p class="feature-description">
+              Employees can submit progress logs, notes, and updates – helping
+              teams stay aligned and accountable.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ROLES SECTION -->
+      <section class="roles-section">
+        <h2 class="section-title">How SEEF Helps Each Role</h2>
+        <div class="roles-grid">
+          <div class="role-box">
+            <h3 class="role-title">Admin</h3>
+            <ul>
+              <li>Manage users, departments, and roles</li>
+              <li>Create and organize KPI categories</li>
+              <li>Assign KPIs to managers or departments</li>
+              <li>View organization-wide analytics</li>
+            </ul>
+          </div>
+
+          <div class="role-box">
+            <h3 class="role-title">Manager</h3>
+            <ul>
+              <li>Track employee performance</li>
+              <li>Assign KPIs to staff</li>
+              <li>Monitor department progress in real time</li>
+              <li>Review submitted progress entries</li>
+            </ul>
+          </div>
+
+          <div class="role-box">
+            <h3 class="role-title">Employee</h3>
+            <ul>
+              <li>View personal KPIs</li>
+              <li>Submit daily / weekly progress updates</li>
+              <li>Add notes and comments</li>
+              <li>Track completion percentage and deadlines</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA SECTION -->
+      <section class="cta-section">
+        <div class="cta-content">
+          <h2 class="cta-title">Ready to Boost Your Team's Performance?</h2>
+          <p class="cta-description">
+            Start managing KPIs the smart way – track progress, improve
+            accountability, and align your team with clarity.
+          </p>
+
+          <a href="{% url 'login' %}" class="btn-primary">Get Started</a>
+        </div>
+      </section>
+    </div>
+  </div>
 {% endblock %}
