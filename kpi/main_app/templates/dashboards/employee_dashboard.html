@@ -1,10 +1,49 @@
-{% extends 'base.html' %}
-{% block content %}
-<h2>Employee Dashboard</h2>
+{% extends 'base.html' %} {% load static %} {% block content %}
 
-<div class="dashboard-box">
-  <p><strong>Name:</strong> {{ employee_name }}</p>
-  <p><strong>Department:</strong> {{ department }}</p>
-  <p><strong>Role:</strong> {{ role }}</p>
+<div class="dashboard-container">
+  <a href="{% url 'ai_employee_coach' %}" class="btn blue">AI KPI Coach</a>
+
+  <div class="dashboard-content">
+    <h2>Employee Dashboard</h2>
+    <p>Welcome, {{ employee_name }}</p>
+    <p>Role: {{ role }}</p>
+
+    <h3>KPI Overview</h3>
+
+    <div class="kpi-grid">
+      {% for kpi in kpi_cards %}
+      <div class="kpi-item">
+        <h4>{{ kpi.title }}</h4>
+        <p>Target: {{ kpi.target }}</p>
+        <p>Progress: {{ kpi.progress }}</p>
+        <p>Deadline: {{ kpi.days_left }} days left</p>
+        <a href="{% url 'progress' %}"><button>Add Update</button></a>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="kpi-box">
+      <canvas id="employeeChart"></canvas>
+    </div>
+  </div>
 </div>
+
+<script>
+  const employeeLabels = {{ chart_labels|safe }};
+  const employeeValues = {{ chart_values|safe }};
+
+  new Chart(document.getElementById("employeeChart"), {
+      type: "line",
+      data: {
+          labels: employeeLabels,
+          datasets: [{
+              label: "Progress (%)",
+              data: employeeValues,
+              borderWidth: 2,
+              tension: 0.3
+          }]
+      }
+  });
+</script>
+
 {% endblock %}

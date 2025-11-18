@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{% static 'css/output.css' %}" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <title>KPI Dashboard</title>
   </head>
 
@@ -45,6 +46,12 @@
           </svg>
           <span class="sidebar-text ml-3 text-lg">View KPIs</span>
         </a>
+        <a href="{% url 'admin_reports' %}" class="btn btn-ghost hover:bg-white/20 mb-4 text-white flex items-center justify-start w-full px-4" title="View KPIs">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+          </svg>
+          <span class="sidebar-text ml-3 text-lg">Reports</span>
+        </a>
 
         <a href="{% url 'activity_logs' %}" class="btn btn-ghost hover:bg-white/20 mb-4 text-white flex items-center justify-start w-full px-4" title="Activity Logs">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -61,6 +68,13 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
           <span class="sidebar-text ml-3 text-lg">Assignments</span>
+        </a>
+
+        <a href="{% url 'reports' %}" class="btn btn-ghost hover:bg-white/20 mb-4 text-white flex items-center justify-start w-full px-4" title="Assign KPI">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          </svg>
+          <span class="sidebar-text ml-3 text-lg">Reports</span>
         </a>
         {% endif %}
 

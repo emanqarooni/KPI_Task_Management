@@ -6,16 +6,14 @@
   <p><strong>Last Name:</strong> {{ request.user.last_name }}</p>
 
   {% if request.user.employeeprofile %}
+  <p><strong>Department:</strong>
+    {{ request.user.employeeprofile.get_department_display }}</p>
+
   <p>
-    <strong>Department:</strong> {{
-    request.user.employeeprofile.get_department_display }}
+    <strong>Role:</strong> {{request.user.employeeprofile.get_role_display}}
   </p>
   <p>
-    <strong>Role:</strong> {{ request.user.employeeprofile.get_role_display }}
-  </p>
-  <p>
-    <strong>Gender:</strong> {{ request.user.employeeprofile.get_gender_display
-    }}
+    <strong>Gender:</strong> {{request.user.employeeprofile.get_gender_display}}
   </p>
 
   {% if request.user.employeeprofile.image %}
