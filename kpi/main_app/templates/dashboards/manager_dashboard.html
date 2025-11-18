@@ -1,17 +1,13 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block content %}
 <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
 <div class="dashboard-container">
   <div class="dashboard-content">
-
-    <h2>Manager Dashboard</h2>
-
-
-    <a href="{% url 'ai_kpi_insights' %}" class="btn blue">
-      Generate AI KPI Insights
-    </a>
-
+    <div class="flex_one_line">
+      <h2>Manager Dashboard</h2>
+      <a href="{% url 'ai_kpi_insights' %}" class="btn blue">
+        Generate AI KPI Insights
+      </a>
+    </div>
 
     <div class="kpi-box manager-summary-box">
       <h3>Manager Overview</h3>
@@ -63,33 +59,32 @@
       <h3>Team KPI Performance Chart</h3>
       <canvas id="managerChart"></canvas>
     </div>
-
   </div>
 </div>
 
 <script>
-const managerLabels = [
-{% for row in employee_rows %}"{{ row.name }}",{% endfor %}
-];
+  const managerLabels = [
+  {% for row in employee_rows %}"{{ row.name }}",{% endfor %}
+  ];
 
-const managerValues = [
-{% for row in employee_rows %}{{ row.completion }},{% endfor %}
-];
+  const managerValues = [
+  {% for row in employee_rows %}{{ row.completion }},{% endfor %}
+  ];
 
-new Chart(document.getElementById("managerChart"), {
-    type: "bar",
-    data: {
-        labels: managerLabels,
-        datasets: [{
-            label: "Team KPI Completion (%)",
-            data: managerValues,
-            backgroundColor: "rgba(102, 126, 234, 0.6)",
-            borderColor: "rgba(102, 126, 234, 1)",
-            borderWidth: 2,
-            borderRadius: 6
-        }]
-    }
-});
+  new Chart(document.getElementById("managerChart"), {
+      type: "bar",
+      data: {
+          labels: managerLabels,
+          datasets: [{
+              label: "Team KPI Completion (%)",
+              data: managerValues,
+              backgroundColor: "rgba(102, 126, 234, 0.6)",
+              borderColor: "rgba(102, 126, 234, 1)",
+              borderWidth: 2,
+              borderRadius: 6
+          }]
+      }
+  });
 </script>
 
 {% endblock %}
