@@ -140,14 +140,14 @@
                   <div class="flex items-center gap-3">
                     <div class="avatar placeholder">
                       <div class="bg-primary text-primary-content rounded-full w-10">
-                        <span class="text-sm">{{ k.employee.user.username|slice:":2"|upper }}</span>
+                        <img src="{{ k.employee.image.url }}" alt="">
                       </div>
                     </div>
                     <div>
-                      <div class="font-semibold">{{ k.employee.user.username }}</div>
                       {% if k.employee.user.first_name or k.employee.user.last_name %}
-                        <div class="text-xs text-base-content/50">{{ k.employee.user.first_name }} {{ k.employee.user.last_name }}</div>
+                        <div class="font-semibold">{{ k.employee.user.first_name }} {{ k.employee.user.last_name }}</div>
                       {% endif %}
+                      <div class="text-xs text-base-content/50">{{ k.employee.user.username }}</div>
                     </div>
                   </div>
                 </td>
