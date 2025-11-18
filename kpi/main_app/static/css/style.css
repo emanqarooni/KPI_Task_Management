@@ -1,5 +1,5 @@
 /* ===================================
-  KPI Dashboard Custom Styles
+   KPI Dashboard Custom Styles
    =================================== */
 
 /* Sidebar Styles */
@@ -137,6 +137,90 @@
   }
 }
 
+/* ===================================
+   Chart.js Styling
+   =================================== */
+
+/* Chart Container Sizing */
+.kpi-box {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+  padding: 1.5rem;
+  background-color: var(--color-base-100);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 1.5rem 0;
+}
+
+.kpi-box canvas {
+  max-height: 400px !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Individual Chart Styling */
+#adminChart,
+#managerChart,
+#employeeChart {
+  min-height: 350px;
+  max-height: 450px;
+}
+
+/* Chart responsive behavior */
+@media (max-width: 768px) {
+  .kpi-box {
+    min-height: 300px;
+    padding: 1rem;
+  }
+
+  .kpi-box canvas {
+    max-height: 300px !important;
+  }
+
+  #adminChart,
+  #managerChart,
+  #employeeChart {
+    min-height: 250px;
+    max-height: 350px;
+  }
+}
+
+/* Chart Loading State */
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: var(--color-base-content);
+  font-size: 1rem;
+}
+
+.chart-loading::after {
+  content: "Loading chart...";
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Chart Error State */
+.chart-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #EF4444;
+  font-size: 1rem;
+  text-align: center;
+  padding: 2rem;
+}
 
 /* Optional: Dashboard Card Styles */
 .dashboard-card {
@@ -413,12 +497,13 @@ input:focus {
 
 /* Badge size adjustments */
 .badge {
-    height: auto !important;       /* Allow it to grow normally */
-    line-height: 1.2 !important;   /* Fix text overflow */
-    padding-top: 0.35rem !important;
-    padding-bottom: 0.35rem !important;
-    white-space: nowrap !important; /* Force one line */
-  }
+  height: auto !important;
+  line-height: 1.2 !important;
+  padding-top: 0.35rem !important;
+  padding-bottom: 0.35rem !important;
+  white-space: nowrap !important;
+}
+
 .badge-lg {
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
@@ -665,921 +750,134 @@ input:focus {
 }
 
 /* ===================================
-  ADMIN DASHBOARD - PROFESSIONAL STYLING
+   Admin Dashboard Styling
    =================================== */
 
-/* ===================================
-   1. DASHBOARD CONTAINER & LAYOUT
-   =================================== */
-
+/* Dashboard Container */
 .dashboard-container {
   width: 100%;
   min-height: 100vh;
-  padding: 2.5rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #e8f0fe 100%);
-  position: relative;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
-.dashboard-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 300px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  opacity: 0.05;
-  z-index: 0;
-}
-
+/* Dashboard Content Area */
 .dashboard-content {
-  max-width: 1600px;
+  max-width: 1400px;
   margin: 0 auto;
-  position: relative;
-  z-index: 1;
 }
 
-/* ===================================
-   2. HEADER SECTION
-   =================================== */
-
+/* Dashboard Header */
 .dashboard-content h2 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0F172A;
   margin-bottom: 2rem;
   display: flex;
   align-items: center;
   gap: 1rem;
-  letter-spacing: -0.5px;
 }
 
 .dashboard-content h2::before {
   content: '';
-  width: 6px;
-  height: 3rem;
-  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-  border-radius: 3px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  width: 4px;
+  height: 2rem;
+  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+  border-radius: 2px;
+}
+
+/* Dashboard Section Headers */
+.dashboard-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1E293B;
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #E2E8F0;
 }
 
 /* AI Insights Button */
 .btn.blue {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   color: white;
-  font-weight: 700;
-  padding: 1rem 2rem;
-  border-radius: 12px;
+  font-weight: 600;
+  padding: 0.875rem 1.75rem;
+  border-radius: 0.5rem;
   border: none;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 2.5rem;
-  font-size: 1rem;
-  letter-spacing: 0.3px;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn.blue::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.6s ease;
-}
-
-.btn.blue:hover::before {
-  left: 100%;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
 }
 
 .btn.blue:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5);
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
 
 .btn.blue:active {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
-/* ===================================
-   3. SECTION HEADERS
-   =================================== */
-
-.dashboard-content h3 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-top: 3rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 3px solid transparent;
-  border-image: linear-gradient(90deg, #667eea, #764ba2, transparent) 1;
-  position: relative;
-}
-
-.dashboard-content h3::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 80px;
-  height: 3px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  border-radius: 2px;
-}
-
-/* ===================================
-   4. KPI BOX / SYSTEM OVERVIEW
-   =================================== */
-
+/* Stats/KPI Box */
 .kpi-box {
   background: white;
-  border-radius: 20px;
-  padding: 2.5rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  margin-bottom: 2.5rem;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  position: relative;
-  overflow: visible;
-  text-align: center;
-}
-
-.kpi-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .kpi-box:hover {
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
-.kpi-box h3 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-top: 0;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 2px solid #f1f5f9;
-}
-
-/* Stats Cards - All in one line, compact squares */
-.kpi-box > p:nth-of-type(1),
-.kpi-box > p:nth-of-type(2),
-.kpi-box > p:nth-of-type(3) {
-  font-size: 0.75rem;
-  color: #475569;
-  font-weight: 600;
-  display: inline-flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 1.2rem 1rem;
-  background: white;
-  border-radius: 12px;
-  border: 2px solid #667eea;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-  width: 160px;
-  height: 160px;
-  box-sizing: border-box;
-  vertical-align: top;
-  text-align: center;
-  margin: 0.5rem;
-  line-height: 1.3;
-}
-
-.kpi-box > p:nth-of-type(1):hover,
-.kpi-box > p:nth-of-type(2):hover,
-.kpi-box > p:nth-of-type(3):hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  transform: translateY(-8px);
-  border-color: #764ba2;
-  box-shadow: 0 12px 24px rgba(102, 126, 234, 0.3);
-  color: white;
-}
-
-.kpi-box > p:nth-of-type(1):hover strong,
-.kpi-box > p:nth-of-type(2):hover strong,
-.kpi-box > p:nth-of-type(3):hover strong {
-  color: white;
-  -webkit-text-fill-color: white;
-}
-
-.kpi-box > p strong {
-  color: #0f172a;
-  font-weight: 800;
-  font-size: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
-  display: block;
-  margin-top: 0.3rem;
-
-}
-
-/* Regular KPI Stats (for other content) */
-.kpi-box p:not(:nth-of-type(1)):not(:nth-of-type(2)):not(:nth-of-type(3)) {
+/* Stats inside KPI Box */
+.kpi-box p {
   font-size: 1.125rem;
   color: #475569;
-  margin: 1rem 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.25rem 1.5rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 12px;
-  border-left: 4px solid #667eea;
-  transition: all 0.3s ease;
-}
-
-.kpi-box p:not(:nth-of-type(1)):not(:nth-of-type(2)):not(:nth-of-type(3)):hover {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  transform: translateX(5px);
-  border-left-color: #764ba2;
-}
-
-/* Department List */
-.kpi-box h4 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-}
-
-.kpi-box ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.kpi-box ul li {
-  padding: 1rem 1.5rem;
-  margin-bottom: 0.75rem;
-  background: white;
-  border-radius: 12px;
-  border: 2px solid #f1f5f9;
-  transition: all 0.3s ease;
-  font-size: 1rem;
-  color: #475569;
+  margin: 0.75rem 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: 600;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  border-radius: 0.5rem;
+  border-left: 4px solid #3B82F6;
 }
 
-.kpi-box ul li:hover {
-  border-color: #667eea;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  transform: translateX(5px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
-}
-
-/* ===================================
-   5. TABLES - PROFESSIONAL DESIGN
-   =================================== */
-
-/* Table Container - Make ALL tables scrollable */
-.dashboard-content > div:has(table) {
-  margin-bottom: 3rem;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  background: white;
-  max-height: 500px;
-  overflow-y: auto;
-  overflow-x: auto;
-}
-
-/* Custom Scrollbar for ALL Table Containers */
-.dashboard-content > div:has(table)::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-.dashboard-content > div:has(table)::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 10px;
-}
-
-.dashboard-content > div:has(table)::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 10px;
-}
-
-.dashboard-content > div:has(table)::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-}
-
-/* Firefox Scrollbar */
-.dashboard-content > div:has(table) {
-  scrollbar-width: thin;
-  scrollbar-color: #667eea #f1f5f9;
-}
-
-/* Table Styling */
-.table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: white;
-  margin: 0;
-}
-
-/* Table Header */
-.table thead {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.table thead tr th {
-  color: white;
+.kpi-box p strong {
+  color: #0F172A;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  padding: 1.5rem 1.5rem;
-  font-size: 0.875rem;
-  text-align: left;
-  border-bottom: 3px solid #667eea;
-  white-space: nowrap;
-}
-
-.table thead tr th:first-child {
-  padding-left: 2rem;
-  border-top-left-radius: 20px;
-}
-
-.table thead tr th:last-child {
-  padding-right: 2rem;
-  border-top-right-radius: 20px;
-}
-
-/* Table Body Rows */
-.table tbody tr {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.table tbody tr:hover {
-  background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-  transform: scale(1.01);
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
-}
-
-.table tbody tr:last-child {
-  border-bottom: none;
-}
-
-/* Table Cells */
-.table tbody tr td {
-  padding: 1.5rem 1.5rem;
-  font-size: 0.9375rem;
-  color: #475569;
-  vertical-align: middle;
-}
-
-.table tbody tr td:first-child {
-  padding-left: 2rem;
-  font-weight: 700;
-  color: #667eea;
-  font-size: 1rem;
-}
-
-.table tbody tr td:nth-child(2) {
-  font-weight: 700;
-  color: #1e293b;
-}
-
-.table tbody tr td:nth-child(6) {
-  color: #64748b;
-  font-style: italic;
-}
-
-/* Empty State */
-.table tbody tr td[colspan] {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #94a3b8;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-/* ===================================
-   6. KPI ASSIGNMENT TABLE
-   =================================== */
-
-/* KPI Table Specific Styling */
-.dashboard-content h3 + table.table {
-  margin-top: 1.5rem;
-}
-
-/* Status Column Styling */
-.table tbody tr td:nth-last-child(2) {
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.8125rem;
-  letter-spacing: 0.5px;
-}
-
-/* Weighted Score Column */
-.table tbody tr td:last-child {
-  font-weight: 800;
-  font-size: 1.125rem;
-  color: #667eea;
-}
-
-/* ===================================
-   7. FINAL WEIGHTED SCORE TABLE
-   =================================== */
-
-/* Score Table Specific */
-.dashboard-content h3:nth-of-type(3) + table.table tbody tr td:first-child {
-  font-weight: 700;
-  color: #1e293b;
-  font-size: 1rem;
-}
-
-.dashboard-content h3:nth-of-type(3) + table.table tbody tr td:last-child {
-  font-weight: 800;
-  font-size: 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ===================================
-   8. CHART CONTAINER
-   =================================== */
-
-.kpi-box canvas {
-  max-height: 500px !important;
-  width: 100% !important;
-  height: auto !important;
-  margin-top: 1.5rem;
-}
-
-#adminChart {
-  min-height: 400px;
-  max-height: 500px;
-  filter: drop-shadow(0 4px 12px rgba(102, 126, 234, 0.15));
-}
-
-/* ===================================
-   9. RESPONSIVE DESIGN
-   =================================== */
-
-@media (max-width: 1440px) {
-  .dashboard-container {
-    padding: 2rem;
-  }
-
-  .dashboard-content h2 {
-    font-size: 2.25rem;
-  }
-}
-
-@media (max-width: 1024px) {
-  .dashboard-container {
-    padding: 1.5rem;
-  }
-
-  .dashboard-content h2 {
-    font-size: 2rem;
-  }
-
-  .dashboard-content h3 {
-    font-size: 1.5rem;
-  }
-
-  .kpi-box {
-    padding: 2rem;
-  }
-
-  .table thead tr th,
-  .table tbody tr td {
-    padding: 1.25rem 1rem;
-    font-size: 0.875rem;
-  }
-
-  .table thead tr th:first-child,
-  .table tbody tr td:first-child {
-    padding-left: 1.5rem;
-  }
-
-  .table thead tr th:last-child,
-  .table tbody tr td:last-child {
-    padding-right: 1.5rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboard-container {
-    padding: 1rem;
-    background: #f8fafc;
-  }
-
-  .dashboard-content h2 {
-    font-size: 1.75rem;
-  }
-
-  .dashboard-content h2::before {
-    width: 4px;
-    height: 2.5rem;
-  }
-
-  .dashboard-content h3 {
-    font-size: 1.25rem;
-    margin-top: 2rem;
-  }
-
-  .btn.blue {
-    padding: 0.875rem 1.5rem;
-    font-size: 0.9375rem;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .kpi-box {
-    padding: 1.5rem;
-    border-radius: 16px;
-  }
-
-  .kpi-box p {
-    font-size: 1rem;
-    padding: 1rem 1.25rem;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .kpi-box p strong {
-    font-size: 1.25rem;
-  }
-
-  .kpi-box ul li {
-    padding: 0.875rem 1.25rem;
-    font-size: 0.9375rem;
-  }
-
-  /* Responsive Table */
-  .dashboard-content > div {
-    border-radius: 16px;
-    overflow-x: auto;
-  }
-
-  .table {
-    min-width: 800px;
-  }
-
-  .table thead tr th {
-    padding: 1rem 0.75rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-  }
-
-  .table tbody tr td {
-    padding: 1rem 0.75rem;
-    font-size: 0.875rem;
-  }
-
-  .table thead tr th:first-child,
-  .table tbody tr td:first-child {
-    padding-left: 1rem;
-  }
-
-  .table thead tr th:last-child,
-  .table tbody tr td:last-child {
-    padding-right: 1rem;
-  }
-
-  .table tbody tr:hover {
-    transform: none;
-  }
-
-  #adminChart {
-    min-height: 300px;
-    max-height: 400px;
-  }
-}
-
-@media (max-width: 480px) {
-  .dashboard-content h2 {
-    font-size: 1.5rem;
-  }
-
-  .dashboard-content h3 {
-    font-size: 1.125rem;
-  }
-
-  .kpi-box {
-    padding: 1.25rem;
-  }
-
-  .table thead tr th {
-    padding: 0.875rem 0.5rem;
-    font-size: 0.6875rem;
-  }
-
-  .table tbody tr td {
-    padding: 0.875rem 0.5rem;
-    font-size: 0.8125rem;
-  }
-}
-
-/* ===================================
-   10. PRINT STYLES
-   =================================== */
-
-@media print {
-  .dashboard-container {
-    background: white;
-    padding: 0;
-  }
-
-  .dashboard-container::before {
-    display: none;
-  }
-
-  .btn.blue {
-    display: none;
-  }
-
-  .kpi-box,
-  .dashboard-content > div {
-    box-shadow: none;
-    border: 1px solid #e2e8f0;
-    page-break-inside: avoid;
-  }
-
-  .kpi-box:hover,
-  .table tbody tr:hover {
-    transform: none;
-    box-shadow: none;
-  }
-
-  .table thead {
-    background: #1e293b !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-}
-
-/* ===================================
-   11. ANIMATIONS
-   =================================== */
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.kpi-box {
-  animation: scaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-}
-
-.kpi-box:nth-child(1) {
-  animation-delay: 0.1s;
-}
-
-.kpi-box:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.dashboard-content > div {
-  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-}
-
-.table tbody tr {
-  animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-}
-
-.table tbody tr:nth-child(1) { animation-delay: 0.05s; }
-.table tbody tr:nth-child(2) { animation-delay: 0.1s; }
-.table tbody tr:nth-child(3) { animation-delay: 0.15s; }
-.table tbody tr:nth-child(4) { animation-delay: 0.2s; }
-.table tbody tr:nth-child(5) { animation-delay: 0.25s; }
-
-/* ===================================
-   12. ACCESSIBILITY
-   =================================== */
-
-.kpi-box:focus-within,
-.table tbody tr:focus-within {
-  outline: 3px solid #667eea;
-  outline-offset: 3px;
-}
-
-.btn.blue:focus-visible {
-  outline: 3px solid #667eea;
-  outline-offset: 5px;
-}
-
-/* ===================================
-   13. HIGH CONTRAST MODE
-   =================================== */
-
-@media (prefers-contrast: high) {
-  .kpi-box,
-  .dashboard-content > div {
-    border: 3px solid currentColor;
-  }
-
-  .table thead tr th {
-    border-bottom-width: 4px;
-  }
-
-  .table tbody tr {
-    border-bottom-width: 2px;
-  }
-
-  .btn.blue {
-    border: 3px solid white;
-  }
-}
-/* ===================================
-  EMPLOYEE DASHBOARD - PROFESSIONAL STYLING
-   =================================== */
-
-/* ===================================
-   1. DASHBOARD CONTAINER & LAYOUT
-   =================================== */
-
-.dashboard-container {
-  width: 100%;
-  min-height: 100vh;
-  padding: 2.5rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #e8f0fe 100%);
-  position: relative;
-}
-
-.dashboard-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 300px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  opacity: 0.05;
-  z-index: 0;
-}
-
-.dashboard-content {
-  max-width: 1600px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-}
-
-/* ===================================
-   2. HEADER SECTION
-   =================================== */
-
-.dashboard-content h2 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  letter-spacing: -0.5px;
-}
-
-.dashboard-content h2::before {
-  content: '';
-  width: 6px;
-  height: 3rem;
-  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-  border-radius: 3px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-/* Welcome Text */
-.dashboard-content > p {
-  font-size: 1.125rem;
-  color: #475569;
-  margin: 0.5rem 0;
-  padding-left: 2.5rem;
-  font-weight: 600;
-}
-
-.dashboard-content > p:first-of-type {
-  color: #1e293b;
   font-size: 1.25rem;
-  margin-top: 0;
 }
 
-/* ===================================
-   3. SECTION HEADERS
-   =================================== */
-
-.dashboard-content h3 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-top: 3rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 3px solid transparent;
-  border-image: linear-gradient(90deg, #667eea, #764ba2, transparent) 1;
-  position: relative;
-}
-
-.dashboard-content h3::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 80px;
-  height: 3px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  border-radius: 2px;
-}
-
-/* ===================================
-   4. KPI GRID - CARD LAYOUT
-   =================================== */
-
+/* KPI Grid Layout */
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
-  margin-bottom: 3rem;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-/* ===================================
-   5. KPI ITEM CARDS
-   =================================== */
-
+/* Individual KPI Items */
 .kpi-item {
   background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid #E2E8F0;
   position: relative;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 
 .kpi-item::before {
@@ -1587,371 +885,167 @@ input:focus {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  height: 6px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #3B82F6, #8B5CF6, #EC4899);
 }
 
 .kpi-item:hover {
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-  transform: translateY(-8px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  border-color: #3B82F6;
 }
 
-/* KPI Card Title */
 .kpi-item h4 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0;
-  padding-top: 0.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* KPI Card Details */
-.kpi-item p {
-  font-size: 1rem;
-  color: #475569;
-  margin: 0.5rem 0;
-  padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border-radius: 10px;
-  border-left: 4px solid #667eea;
-  transition: all 0.3s ease;
+  font-size: 1.125rem;
   font-weight: 600;
+  color: #0F172A;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.kpi-item p:hover {
-  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-  transform: translateX(5px);
-  border-left-color: #764ba2;
+.kpi-item h4::before {
+  content: '📊';
+  font-size: 1.5rem;
 }
 
-/* Deadline highlighting */
-.kpi-item p:last-of-type {
-  border-left-color: #f59e0b;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  color: #92400e;
+.kpi-item p {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #3B82F6;
+  margin: 0;
+  background: none;
+  padding: 0;
+  border: none;
+  display: block;
 }
 
-.kpi-item p:last-of-type:hover {
-  background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
-  border-left-color: #d97706;
-}
-
-/* ===================================
-   6. BUTTONS
-   =================================== */
-
-.kpi-item a {
-  text-decoration: none;
+.kpi-item p small {
+  font-size: 0.875rem;
+  color: #64748B;
+  font-weight: 400;
+  display: block;
   margin-top: 0.5rem;
 }
 
-.kpi-item button {
-  width: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-weight: 700;
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1rem;
-  letter-spacing: 0.3px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.kpi-item button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.6s ease;
-}
-
-.kpi-item button:hover::before {
-  left: 100%;
-}
-
-.kpi-item button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5);
-}
-
-.kpi-item button:active {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-/* ===================================
-   7. CHART CONTAINER
-   =================================== */
-
-.kpi-box {
-  background: white;
-  border-radius: 20px;
-  padding: 2.5rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  margin-bottom: 2.5rem;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  position: relative;
-  overflow: visible;
-}
-
-.kpi-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-}
-
-.kpi-box:hover {
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-  transform: translateY(-5px);
-}
-
+/* Chart Container Specific Styling */
 .kpi-box canvas {
-  max-height: 500px !important;
+  max-height: 450px !important;
   width: 100% !important;
   height: auto !important;
-  margin-top: 1.5rem;
 }
 
-#employeeChart {
+/* Chart Title */
+.kpi-box h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1E293B;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Loading State for Dashboard */
+.dashboard-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   min-height: 400px;
-  max-height: 500px;
-  filter: drop-shadow(0 4px 12px rgba(102, 126, 234, 0.15));
+  gap: 1rem;
 }
 
-/* ===================================
-   8. RESPONSIVE DESIGN
-   =================================== */
-
-@media (max-width: 1440px) {
-  .dashboard-container {
-    padding: 2rem;
-  }
-
-  .dashboard-content h2 {
-    font-size: 2.25rem;
-  }
-
-  .kpi-grid {
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.5rem;
-  }
+.dashboard-loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(59, 130, 246, 0.2);
+  border-top-color: #3B82F6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
+.dashboard-loading-text {
+  color: #64748B;
+  font-size: 1rem;
+}
+
+/* Empty State */
+.dashboard-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748B;
+}
+
+.dashboard-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.4;
+}
+
+.dashboard-empty-text {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Responsive Design */
 @media (max-width: 1024px) {
   .dashboard-container {
     padding: 1.5rem;
   }
 
-  .dashboard-content h2 {
-    font-size: 2rem;
-  }
-
-  .dashboard-content h3 {
-    font-size: 1.5rem;
-  }
-
   .kpi-grid {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .kpi-item {
-    padding: 1.75rem;
-  }
-
-  .kpi-box {
-    padding: 2rem;
+    gap: 1rem;
   }
 }
 
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 1rem;
-    background: #f8fafc;
   }
 
-  .dashboard-content h2 {
-    font-size: 1.75rem;
-  }
-
-  .dashboard-content h2::before {
-    width: 4px;
-    height: 2.5rem;
-  }
-
-  .dashboard-content h3 {
-    font-size: 1.25rem;
-    margin-top: 2rem;
-  }
-
-  .dashboard-content > p {
-    font-size: 1rem;
-    padding-left: 1.5rem;
-  }
-
-  .kpi-grid {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-  }
-
-  .kpi-item {
-    padding: 1.5rem;
-    border-radius: 16px;
-  }
-
-  .kpi-item h4 {
-    font-size: 1.125rem;
-  }
-
-  .kpi-item p {
-    font-size: 0.9375rem;
-    padding: 0.625rem 0.875rem;
-  }
-
-  .kpi-item button {
-    padding: 0.875rem 1.5rem;
-    font-size: 0.9375rem;
-  }
-
-  .kpi-box {
-    padding: 1.5rem;
-    border-radius: 16px;
-  }
-
-  #employeeChart {
-    min-height: 300px;
-    max-height: 400px;
-  }
-}
-
-@media (max-width: 480px) {
   .dashboard-content h2 {
     font-size: 1.5rem;
   }
 
   .dashboard-content h3 {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
   }
 
-  .dashboard-content > p {
-    font-size: 0.9375rem;
-    padding-left: 1rem;
+  .kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .kpi-item {
     padding: 1.25rem;
   }
 
-  .kpi-item h4 {
-    font-size: 1rem;
-  }
-
-  .kpi-item p {
-    font-size: 0.875rem;
-    padding: 0.5rem 0.75rem;
-  }
-
   .kpi-box {
     padding: 1.25rem;
   }
-}
 
-/* ===================================
-   9. ANIMATIONS
-   =================================== */
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .kpi-box canvas {
+    max-height: 300px !important;
   }
 }
 
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.kpi-item {
-  animation: scaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-}
-
-.kpi-item:nth-child(1) { animation-delay: 0.1s; }
-.kpi-item:nth-child(2) { animation-delay: 0.2s; }
-.kpi-item:nth-child(3) { animation-delay: 0.3s; }
-.kpi-item:nth-child(4) { animation-delay: 0.4s; }
-.kpi-item:nth-child(5) { animation-delay: 0.5s; }
-.kpi-item:nth-child(6) { animation-delay: 0.6s; }
-
-.kpi-box {
-  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-  animation-delay: 0.3s;
-}
-
-/* ===================================
-   10. ACCESSIBILITY
-   =================================== */
-
-.kpi-item:focus-within {
-  outline: 3px solid #667eea;
-  outline-offset: 3px;
-}
-
-.kpi-item button:focus-visible {
-  outline: 3px solid #667eea;
-  outline-offset: 5px;
-}
-
-/* ===================================
-   11. PRINT STYLES
-   =================================== */
-
+/* Print Styles */
 @media print {
   .dashboard-container {
     background: white;
     padding: 0;
   }
 
-  .dashboard-container::before {
+  .btn.blue {
     display: none;
   }
 
-  .kpi-item button {
-    display: none;
-  }
-
-  .kpi-item,
-  .kpi-box {
+  .kpi-box,
+  .kpi-item {
     box-shadow: none;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #E2E8F0;
     page-break-inside: avoid;
   }
 
@@ -1961,499 +1055,41 @@ input:focus {
     box-shadow: none;
   }
 }
-/* ===================================
-  MANAGER DASHBOARD - PROFESSIONAL STYLING
-   =================================== */
 
-/* ===================================
-   1. DASHBOARD CONTAINER & LAYOUT
-   =================================== */
-
-.dashboard-container {
-  width: 100%;
-  min-height: 100vh;
-  padding: 2.5rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #e8f0fe 100%);
-  position: relative;
-}
-
-.dashboard-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 300px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  opacity: 0.05;
-  z-index: 0;
-}
-
-.dashboard-content {
-  max-width: 1600px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-}
-
-/* ===================================
-   2. HEADER SECTION
-   =================================== */
-
-.dashboard-content h2 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  letter-spacing: -0.5px;
-}
-
-.dashboard-content h2::before {
-  content: '';
-  width: 6px;
-  height: 3rem;
-  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-  border-radius: 3px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-/* Manager Info */
-.dashboard-content > p {
-  font-size: 1.125rem;
-  color: #475569;
-  margin: 0.5rem 0;
-  padding-left: 2.5rem;
-  font-weight: 600;
-}
-
-.dashboard-content > p:first-of-type {
-  color: #1e293b;
-  font-size: 1.25rem;
-  margin-top: 0;
-}
-
-/* ===================================
-   3. SECTION HEADERS
-   =================================== */
-
-.dashboard-content h3 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-top: 3rem;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 3px solid transparent;
-  border-image: linear-gradient(90deg, #667eea, #764ba2, transparent) 1;
-  position: relative;
-}
-
-.dashboard-content h3::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 80px;
-  height: 3px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-  border-radius: 2px;
-}
-
-/* ===================================
-   4. TABLE STYLING
-   =================================== */
-
-/* Table Container - Scrollable */
-.dashboard-content > table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: white;
-  margin: 2rem 0 3rem 0;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  position: relative;
-}
-
-/* Table Wrapper for scroll */
-.dashboard-content > table::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  z-index: 1;
-}
-
-/* Table Header */
-.dashboard-content table thead,
-.dashboard-content table tr:first-child {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-}
-
-.dashboard-content table th {
-  color: white;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  padding: 1.5rem 1.5rem;
-  font-size: 0.875rem;
-  text-align: left;
-  border-bottom: 3px solid #667eea;
-}
-
-.dashboard-content table th:first-child {
-  padding-left: 2rem;
-  border-top-left-radius: 20px;
-}
-
-.dashboard-content table th:last-child {
-  padding-right: 2rem;
-  border-top-right-radius: 20px;
-}
-
-/* Table Body Rows */
-.dashboard-content table tbody tr {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border-bottom: 1px solid #f1f5f9;
-  background: white;
-}
-
-.dashboard-content table tbody tr:hover {
-  background: linear-gradient(90deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-  transform: scale(1.01);
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
-}
-
-.dashboard-content table tbody tr:last-child {
-  border-bottom: none;
-}
-
-/* Table Cells */
-.dashboard-content table td {
-  padding: 1.5rem 1.5rem;
-  font-size: 0.9375rem;
-  color: #475569;
-  vertical-align: middle;
-}
-
-.dashboard-content table td:first-child {
-  padding-left: 2rem;
-  font-weight: 700;
-  color: #667eea;
-  font-size: 1rem;
-}
-
-.dashboard-content table td:nth-child(2) {
-  font-weight: 700;
-  color: #1e293b;
-  font-size: 1.125rem;
-}
-
-/* Status Column Styling */
-.dashboard-content table td:last-child {
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.8125rem;
-  letter-spacing: 0.5px;
-}
-
-/* Empty State */
-.dashboard-content table td[colspan] {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #94a3b8;
-  font-size: 1.125rem;
-  font-weight: 600;
-}
-
-/* ===================================
-   5. CHART CONTAINER
-   =================================== */
-
-.kpi-box {
-  background: white;
-  border-radius: 20px;
-  padding: 2.5rem;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  margin-bottom: 2.5rem;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  position: relative;
-  overflow: visible;
-}
-
-.kpi-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-}
-
-.kpi-box:hover {
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-  transform: translateY(-5px);
-}
-
-.kpi-box canvas {
-  max-height: 500px !important;
-  width: 100% !important;
-  height: auto !important;
-  margin-top: 1.5rem;
-}
-
-#managerChart {
-  min-height: 400px;
-  max-height: 500px;
-  filter: drop-shadow(0 4px 12px rgba(102, 126, 234, 0.15));
-}
-
-/* ===================================
-   6. AI INSIGHTS BUTTON
-   =================================== */
-
-.btn.blue {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-weight: 700;
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 2.5rem;
-  font-size: 1rem;
-  letter-spacing: 0.3px;
-  position: relative;
-  overflow: hidden;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.btn.blue::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.6s ease;
-}
-
-.btn.blue:hover::before {
-  left: 100%;
-}
-
-.btn.blue:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5);
-}
-
-.btn.blue:active {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-}
-
-/* Button container outside dashboard */
-body > div:has(.btn.blue),
-.dashboard-container + div {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 0 2.5rem 2.5rem 2.5rem;
-}
-
-/* ===================================
-   7. RESPONSIVE DESIGN
-   =================================== */
-
-@media (max-width: 1440px) {
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
   .dashboard-container {
-    padding: 2rem;
+    background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
   }
 
-  .dashboard-content h2 {
-    font-size: 2.25rem;
+  .kpi-box,
+  .kpi-item {
+    background: #1E293B;
+    border-color: #334155;
   }
 
-  body > div:has(.btn.blue),
-  .dashboard-container + div {
-    padding: 0 2rem 2rem 2rem;
-  }
-}
-
-@media (max-width: 1024px) {
-  .dashboard-container {
-    padding: 1.5rem;
+  .kpi-box p {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    color: #CBD5E1;
   }
 
-  .dashboard-content h2 {
-    font-size: 2rem;
+  .dashboard-content h2,
+  .dashboard-content h3,
+  .kpi-item h4 {
+    color: #F1F5F9;
   }
 
-  .dashboard-content h3 {
-    font-size: 1.5rem;
-  }
-
-  .kpi-box {
-    padding: 2rem;
-  }
-
-  .dashboard-content table th,
-  .dashboard-content table td {
-    padding: 1.25rem 1rem;
-    font-size: 0.875rem;
-  }
-
-  .dashboard-content table th:first-child,
-  .dashboard-content table td:first-child {
-    padding-left: 1.5rem;
-  }
-
-  .dashboard-content table th:last-child,
-  .dashboard-content table td:last-child {
-    padding-right: 1.5rem;
-  }
-
-  body > div:has(.btn.blue),
-  .dashboard-container + div {
-    padding: 0 1.5rem 1.5rem 1.5rem;
+  .kpi-box p strong,
+  .kpi-item p {
+    color: #60A5FA;
   }
 }
 
-@media (max-width: 768px) {
-  .dashboard-container {
-    padding: 1rem;
-    background: #f8fafc;
-  }
-
-  .dashboard-content h2 {
-    font-size: 1.75rem;
-  }
-
-  .dashboard-content h2::before {
-    width: 4px;
-    height: 2.5rem;
-  }
-
-  .dashboard-content h3 {
-    font-size: 1.25rem;
-    margin-top: 2rem;
-  }
-
-  .dashboard-content > p {
-    font-size: 1rem;
-    padding-left: 1.5rem;
-  }
-
-  /* Scrollable Table on Mobile */
-  .dashboard-content > table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-    border-radius: 16px;
-  }
-
-  .dashboard-content table th {
-    padding: 1rem 0.75rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-  }
-
-  .dashboard-content table td {
-    padding: 1rem 0.75rem;
-    font-size: 0.875rem;
-  }
-
-  .dashboard-content table th:first-child,
-  .dashboard-content table td:first-child {
-    padding-left: 1rem;
-  }
-
-  .dashboard-content table th:last-child,
-  .dashboard-content table td:last-child {
-    padding-right: 1rem;
-  }
-
-  .dashboard-content table tbody tr:hover {
-    transform: none;
-  }
-
-  .btn.blue {
-    padding: 0.875rem 1.5rem;
-    font-size: 0.9375rem;
-    width: 100%;
-    justify-content: center;
-  }
-
-  .kpi-box {
-    padding: 1.5rem;
-    border-radius: 16px;
-  }
-
-  #managerChart {
-    min-height: 300px;
-    max-height: 400px;
-  }
-
-  body > div:has(.btn.blue),
-  .dashboard-container + div {
-    padding: 0 1rem 1rem 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .dashboard-content h2 {
-    font-size: 1.5rem;
-  }
-
-  .dashboard-content h3 {
-    font-size: 1.125rem;
-  }
-
-  .dashboard-content > p {
-    font-size: 0.9375rem;
-    padding-left: 1rem;
-  }
-
-  .kpi-box {
-    padding: 1.25rem;
-  }
-
-  .dashboard-content table th {
-    padding: 0.875rem 0.5rem;
-    font-size: 0.6875rem;
-  }
-
-  .dashboard-content table td {
-    padding: 0.875rem 0.5rem;
-    font-size: 0.8125rem;
-  }
-}
-
-/* ===================================
-   8. ANIMATIONS
-   =================================== */
-
-@keyframes fadeInUp {
+/* Animation for KPI Values */
+@keyframes countUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -2461,102 +1097,30 @@ body > div:has(.btn.blue),
   }
 }
 
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.kpi-item p {
+  animation: countUp 0.6s ease-out;
 }
 
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.dashboard-content > table {
-  animation: scaleIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-  animation-delay: 0.1s;
-}
-
-.kpi-box {
-  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-  animation-delay: 0.2s;
-}
-
-.dashboard-content table tbody tr {
-  animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards;
-}
-
-.dashboard-content table tbody tr:nth-child(1) { animation-delay: 0.05s; }
-.dashboard-content table tbody tr:nth-child(2) { animation-delay: 0.1s; }
-.dashboard-content table tbody tr:nth-child(3) { animation-delay: 0.15s; }
-.dashboard-content table tbody tr:nth-child(4) { animation-delay: 0.2s; }
-.dashboard-content table tbody tr:nth-child(5) { animation-delay: 0.25s; }
-.dashboard-content table tbody tr:nth-child(6) { animation-delay: 0.3s; }
-.dashboard-content table tbody tr:nth-child(7) { animation-delay: 0.35s; }
-.dashboard-content table tbody tr:nth-child(8) { animation-delay: 0.4s; }
-
-/* ===================================
-   9. ACCESSIBILITY
-   =================================== */
-
-.dashboard-content table:focus-within,
-.kpi-box:focus-within {
-  outline: 3px solid #667eea;
-  outline-offset: 3px;
+/* Accessibility Improvements */
+.kpi-item:focus-within {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
 }
 
 .btn.blue:focus-visible {
-  outline: 3px solid #667eea;
-  outline-offset: 5px;
+  outline: 2px solid #3B82F6;
+  outline-offset: 4px;
 }
 
-/* ===================================
-   10. PRINT STYLES
-   =================================== */
-
-@media print {
-  .dashboard-container {
-    background: white;
-    padding: 0;
-  }
-
-  .dashboard-container::before {
-    display: none;
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .kpi-box,
+  .kpi-item {
+    border: 2px solid currentColor;
   }
 
   .btn.blue {
-    display: none;
-  }
-
-  .dashboard-content > table,
-  .kpi-box {
-    box-shadow: none;
-    border: 1px solid #e2e8f0;
-    page-break-inside: avoid;
-  }
-
-  .dashboard-content table tbody tr:hover,
-  .kpi-box:hover {
-    transform: none;
-    box-shadow: none;
-  }
-
-  .dashboard-content table thead,
-  .dashboard-content table tr:first-child {
-    background: #1e293b !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    border: 2px solid white;
   }
 }
 
@@ -3444,4 +2008,64 @@ body > div:has(.btn.blue),
   min-height: 400px;
   max-height: 500px;
   filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.15));
+}
+/* ========================================
+   MANAGER DASHBOARD STYLING
+   ======================================== */
+
+/* Summary Box (Manager Overview) */
+.manager-summary-box {
+  margin-bottom: 3rem;
+}
+
+/* Manager KPI Small Cards */
+.manager-summary-grid {
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.manager-card {
+  padding: 1.5rem !important;
+}
+
+/* Chart Box */
+.manager-chart-box h3 {
+  margin-bottom: 1.5rem;
+}
+
+.manager-chart-box canvas {
+  max-height: 500px !important;
+  width: 100% !important;
+  height: auto;
+}
+
+/* Table Container (scrolling, shadows, borders)
+   — Reuses admin table styling automatically */
+.table-container {
+  margin-bottom: 2.5rem;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: white;
+  border: 1px solid #e2e8f0;
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+/* Make chart match admin design */
+.manager-chart-box {
+  animation: scaleIn 0.6s ease backwards;
+  filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.15));
+}
+
+/* Optional: Animated KPI Cards (Manager) */
+.manager-card {
+  animation: fadeInUp 0.5s ease backwards;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .manager-summary-grid {
+    grid-template-columns: 1fr;
+  }
 }
