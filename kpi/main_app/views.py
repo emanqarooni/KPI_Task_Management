@@ -47,6 +47,7 @@ def dashboard(request):
 @login_required
 @role_required(["admin"])
 def admin_dashboard(request):
+    # Total users
     total_users_count = User.objects.count()
 
     # Employees & managers
@@ -59,26 +60,31 @@ def admin_dashboard(request):
     # Department counts
     department_counts = EmployeeProfile.objects.values('department').annotate(count=Count('id'))
 
+    # Use safe keys for template
     department_data = {
-        "Sales & Marketing": 0,
-        "Information Technology": 0,
-        "Human Resources": 0,
-        "Project Management": 0,
+        "Sales_Marketing": 0,
+        "Information_Technology": 0,
+        "Human_Resources": 0,
+        "Project_Management": 0,
     }
 
-    # Convert short codes (SM, IT, HR, PM) into full names
-    department_map = dict(DEPARTMENT)
+    department_map = {
+        "SM": "Sales_Marketing",
+        "IT": "Information_Technology",
+        "HR": "Human_Resources",
+        "PM": "Project_Management",
+    }
 
     for dept in department_counts:
         dept_code = dept['department']
-        dept_name = department_map.get(dept_code, dept_code)
-        department_data[dept_name] = dept['count']
+        key = department_map.get(dept_code, dept_code)
+        department_data[key] = dept['count']
 
     # KPI data
     all_kpis = Kpi.objects.all()
     employee_kpi_assignments = EmployeeKpi.objects.select_related(
         'employee__user', 'employee__manager', 'kpi'
-    ).all()
+    )
 
     employee_kpi_data = []
     for assignment in employee_kpi_assignments:
@@ -97,17 +103,21 @@ def admin_dashboard(request):
             'weighted_score': round(weighted_score, 2),
         })
 
+    # ✅ Calculate total weighted score per employee
+    employee_total_scores = {}
+    for data in employee_kpi_data:
+        name = data['employee_name']
+        employee_total_scores[name] = employee_total_scores.get(name, 0) + data['weighted_score']
+
     # Chart lists
     chart_labels_list = []
     chart_values_list = []
 
     for kpi in all_kpis:
         chart_labels_list.append(kpi.title)
-
         total_progress_for_kpi = ProgressEntry.objects.filter(
             employee_kpi__kpi=kpi
         ).aggregate(total=Sum("value"))["total"] or 0
-
         chart_values_list.append(float(total_progress_for_kpi))
 
     context = {
@@ -115,11 +125,10 @@ def admin_dashboard(request):
         "total_employees": total_employees_count,
         "total_managers": total_managers_count,
         "department_data": department_data,
-
         "employees": all_employees,
         "managers": all_managers,
-
         "employee_kpi_data": employee_kpi_data,
+        "employee_total_scores": employee_total_scores,  # <- added
         "chart_labels": json.dumps(chart_labels_list),
         "chart_values": json.dumps([float(v) for v in chart_values_list]),
     }
