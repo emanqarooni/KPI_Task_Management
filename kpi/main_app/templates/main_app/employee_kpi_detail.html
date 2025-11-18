@@ -83,13 +83,14 @@
           </h2>
           <div class="flex items-center gap-4">
             <div class="avatar placeholder">
-              <div class="bg-primary text-primary-content rounded-full w-16">
-                <span class="text-xl">{{ kpi.employee.user.username|slice:":2"|upper }}</span>
+              <div class="bg-primary text-primary-content rounded-full w-10">
+                <img src="{{ kpi.employee.image.url }}" alt="">
               </div>
             </div>
             <div>
-              <h3 class="font-bold text-lg">{{ kpi.employee.user.username }}</h3>
-              <p class="text-sm text-base-content/70">{{ kpi.employee.job_role }}</p>
+              <h3 class="font-bold text-lg">{{ kpi.employee.user.first_name }} {{ kpi.employee.user.last_name }}</h3>
+              <p class="text-sm text-base-content/70">{{ kpi.employee.user.username }}</p>
+              <p class="text-sm text-base-content/80">{{ kpi.employee.job_role }}</p>
               <p class="text-xs text-base-content/50">{{ kpi.employee.get_department_display }}</p>
             </div>
           </div>
@@ -153,13 +154,24 @@
     <div class="lg:col-span-2">
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
-          <h2 class="card-title text-lg mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-            Progress Entries
-            <span class="badge badge-primary ml-2">{{ progress_entries|length }}</span>
-          </h2>
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="card-title text-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Progress Entries
+              <span class="badge badge-primary ml-2">{{ progress_entries|length }}</span>
+            </h2>
+
+            {% if user.employeeprofile.role == 'employee' and kpi.status != 'Complete' %}
+            <a href="{% url 'progress' %}" class="btn btn-success btn-sm">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              Add Progress
+            </a>
+            {% endif %}
+          </div>
 
           {% if progress_entries %}
             <!-- Progress Timeline -->
