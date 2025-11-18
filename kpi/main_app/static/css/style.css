@@ -2069,3 +2069,7 @@ input:focus {
     grid-template-columns: 1fr;
   }
 }
+.dashboard-content > .btn.blue {
+  margin-bottom: 2rem;
+  display: inline-block;
+}
