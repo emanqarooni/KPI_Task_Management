@@ -39,27 +39,7 @@
             </svg>
           </button>
 
-          <!-- Home Icon -->
-          <a
-            href="{% url 'home' %}"
-            class="btn btn-ghost hover:bg-white/20 mb-4 text-white flex items-center justify-start w-full px-4"
-            title="Home"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-8 w-8 flex-shrink-0"
-              fill="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M11.47 3.84a.75.75 0 011.06 0l8.69 8.69a.75.75 0 101.06-1.06l-8.689-8.69a2.25 2.25 0 00-3.182 0l-8.69 8.69a.75.75 0 001.061 1.06l8.69-8.69z"
-              />
-              <path
-                d="M12 5.432l8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 01-.75-.75v-4.5a.75.75 0 00-.75-.75h-3a.75.75 0 00-.75.75V21a.75.75 0 01-.75.75H5.625a1.875 1.875 0 01-1.875-1.875v-6.198a2.29 2.29 0 00.091-.086L12 5.43z"
-              />
-            </svg>
-            <span class="sidebar-text ml-3 text-lg font-medium">Home</span>
-          </a>
+
 
           <!-- Dashboard Link -->
           <a
@@ -377,21 +357,21 @@
       </div>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const sidebar = document.getElementById("sidebar");
-  const sidebarToggle = document.getElementById("sidebar-toggle");
-  const mainContent = document.getElementById("main-content");
-  const backdrop = document.getElementById("sidebar-backdrop");
+  const sidebar = document.getElementById("sidebar")
+  const sidebarToggle = document.getElementById("sidebar-toggle")
+  const mainContent = document.getElementById("main-content")
+  const backdrop = document.getElementById("sidebar-backdrop")
 
   sidebarToggle.addEventListener("click", (e) => {
     e.stopPropagation();
-    sidebar.classList.toggle("sidebar-collapsed");
-    sidebar.classList.toggle("sidebar-expanded");
-    backdrop.classList.toggle("active");
-  });
+    sidebar.classList.toggle("sidebar-collapsed")
+    sidebar.classList.toggle("sidebar-expanded")
+    backdrop.classList.toggle("active")
+  })
 
   backdrop.addEventListener("click", () => {
-    sidebar.classList.remove("sidebar-expanded");
-    sidebar.classList.add("sidebar-collapsed");
+    sidebar.classList.remove("sidebar-expanded")
+    sidebar.classList.add("sidebar-collapsed")
     backdrop.classList.remove("active");
   });
 
@@ -400,9 +380,9 @@ document.addEventListener("DOMContentLoaded", () => {
       e.key === "Escape" &&
       sidebar.classList.contains("sidebar-expanded")
     ) {
-      sidebar.classList.remove("sidebar-expanded");
-      sidebar.classList.add("sidebar-collapsed");
-      backdrop.classList.remove("active");
+      sidebar.classList.remove("sidebar-expanded")
+      sidebar.classList.add("sidebar-collapsed")
+      backdrop.classList.remove("active")
     }
   });
 
@@ -413,8 +393,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (link.getAttribute("href") === currentPath) {
       link.classList.add("bg-white/30");
     }
-  });
-});
+  })
+})
 </script>
 
     </div>

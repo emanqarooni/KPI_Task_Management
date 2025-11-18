@@ -757,6 +757,7 @@ input:focus {
 }
 
 /* home page */
+
 .home-container {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: #ffffff;
@@ -1032,6 +1033,29 @@ input:focus {
   margin-right: auto;
 }
 
+body.home-page .sidebar-purple,
+body.home-page #sidebar {
+  display: none !important;
+}
+
+/* Remove left margin from main content on home page */
+body.home-page #main-content {
+  margin-left: 0 !important;
+  width: 100% !important;
+}
+
+/* Hide sidebar backdrop on home page */
+body.home-page #sidebar-backdrop,
+body.home-page .sidebar-backdrop {
+  display: none !important;
+}
+
+/* Make navbar full width on home page */
+body.home-page .navbar {
+  width: 100%;
+}
+
+
 /* ===================================
    ANIMATIONS
    =================================== */
@@ -1130,3 +1154,13 @@ input:focus {
     padding: 30px 20px;
   }
 }
+
+/* add progress */
+
+
+
+
+
+
+
+

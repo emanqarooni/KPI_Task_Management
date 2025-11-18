@@ -1,12 +1,159 @@
 {% extends 'base.html'%}
 {% block content %}
-<h1>Add Progress</h1>
 
-<form method="POST" action="{% url 'progress' %}">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="btn">Save Progress</button>
-</form>
+<!-- Progress Form Container -->
+<div class="progress-form-container max-w-4xl mx-auto">
 
+  <!-- Page Header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-3 mb-2">
+      <div class="w-1 h-10 bg-primary rounded-full"></div>
+      <h1 class="text-3xl font-bold text-base-content">Add Progress Update</h1>
+    </div>
+    <p class="text-base-content/70 ml-7">
+      Track your KPI progress by submitting regular updates with notes and achievements.
+    </p>
+  </div>
+
+  <!-- Progress Form Card -->
+  <div class="card bg-base-100 shadow-xl border border-base-300">
+    <div class="card-body p-8">
+
+      <!-- Form Header with Icon -->
+
+
+      <!-- Form -->
+      <form method="POST" action="{% url 'progress' %}" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Display Form Errors -->
+        {% if form.errors %}
+        <div class="alert alert-error shadow-lg">
+          <div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <div>
+              <h3 class="font-bold">Please fix the following errors:</h3>
+              <ul class="list-disc list-inside mt-2">
+                {% for field, errors in form.errors.items %}
+                  {% for error in errors %}
+                    <li>{{ field }}: {{ error }}</li>
+                  {% endfor %}
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Form Fields with Custom Styling -->
+        <div class="form-control-wrapper space-y-6">
+          {% for field in form %}
+          <div class="form-control w-full">
+            <!-- Label -->
+            <label class="label">
+              <span class="label-text font-semibold text-base-content flex items-center gap-2">
+                {{ field.label }}
+                {% if field.field.required %}
+                <span class="badge badge-error badge-sm text-white">Required</span>
+                {% endif %}
+              </span>
+            </label>
+
+            <!-- Field Input -->
+            <div class="relative">
+              {% if field.field.widget.input_type == 'select' %}
+                <!-- Select Dropdown Styling -->
+                <select name="{{ field.name }}" id="id_{{ field.name }}"
+                        class="select select-bordered w-full focus:select-primary transition-all"
+                        {% if field.field.required %}required{% endif %}>
+                  {% for choice in field.field.choices %}
+                    <option value="{{ choice.0 }}" {% if choice.0 == field.value %}selected{% endif %}>
+                      {{ choice.1 }}
+                    </option>
+                  {% endfor %}
+                </select>
+
+              {% elif field.field.widget.input_type == 'textarea' %}
+                <!-- Textarea Styling -->
+                <textarea name="{{ field.name }}" id="id_{{ field.name }}"
+                          class="textarea textarea-bordered w-full h-32 focus:textarea-primary transition-all resize-y"
+                          placeholder="{{ field.help_text|default:'Enter your notes here...' }}"
+                          {% if field.field.required %}required{% endif %}>{{ field.value|default:'' }}</textarea>
+
+              {% elif field.field.widget.input_type == 'number' %}
+                <!-- Number Input Styling -->
+                <input type="number" name="{{ field.name }}" id="id_{{ field.name }}"
+                       value="{{ field.value|default:'' }}"
+                       class="input input-bordered w-full focus:input-primary transition-all"
+                       placeholder="{{ field.help_text|default:'0' }}"
+                       step="0.01"
+                       min="0"
+                       {% if field.field.required %}required{% endif %}>
+
+              {% elif field.field.widget.input_type == 'date' %}
+                <!-- Date Input Styling -->
+                <input type="date" name="{{ field.name }}" id="id_{{ field.name }}"
+                       value="{{ field.value|default:'' }}"
+                       class="input input-bordered w-full focus:input-primary transition-all"
+                       {% if field.field.required %}required{% endif %}>
+
+              {% else %}
+                <!-- Text Input Styling -->
+                <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="id_{{ field.name }}"
+                       value="{{ field.value|default:'' }}"
+                       class="input input-bordered w-full focus:input-primary transition-all"
+                       placeholder="{{ field.help_text|default:'' }}"
+                       {% if field.field.required %}required{% endif %}>
+              {% endif %}
+            </div>
+
+            <!-- Help Text -->
+            {% if field.help_text %}
+            <label class="label">
+              <span class="label-text-alt text-base-content/50">{{ field.help_text }}</span>
+            </label>
+            {% endif %}
+
+            <!-- Field Errors -->
+            {% if field.errors %}
+            <label class="label">
+              <span class="label-text-alt text-error">
+                {% for error in field.errors %}
+                  {{ error }}
+                {% endfor %}
+              </span>
+            </label>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Form Actions -->
+        <div class="divider"></div>
+
+        <div class="card-actions justify-between items-center flex-wrap gap-4">
+          <!-- Cancel Button -->
+          <a href="{% url 'employee_kpi' %}" class="btn btn-ghost gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Cancel
+          </a>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-primary gap-2 shadow-lg hover:shadow-xl transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Save Progress
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>
 
 {% endblock %}
