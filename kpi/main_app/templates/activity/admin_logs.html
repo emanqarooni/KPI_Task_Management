@@ -91,16 +91,23 @@
         <tbody>
           {% for log in logs %}
           <tr class="activity-table-row hover">
-            <!-- User Column -->
+            <!-- User Column with Profile Image -->
             <td>
               <div class="flex items-center gap-3">
-                <div class="avatar placeholder">
-                  <div class="bg-primary text-primary-content rounded-full w-10
+                <div class="avatar">
+                  <div class="w-10 rounded-full
                     {% if log.action == 'PROGRESS_ADDED' %}avatar-progress
                     {% elif log.action == 'KPI_ASSIGNED' %}avatar-assign
                     {% elif log.action == 'KPI_UPDATED' %}avatar-update
                     {% elif log.action == 'KPI_DELETED' %}avatar-delete{% endif %}">
-                    <span class="text-sm font-bold">{{ log.user.username|first|upper }}</span>
+                    {% if log.user.employeeprofile.image %}
+                      <img src="{{ log.user.employeeprofile.image.url }}" alt="{{ log.user.username }}" />
+                    {% else %}
+                      <!-- Fallback to initial if no image -->
+                      <div class="bg-primary text-primary-content w-full h-full flex items-center justify-center">
+                        <span class="text-sm font-bold">{{ log.user.username|first|upper }}</span>
+                      </div>
+                    {% endif %}
                   </div>
                 </div>
                 <div>
@@ -145,13 +152,20 @@
               <div class="text-sm max-w-md activity-description">{{ log.description }}</div>
             </td>
 
-            <!-- Affected Employee Column -->
+            <!-- Affected Employee Column with Profile Image -->
             <td>
               {% if log.related_user %}
                 <div class="flex items-center gap-2">
-                  <div class="avatar placeholder">
-                    <div class="bg-neutral text-neutral-content rounded-full w-8">
-                      <span class="text-xs">{{ log.related_user.username|first|upper }}</span>
+                  <div class="avatar">
+                    <div class="w-8 rounded-full">
+                      {% if log.related_user.employeeprofile.image %}
+                        <img src="{{ log.related_user.employeeprofile.image.url }}" alt="{{ log.related_user.username }}" />
+                      {% else %}
+                        <!-- Fallback to initial if no image -->
+                        <div class="bg-neutral text-neutral-content w-full h-full flex items-center justify-center">
+                          <span class="text-xs font-bold">{{ log.related_user.username|first|upper }}</span>
+                        </div>
+                      {% endif %}
                     </div>
                   </div>
                   <span class="text-sm font-medium">{{ log.related_user.username }}</span>

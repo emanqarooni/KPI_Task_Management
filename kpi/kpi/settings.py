@@ -67,6 +67,8 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                # added the notification decorator so that the counter can show in all of the views in the templates
+                'main_app.context_processors.notification_count',
             ],
         },
     },

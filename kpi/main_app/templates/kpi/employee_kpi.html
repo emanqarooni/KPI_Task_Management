@@ -1,43 +1,251 @@
 {% extends 'base.html'%}
 {% block content%}
-<h1>My KPIs</h1>
 
-<table>
-  <thead>
-    <tr>
-      <th>KPI Name</th>
-      <th>Progress</th>
-      <th>Deadline</th>
-      <th>Status</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for ekpi in employee_kpi %}
-    <tr>
-      <td>{{ekpi.kpi.title}}</td>
-      <td>{{ekpi.progress_percentage}}%</td>
-      <td>{{ekpi.end_date}}</td>
-      <td>{{ekpi.status}}</td>
+<div class="max-w-7xl mx-auto">
+  <!-- Toast Messages Container -->
+  {% if messages %}
+  <div class="toast toast-top toast-end z-50">
+    {% for message in messages %}
+    <div class="alert
+      {% if message.tags == 'success' %}alert-success
+      {% elif message.tags == 'error' %}alert-error
+      {% elif message.tags == 'warning' %}alert-warning
+      {% else %}alert-info{% endif %}
+      shadow-lg animate-slide-in">
+      <div class="flex items-center gap-3">
+        <!-- Icon based on message type -->
+        {% if message.tags == 'success' %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {% elif message.tags == 'error' %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {% elif message.tags == 'warning' %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        {% else %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {% endif %}
 
-      <td>
-        <a href="{% url 'detail' ekpi.kpi.id%}"><button>Details</button></a>
-      </td>
-    </tr>
+        <span class="font-semibold">{{ message }}</span>
+
+        <!-- Close button -->
+        <button class="btn btn-ghost btn-sm btn-circle ml-2" onclick="this.parentElement.parentElement.remove()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
     {% endfor %}
-  </tbody>
-</table>
+  </div>
+  {% endif %}
 
-{% if messages %}
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h1 class="text-4xl font-bold text-base-content flex items-center gap-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+      </svg>
+      My KPIs
+    </h1>
+    <p class="text-base-content/60 mt-2">Track and manage your assigned Key Performance Indicators</p>
+  </div>
 
+  <!-- KPIs Table -->
+  {% if employee_kpi %}
+  <div class="card bg-base-100 shadow-xl">
+    <div class="overflow-x-auto">
+      <table class="table table-zebra">
+        <thead class="kpi-table-header">
+          <tr>
+            <th>
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+                KPI Name
+              </div>
+            </th>
+            <th>
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+                Progress
+              </div>
+            </th>
+            <th>
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Deadline
+              </div>
+            </th>
+            <th>
+              <div class="flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Status
+              </div>
+            </th>
+            <th class="text-center">
+              <div class="flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+                Actions
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ekpi in employee_kpi %}
+          <tr class="hover">
+            <!-- KPI Name -->
+            <td>
+              <div>
+                <div class="font-bold text-base">{{ekpi.kpi.title}}</div>
+                {% if ekpi.kpi.description %}
+                <div class="text-sm opacity-50 max-w-md truncate">{{ekpi.kpi.description|truncatewords:10}}</div>
+                {% endif %}
+              </div>
+            </td>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      {% for message in messages %}
-        M.toast({html: "{{ message }}", classes: "{{ message.tags }}"});
-      {% endfor %}
+            <!-- Progress -->
+            <td>
+              <span class="font-bold text-lg" style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                {{ekpi.progress_percentage}}%
+              </span>
+            </td>
+
+            <!-- Deadline -->
+            <td>
+              <span class="font-mono text-sm" style="color: #6b7280;">{{ekpi.end_date}}</span>
+            </td>
+
+            <!-- Status Badge -->
+            <td>
+              <div class="badge badge-lg gap-2
+                {% if ekpi.status == 'Active' or ekpi.status == 'In Progress' %}badge-activity-assign
+                {% elif ekpi.status == 'Pending' or ekpi.status == 'No Progress' %}badge-activity-progress
+                {% elif ekpi.status == 'Completed' or ekpi.status == 'Complete' %}badge-success
+                {% elif ekpi.status == 'Overdue' %}badge-activity-delete
+                {% else %}badge-ghost{% endif %}">
+
+                <!-- Status Icon -->
+                {% if ekpi.status == 'Active' or ekpi.status == 'In Progress' %}
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                {% elif ekpi.status == 'Pending' or ekpi.status == 'No Progress' %}
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                {% elif ekpi.status == 'Completed' or ekpi.status == 'Complete' %}
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                {% elif ekpi.status == 'Overdue' %}
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                {% endif %}
+
+                {{ekpi.status}}
+              </div>
+            </td>
+
+            <!-- Actions -->
+            <td>
+              <div class="flex justify-center gap-2">
+                <a href="{% url 'employee_kpi_detail' ekpi.kpi.id%}" class="btn btn-sm btn-ghost" title="View Details">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  Details
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% else %}
+  <!-- Empty State -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body items-center text-center py-16">
+      <div class="empty-state-animation">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 text-base-content/20 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+        </svg>
+      </div>
+      <h3 class="text-2xl font-bold mb-2">No KPIs Assigned</h3>
+      <p class="text-base-content/60 mb-4">You don't have any KPIs assigned to you yet.</p>
+      <p class="text-sm text-base-content/50">Contact your manager to get started with your performance tracking.</p>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Auto-dismiss messages after 5 seconds -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const messages = document.querySelectorAll('.toast .alert');
+    messages.forEach(function(message) {
+      setTimeout(function() {
+        message.style.opacity = '0';
+        message.style.transform = 'translateX(100%)';
+        setTimeout(function() {
+          message.remove();
+        }, 300);
+      }, 5000);
     });
-  </script>
-{% endif %}
+  });
+</script>
+
+<style>
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+
+  .toast {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 400px;
+  }
+
+  .toast .alert {
+    transition: all 0.3s ease;
+    min-width: 300px;
+  }
+</style>
 
 {% endblock %}
