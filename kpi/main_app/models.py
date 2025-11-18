@@ -171,7 +171,6 @@ class Notification(models.Model):
         ('kpi_completed', 'KPI Completed'),
         ('kpi_approaching_deadline', 'Approaching Deadline'),
     ]
-
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_notifications', null=True, blank=True)
     notification_type = models.CharField(max_length=30, choices=NOTIFICATION_TYPES)

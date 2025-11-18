@@ -28,6 +28,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from decimal import Decimal
 
 
+import google.generativeai as genai
+
+
 # Employee dashboard'
 @login_required
 def dashboard(request):
@@ -50,11 +53,8 @@ def admin_dashboard(request):
 
     all_kpis = Kpi.objects.all()
 
-    # Add recent activity logs
-    recent_logs = ActivityLog.objects.select_related("user", "related_user")[:10]
     chart_labels_list = []
     chart_values_list = []
-
 
     for kpi in all_kpis:
         chart_labels_list.append(kpi.title)
@@ -88,12 +88,10 @@ def manager_dashboard(request):
     manager_department = manager_profile.department
 
     employees_in_department = EmployeeProfile.objects.filter(
-        department=manager_department,
-        role="employee"
+        department=manager_department, role="employee"
     )
 
     employee_dashboard_rows = []
-
 
     for employee in employees_in_department:
         employee_kpis = EmployeeKpi.objects.filter(employee=employee)
@@ -101,7 +99,6 @@ def manager_dashboard(request):
         if employee_kpis.exists():
             total_progress_value = 0
             total_target_value = 0
-
 
             for employee_kpi in employee_kpis:
                 progress_entries = employee_kpi.progressentry_set.all()
@@ -113,7 +110,9 @@ def manager_dashboard(request):
             if total_target_value == 0:
                 completion_percentage = 0
             else:
-                completion_percentage = round((total_progress_value / total_target_value) * 100)
+                completion_percentage = round(
+                    (total_progress_value / total_target_value) * 100
+                )
 
             if completion_percentage == 0:
                 status_text = "No Progress"
@@ -126,11 +125,13 @@ def manager_dashboard(request):
             completion_percentage = 0
             status_text = "No KPI Assigned"
 
-        employee_dashboard_rows.append({
-            "name": employee.user.username,
-            "completion": completion_percentage,
-            "status": status_text,
-        })
+        employee_dashboard_rows.append(
+            {
+                "name": employee.user.username,
+                "completion": completion_percentage,
+                "status": status_text,
+            }
+        )
 
     context = {
         "manager_name": manager_profile.user.username,
@@ -153,7 +154,6 @@ def employee_dashboard(request):
     chart_values_list = []
     kpi_cards_list = []
 
-
     for employee_kpi in assigned_kpis:
         kpi_title = employee_kpi.kpi.title
         total_progress_value = 0
@@ -165,21 +165,25 @@ def employee_dashboard(request):
         if employee_kpi.target_value == 0:
             progress_percentage = 0
         else:
-            progress_percentage = round((total_progress_value / employee_kpi.target_value) * 100)
+            progress_percentage = round(
+                (total_progress_value / employee_kpi.target_value) * 100
+            )
 
         days_remaining = (employee_kpi.end_date - date.today()).days
 
         chart_labels_list.append(kpi_title)
         chart_values_list.append(progress_percentage)
 
-        kpi_cards_list.append({
-            "title": kpi_title,
-            "target": employee_kpi.target_value,
-            "progress": total_progress_value,
-            "percentage": progress_percentage,
-            "days_left": days_remaining,
-            "id": employee_kpi.id,
-        })
+        kpi_cards_list.append(
+            {
+                "title": kpi_title,
+                "target": employee_kpi.target_value,
+                "progress": total_progress_value,
+                "percentage": progress_percentage,
+                "days_left": days_remaining,
+                "id": employee_kpi.id,
+            }
+        )
 
     context = {
         "employee_name": employee_profile.user.username,
@@ -331,6 +335,16 @@ def assign_kpi(request):
                 employee_kpi=kpi_assignment
             )
 
+            # send notification to employees
+            create_notification(
+                recipient=employee_kpi.employee.user,
+                sender=request.user,
+                notification_type="kpi_assigned",
+                title="New KPI Assigned",
+                message=f"You have been assigned a new KPI: {employee_kpi.kpi.title}. Target: {employee_kpi.target_value}",
+                employee_kpi=employee_kpi,
+            )
+
             messages.success(request, "KPI assigned successfully.")
             return redirect("employee_kpi_list")
     return render(request, "main_app/assign_kpi.html", {"form": form})
@@ -435,6 +449,16 @@ def employee_kpi_edit(request, pk):
             employee_kpi=kpi_assignment
         )
 
+        # send notification to employee
+        create_notification(
+            recipient=employee_kpi.employee.user,
+            sender=request.user,
+            notification_type="kpi_updated",
+            title="KPI Updated",
+            message=f'Your KPI "{employee_kpi.kpi.title}" has been updated by your manager.',
+            employee_kpi=employee_kpi,
+        )
+
         messages.success(request, "KPI updated successfully.")
         return redirect("employee_kpi_list")
 
@@ -499,34 +523,38 @@ def employee_kpi_detail(request, pk):
         },
     )
 
+
 # reports views
+
 
 # manager reports view with filtering
 @login_required
-@role_required(['manager'])
+@role_required(["manager"])
 def manager_reports(request):
     dept = request.user.employeeprofile.department
 
     # get kpis that r filtered by manager's department
-    kpis = EmployeeKpi.objects.filter(
-        employee__department=dept
-    ).select_related('employee__user', 'kpi').order_by('-id')
+    kpis = (
+        EmployeeKpi.objects.filter(employee__department=dept)
+        .select_related("employee__user", "kpi")
+        .order_by("-id")
+    )
 
     # apply filters from get parameters
-    search_query = request.GET.get('search', '').strip()
+    search_query = request.GET.get("search", "").strip()
     if search_query:
         kpis = kpis.filter(
-            Q(employee__user__username__icontains=search_query) |
-            Q(employee__user__first_name__icontains=search_query) |
-            Q(employee__user__last_name__icontains=search_query)
+            Q(employee__user__username__icontains=search_query)
+            | Q(employee__user__first_name__icontains=search_query)
+            | Q(employee__user__last_name__icontains=search_query)
         )
 
-    kpi_filter = request.GET.get('kpi', '')
+    kpi_filter = request.GET.get("kpi", "")
     if kpi_filter:
         kpis = kpis.filter(kpi__id=kpi_filter)
 
-    start_date = request.GET.get('start_date', '')
-    end_date = request.GET.get('end_date', '')
+    start_date = request.GET.get("start_date", "")
+    end_date = request.GET.get("end_date", "")
 
     if start_date:
         kpis = kpis.filter(start_date__gte=start_date)
@@ -537,45 +565,52 @@ def manager_reports(request):
     all_kpis = Kpi.objects.filter(department=dept)
 
     context = {
-        'kpis': kpis,
-        'all_kpis': all_kpis,
-        'search_query': search_query,
-        'kpi_filter': kpi_filter,
-        'start_date': start_date,
-        'end_date': end_date,
+        "kpis": kpis,
+        "all_kpis": all_kpis,
+        "search_query": search_query,
+        "kpi_filter": kpi_filter,
+        "start_date": start_date,
+        "end_date": end_date,
     }
     return render(request, "reports/manager_reports.html", context)
 
+
 # admin reports view with filtering across all departments
 @login_required
-@role_required(['admin'])
+@role_required(["admin"])
 def admin_reports(request):
     # get all kpis across all departments
-    kpis = EmployeeKpi.objects.select_related('employee__user', 'kpi', 'employee', 'employee__manager','employee__manager__employeeprofile').order_by('-id')
+    kpis = EmployeeKpi.objects.select_related(
+        "employee__user",
+        "kpi",
+        "employee",
+        "employee__manager",
+        "employee__manager__employeeprofile",
+    ).order_by("-id")
 
     # apply filters from get parameters
-    search_query = request.GET.get('search', '').strip()
+    search_query = request.GET.get("search", "").strip()
     if search_query:
         kpis = kpis.filter(
-            Q(employee__user__username__icontains=search_query) |
-            Q(employee__user__first_name__icontains=search_query) |
-            Q(employee__user__last_name__icontains=search_query) |
-            Q(employee__manager__username__icontains=search_query) |
-            Q(employee__manager__first_name__icontains=search_query) |
-            Q(employee__manager__last_name__icontains=search_query)
+            Q(employee__user__username__icontains=search_query)
+            | Q(employee__user__first_name__icontains=search_query)
+            | Q(employee__user__last_name__icontains=search_query)
+            | Q(employee__manager__username__icontains=search_query)
+            | Q(employee__manager__first_name__icontains=search_query)
+            | Q(employee__manager__last_name__icontains=search_query)
         )
 
     # dept filterations
-    department_filter = request.GET.get('department', '')
+    department_filter = request.GET.get("department", "")
     if department_filter:
         kpis = kpis.filter(employee__department=department_filter)
 
-    kpi_filter = request.GET.get('kpi', '')
+    kpi_filter = request.GET.get("kpi", "")
     if kpi_filter:
         kpis = kpis.filter(kpi__id=kpi_filter)
 
-    start_date = request.GET.get('start_date', '')
-    end_date = request.GET.get('end_date', '')
+    start_date = request.GET.get("start_date", "")
+    end_date = request.GET.get("end_date", "")
 
     if start_date:
         kpis = kpis.filter(start_date__gte=start_date)
@@ -588,43 +623,46 @@ def admin_reports(request):
     # get all departments for filter
     all_departments = DEPARTMENT
     context = {
-        'kpis': kpis,
-        'all_kpis': all_kpis,
-        'all_departments': all_departments,
-        'search_query': search_query,
-        'kpi_filter': kpi_filter,
-        'department_filter': department_filter,
-        'start_date': start_date,
-        'end_date': end_date,
+        "kpis": kpis,
+        "all_kpis": all_kpis,
+        "all_departments": all_departments,
+        "search_query": search_query,
+        "kpi_filter": kpi_filter,
+        "department_filter": department_filter,
+        "start_date": start_date,
+        "end_date": end_date,
     }
     return render(request, "reports/admin_reports.html", context)
 
+
 # exporting pdfs from manager side
 @login_required
-@role_required(['manager'])
+@role_required(["manager"])
 def export_pdf(request):
     dept = request.user.employeeprofile.department
 
     # get filtered kpis same logic as manager_reports
-    kpis = EmployeeKpi.objects.filter(
-        employee__department=dept
-    ).select_related('employee__user', 'kpi').order_by('-id')
+    kpis = (
+        EmployeeKpi.objects.filter(employee__department=dept)
+        .select_related("employee__user", "kpi")
+        .order_by("-id")
+    )
 
     # apply filters
-    search_query = request.GET.get('search', '').strip()
+    search_query = request.GET.get("search", "").strip()
     if search_query:
         kpis = kpis.filter(
-            Q(employee__user__username__icontains=search_query) |
-            Q(employee__user__first_name__icontains=search_query) |
-            Q(employee__user__last_name__icontains=search_query)
+            Q(employee__user__username__icontains=search_query)
+            | Q(employee__user__first_name__icontains=search_query)
+            | Q(employee__user__last_name__icontains=search_query)
         )
 
-    kpi_filter = request.GET.get('kpi', '')
+    kpi_filter = request.GET.get("kpi", "")
     if kpi_filter:
         kpis = kpis.filter(kpi__id=kpi_filter)
 
-    start_date = request.GET.get('start_date', '')
-    end_date = request.GET.get('end_date', '')
+    start_date = request.GET.get("start_date", "")
+    end_date = request.GET.get("end_date", "")
 
     if start_date:
         kpis = kpis.filter(start_date__gte=start_date)
@@ -632,8 +670,10 @@ def export_pdf(request):
         kpis = kpis.filter(end_date__lte=end_date)
 
     # create PDF
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename=KPI_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = (
+        f'attachment; filename=KPI_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    )
 
     # create PDF document
     doc = SimpleDocTemplate(response, pagesize=landscape(A4))
@@ -645,48 +685,52 @@ def export_pdf(request):
     # Title
     title = Paragraph(
         f"<b>KPI Performance Report</b><br/>{datetime.now().strftime('%B %d, %Y')}",
-        styles['Title']
+        styles["Title"],
     )
     elements.append(title)
-    elements.append(Spacer(1, 0.3*inch))
+    elements.append(Spacer(1, 0.3 * inch))
 
     # table data
-    data = [['KPI', 'Employee', 'Target', 'Current', 'Progress', 'Status', 'Period']]
+    data = [["KPI", "Employee", "Target", "Current", "Progress", "Status", "Period"]]
 
     for kpi in kpis:
-        data.append([
-            kpi.kpi.title,
-            kpi.employee.user.first_name + " " + kpi.employee.user.last_name,
-            str(kpi.target_value),
-            str(kpi.total_progress()),
-            f"{kpi.progress_percentage()}%",
-            kpi.status(),
-            f"{kpi.start_date}\n - {kpi.end_date}"
-        ])
+        data.append(
+            [
+                kpi.kpi.title,
+                kpi.employee.user.first_name + " " + kpi.employee.user.last_name,
+                str(kpi.target_value),
+                str(kpi.total_progress()),
+                f"{kpi.progress_percentage()}%",
+                kpi.status(),
+                f"{kpi.start_date}\n - {kpi.end_date}",
+            ]
+        )
 
     # Create table
     table = Table(data, repeatRows=1)
-    table.setStyle(TableStyle([
-        # Header styling
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0F172A')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 10),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-
-        # Body styling
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 1), (-1, -1), 8),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-
-        # Alternating rows
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
-    ]))
+    table.setStyle(
+        TableStyle(
+            [
+                # Header styling
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0F172A")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, 0), 10),
+                ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+                # Body styling
+                ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+                ("TEXTCOLOR", (0, 1), (-1, -1), colors.black),
+                ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+                ("FONTSIZE", (0, 1), (-1, -1), 8),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                # Alternating rows
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+            ]
+        )
+    )
 
     elements.append(table)
 
@@ -695,32 +739,35 @@ def export_pdf(request):
 
     return response
 
+
 # exporting excel from manager side
 @login_required
-@role_required(['manager'])
+@role_required(["manager"])
 def export_excel(request):
     dept = request.user.employeeprofile.department
 
     # get filtered kpis same logic as manager_reports
-    kpis = EmployeeKpi.objects.filter(
-        employee__department=dept
-    ).select_related('employee__user', 'kpi').order_by('-id')
+    kpis = (
+        EmployeeKpi.objects.filter(employee__department=dept)
+        .select_related("employee__user", "kpi")
+        .order_by("-id")
+    )
 
     # apply filters from get parameter
-    search_query = request.GET.get('search', '').strip()
+    search_query = request.GET.get("search", "").strip()
     if search_query:
         kpis = kpis.filter(
-            Q(employee__user__username__icontains=search_query) |
-            Q(employee__user__first_name__icontains=search_query) |
-            Q(employee__user__last_name__icontains=search_query)
+            Q(employee__user__username__icontains=search_query)
+            | Q(employee__user__first_name__icontains=search_query)
+            | Q(employee__user__last_name__icontains=search_query)
         )
 
-    kpi_filter = request.GET.get('kpi', '')
+    kpi_filter = request.GET.get("kpi", "")
     if kpi_filter:
         kpis = kpis.filter(kpi__id=kpi_filter)
 
-    start_date = request.GET.get('start_date', '')
-    end_date = request.GET.get('end_date', '')
+    start_date = request.GET.get("start_date", "")
+    end_date = request.GET.get("end_date", "")
 
     if start_date:
         kpis = kpis.filter(start_date__gte=start_date)
@@ -735,29 +782,41 @@ def export_excel(request):
     sheet.title = "KPI Report"
 
     # header styling
-    header_fill = PatternFill(start_color="0F172A", end_color="0F172A", fill_type="solid")
+    header_fill = PatternFill(
+        start_color="0F172A", end_color="0F172A", fill_type="solid"
+    )
     header_font = Font(color="FFFFFF", bold=True, size=12)
 
     # title
-    sheet.merge_cells('A1:G1')
-    title_cell = sheet['A1']
+    sheet.merge_cells("A1:G1")
+    title_cell = sheet["A1"]
     title_cell.value = f"KPI Performance Report - {datetime.now().strftime('%Y-%m-%d')}"
     title_cell.font = Font(bold=True, size=14)
-    title_cell.alignment = Alignment(horizontal='center')
+    title_cell.alignment = Alignment(horizontal="center")
 
     # headers
-    headers = ['KPI', 'Employee', 'Target', 'Current Value', 'Progress %', 'Status', 'Period']
+    headers = [
+        "KPI",
+        "Employee",
+        "Target",
+        "Current Value",
+        "Progress %",
+        "Status",
+        "Period",
+    ]
     for col_num, header in enumerate(headers, 1):
         cell = sheet.cell(row=3, column=col_num)
         cell.value = header
         cell.fill = header_fill
         cell.font = header_font
-        cell.alignment = Alignment(horizontal='center')
+        cell.alignment = Alignment(horizontal="center")
 
     # data
     for row_num, kpi in enumerate(kpis, 4):
         sheet.cell(row=row_num, column=1).value = kpi.kpi.title
-        sheet.cell(row=row_num, column=2).value = kpi.employee.user.first_name + " " + kpi.employee.user.last_name
+        sheet.cell(row=row_num, column=2).value = (
+            kpi.employee.user.first_name + " " + kpi.employee.user.last_name
+        )
         sheet.cell(row=row_num, column=3).value = kpi.target_value
         sheet.cell(row=row_num, column=4).value = kpi.total_progress()
         sheet.cell(row=row_num, column=5).value = f"{kpi.progress_percentage()}%"
@@ -771,7 +830,7 @@ def export_excel(request):
 
         for cell in column_cells:
             # skip merged cells
-            if hasattr(cell, 'column_letter'):
+            if hasattr(cell, "column_letter"):
                 if column_letter is None:
                     column_letter = cell.column_letter
                 try:
@@ -783,14 +842,18 @@ def export_excel(request):
                     pass
 
         if column_letter and max_length > 0:
-            adjusted_width = min(max_length + 2, 50)  # here capping at 50 to avoid overly wide columns
+            adjusted_width = min(
+                max_length + 2, 50
+            )  # here capping at 50 to avoid overly wide columns
             sheet.column_dimensions[column_letter].width = adjusted_width
 
     # prepare response
     response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    response['Content-Disposition'] = f'attachment; filename=KPI_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+    response["Content-Disposition"] = (
+        f'attachment; filename=KPI_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+    )
 
     wb.save(response)
     return response
@@ -798,37 +861,35 @@ def export_excel(request):
 
 # Admin export to PDF
 @login_required
-@role_required(['admin'])
+@role_required(["admin"])
 def admin_export_pdf(request):
     # get filtered kpis - same logic as admin_reports
     kpis = EmployeeKpi.objects.select_related(
-        'employee__user',
-        'kpi',
-        'employee__manager'
-    ).order_by('-id')
+        "employee__user", "kpi", "employee__manager"
+    ).order_by("-id")
 
     # apply filters
-    search_query = request.GET.get('search', '').strip()
+    search_query = request.GET.get("search", "").strip()
     if search_query:
         kpis = kpis.filter(
-            Q(employee__user__username__icontains=search_query) |
-            Q(employee__user__first_name__icontains=search_query) |
-            Q(employee__user__last_name__icontains=search_query) |
-            Q(employee__manager__username__icontains=search_query) |
-            Q(employee__manager__first_name__icontains=search_query) |
-            Q(employee__manager__last_name__icontains=search_query)
+            Q(employee__user__username__icontains=search_query)
+            | Q(employee__user__first_name__icontains=search_query)
+            | Q(employee__user__last_name__icontains=search_query)
+            | Q(employee__manager__username__icontains=search_query)
+            | Q(employee__manager__first_name__icontains=search_query)
+            | Q(employee__manager__last_name__icontains=search_query)
         )
 
-    department_filter = request.GET.get('department', '')
+    department_filter = request.GET.get("department", "")
     if department_filter:
         kpis = kpis.filter(employee__department=department_filter)
 
-    kpi_filter = request.GET.get('kpi', '')
+    kpi_filter = request.GET.get("kpi", "")
     if kpi_filter:
         kpis = kpis.filter(kpi__id=kpi_filter)
 
-    start_date = request.GET.get('start_date', '')
-    end_date = request.GET.get('end_date', '')
+    start_date = request.GET.get("start_date", "")
+    end_date = request.GET.get("end_date", "")
 
     if start_date:
         kpis = kpis.filter(start_date__gte=start_date)
@@ -836,8 +897,10 @@ def admin_export_pdf(request):
         kpis = kpis.filter(end_date__lte=end_date)
 
     # create PDF
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename=Admin_KPI_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    response = HttpResponse(content_type="application/pdf")
+    response["Content-Disposition"] = (
+        f'attachment; filename=Admin_KPI_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+    )
 
     # create PDF document
     doc = SimpleDocTemplate(response, pagesize=landscape(A4))
@@ -849,52 +912,72 @@ def admin_export_pdf(request):
     # Title
     title = Paragraph(
         f"<b>Admin KPI Performance Report</b><br/>{datetime.now().strftime('%B %d, %Y')}",
-        styles['Title']
+        styles["Title"],
     )
     elements.append(title)
-    elements.append(Spacer(1, 0.3*inch))
+    elements.append(Spacer(1, 0.3 * inch))
 
     # table data
-    data = [['KPI', 'Employee', 'Manager', 'Dept', 'Target', 'Current', 'Progress', 'Status', 'Period']]
+    data = [
+        [
+            "KPI",
+            "Employee",
+            "Manager",
+            "Dept",
+            "Target",
+            "Current",
+            "Progress",
+            "Status",
+            "Period",
+        ]
+    ]
 
     for kpi in kpis:
-        manager_name = f"{kpi.employee.manager.first_name} {kpi.employee.manager.last_name}" if kpi.employee.manager else 'N/A'
+        manager_name = (
+            f"{kpi.employee.manager.first_name} {kpi.employee.manager.last_name}"
+            if kpi.employee.manager
+            else "N/A"
+        )
         employee_name = f"{kpi.employee.user.first_name} {kpi.employee.user.last_name}"
-        data.append([
-            kpi.kpi.title[:20],
-            employee_name,
-            manager_name,
-            kpi.employee.get_department_display()[:35],
-            str(kpi.target_value),
-            str(kpi.total_progress()),
-            f"{kpi.progress_percentage()}%",
-            kpi.status(),
-            f"{kpi.start_date}\n{kpi.end_date}"
-        ])
+        data.append(
+            [
+                kpi.kpi.title[:20],
+                employee_name,
+                manager_name,
+                kpi.employee.get_department_display()[:35],
+                str(kpi.target_value),
+                str(kpi.total_progress()),
+                f"{kpi.progress_percentage()}%",
+                kpi.status(),
+                f"{kpi.start_date}\n{kpi.end_date}",
+            ]
+        )
 
     # Create table
     table = Table(data, repeatRows=1)
-    table.setStyle(TableStyle([
-        # Header styling
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#0F172A')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, 0), 9),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-
-        # Body styling
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 1), (-1, -1), 7),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-
-        # Alternating rows
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
-    ]))
+    table.setStyle(
+        TableStyle(
+            [
+                # Header styling
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0F172A")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+                ("FONTSIZE", (0, 0), (-1, 0), 9),
+                ("BOTTOMPADDING", (0, 0), (-1, 0), 12),
+                # Body styling
+                ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+                ("TEXTCOLOR", (0, 1), (-1, -1), colors.black),
+                ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
+                ("FONTSIZE", (0, 1), (-1, -1), 7),
+                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+                ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                # Alternating rows
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+            ]
+        )
+    )
 
     elements.append(table)
 
@@ -906,37 +989,35 @@ def admin_export_pdf(request):
 
 # Admin export to Excel
 @login_required
-@role_required(['admin'])
+@role_required(["admin"])
 def admin_export_excel(request):
     # get filtered kpis - same logic as admin_reports
     kpis = EmployeeKpi.objects.select_related(
-        'employee__user',
-        'kpi',
-        'employee__manager'
-    ).order_by('-id')
+        "employee__user", "kpi", "employee__manager"
+    ).order_by("-id")
 
     # apply filters from get parameter
-    search_query = request.GET.get('search', '').strip()
+    search_query = request.GET.get("search", "").strip()
     if search_query:
         kpis = kpis.filter(
-            Q(employee__user__username__icontains=search_query) |
-            Q(employee__user__first_name__icontains=search_query) |
-            Q(employee__user__last_name__icontains=search_query) |
-            Q(employee__manager__username__icontains=search_query) |
-            Q(employee__manager__first_name__icontains=search_query) |
-            Q(employee__manager__last_name__icontains=search_query)
+            Q(employee__user__username__icontains=search_query)
+            | Q(employee__user__first_name__icontains=search_query)
+            | Q(employee__user__last_name__icontains=search_query)
+            | Q(employee__manager__username__icontains=search_query)
+            | Q(employee__manager__first_name__icontains=search_query)
+            | Q(employee__manager__last_name__icontains=search_query)
         )
 
-    department_filter = request.GET.get('department', '')
+    department_filter = request.GET.get("department", "")
     if department_filter:
         kpis = kpis.filter(employee__department=department_filter)
 
-    kpi_filter = request.GET.get('kpi', '')
+    kpi_filter = request.GET.get("kpi", "")
     if kpi_filter:
         kpis = kpis.filter(kpi__id=kpi_filter)
 
-    start_date = request.GET.get('start_date', '')
-    end_date = request.GET.get('end_date', '')
+    start_date = request.GET.get("start_date", "")
+    end_date = request.GET.get("end_date", "")
 
     if start_date:
         kpis = kpis.filter(start_date__gte=start_date)
@@ -951,28 +1032,47 @@ def admin_export_excel(request):
     sheet.title = "Admin KPI Report"
 
     # header styling
-    header_fill = PatternFill(start_color="0F172A", end_color="0F172A", fill_type="solid")
+    header_fill = PatternFill(
+        start_color="0F172A", end_color="0F172A", fill_type="solid"
+    )
     header_font = Font(color="FFFFFF", bold=True, size=12)
 
     # title
-    sheet.merge_cells('A1:J1')
-    title_cell = sheet['A1']
-    title_cell.value = f"Admin KPI Performance Report - {datetime.now().strftime('%Y-%m-%d')}"
+    sheet.merge_cells("A1:J1")
+    title_cell = sheet["A1"]
+    title_cell.value = (
+        f"Admin KPI Performance Report - {datetime.now().strftime('%Y-%m-%d')}"
+    )
     title_cell.font = Font(bold=True, size=14)
-    title_cell.alignment = Alignment(horizontal='center')
+    title_cell.alignment = Alignment(horizontal="center")
 
     # headers
-    headers = ['KPI', 'Employee', 'Manager', 'Department', 'Target', 'Current Value', 'Progress %', 'Weight %', 'Status', 'Period']
+    headers = [
+        "KPI",
+        "Employee",
+        "Manager",
+        "Department",
+        "Target",
+        "Current Value",
+        "Progress %",
+        "Weight %",
+        "Status",
+        "Period",
+    ]
     for col_num, header in enumerate(headers, 1):
         cell = sheet.cell(row=3, column=col_num)
         cell.value = header
         cell.fill = header_fill
         cell.font = header_font
-        cell.alignment = Alignment(horizontal='center')
+        cell.alignment = Alignment(horizontal="center")
 
     # data
     for row_num, kpi in enumerate(kpis, 4):
-        manager_name = f"{kpi.employee.manager.first_name} {kpi.employee.manager.last_name}" if kpi.employee.manager else 'No Manager'
+        manager_name = (
+            f"{kpi.employee.manager.first_name} {kpi.employee.manager.last_name}"
+            if kpi.employee.manager
+            else "No Manager"
+        )
         employee_name = f"{kpi.employee.user.first_name} {kpi.employee.user.last_name}"
 
         sheet.cell(row=row_num, column=1).value = kpi.kpi.title
@@ -992,7 +1092,7 @@ def admin_export_excel(request):
         column_letter = None
 
         for cell in column_cells:
-            if hasattr(cell, 'column_letter'):
+            if hasattr(cell, "column_letter"):
                 if column_letter is None:
                     column_letter = cell.column_letter
                 try:
@@ -1009,23 +1109,25 @@ def admin_export_excel(request):
 
     # prepare response
     response = HttpResponse(
-        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    response['Content-Disposition'] = f'attachment; filename=Admin_KPI_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+    response["Content-Disposition"] = (
+        f'attachment; filename=Admin_KPI_Report_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+    )
 
     wb.save(response)
     return response
 
+
 @login_required
-@role_required(['admin'])
+@role_required(["admin"])
 def activity_logs(request):
     # get url values form filter form
-    selected_action = request.GET.get('action', '')
-    selected_user = request.GET.get('user', '')
+    selected_action = request.GET.get("action", "")
+    selected_user = request.GET.get("user", "")
 
     all_logs = ActivityLog.objects.all()
-    all_logs = all_logs.select_related('user', 'related_user')
-
+    all_logs = all_logs.select_related("user", "related_user")
 
     if selected_action:
         all_logs = all_logs.filter(action=selected_action)
@@ -1038,31 +1140,33 @@ def activity_logs(request):
     action_choices = ActivityLog.ACTION_CHOICES
 
     users_with_logs = User.objects.filter(activity_logs__isnull=False)
-    users_with_logs = users_with_logs.select_related('employeeprofile')
+    users_with_logs = users_with_logs.select_related("employeeprofile")
     users_with_logs = users_with_logs.distinct()
-    users_with_logs = users_with_logs.order_by('username')
-
-
+    users_with_logs = users_with_logs.order_by("username")
 
     template_data = {
-        'logs': recent_logs,
-        'available_actions': action_choices,
-        'active_users': users_with_logs,
-        'current_action_filter': selected_action,
-        'current_user_filter': selected_user,
+        "logs": recent_logs,
+        "available_actions": action_choices,
+        "active_users": users_with_logs,
+        "current_action_filter": selected_action,
+        "current_user_filter": selected_user,
     }
-    return render(request, 'activity/admin_logs.html', template_data)
+    return render(request, "activity/admin_logs.html", template_data)
+
 
 #  this is the helper function to create notifications
-def create_notification(recipient, sender, notification_type, title, message, employee_kpi=None):
+def create_notification(
+    recipient, sender, notification_type, title, message, employee_kpi=None
+):
     Notification.objects.create(
         recipient=recipient,
         sender=sender,
         notification_type=notification_type,
         title=title,
         message=message,
-        employee_kpi=employee_kpi
+        employee_kpi=employee_kpi,
     )
+
 
 # view all notifications for current user
 @login_required
@@ -1070,17 +1174,18 @@ def notifications(request):
     profile = EmployeeProfile.objects.get(user=request.user)
 
     # exclude admin from notifications
-    if profile.role == 'admin':
-        return redirect('dashboard')
+    if profile.role == "admin":
+        return redirect("dashboard")
 
     user_notifications = Notification.objects.filter(recipient=request.user)
     unread_count = user_notifications.filter(is_read=False).count()
 
     context = {
-        'notifications': user_notifications,
-        'unread_count': unread_count,
+        "notifications": user_notifications,
+        "unread_count": unread_count,
     }
-    return render(request, 'notifications/notifications.html', context)
+    return render(request, "notifications/notifications.html", context)
+
 
 @login_required
 def mark_notification_read(request, notification_id):
@@ -1194,7 +1299,7 @@ def ai_admin_insights(request):
             sum(progress_values) / len(progress_values) if progress_values else 0
         )
 
-        #risky KPIs (low progress)
+        # risky KPIs (low progress)
         risky_kpis = [ek for ek in active_kpis if ek.progress_percentage() < 40]
 
         data += f"""
@@ -1206,7 +1311,7 @@ Completed KPIs: {len(completed_kpis)}
 Average Progress: {avg_progress:.1f}%
 At-Risk KPIs: {len(risky_kpis)}
 """
-##manager summary
+    ##manager summary
     data += "\n## MANAGER PERFORMANCE SUMMARY\n"
 
     managers = EmployeeProfile.objects.filter(role="manager")
@@ -1256,8 +1361,50 @@ Average Team Progress: {avg_progress:.1f}%
         else:
             data += f"\nEmployee: {emp.user.get_full_name()}\nNo active KPI.\n"
 
-    # AI processing
+
     ai_output = generate_kpi_insights(data, mode="admin")
     ai_output_html = markdown.markdown(ai_output)
 
     return render(request, "ai/admin_insights.html", {"ai_output_html": ai_output_html})
+
+
+
+
+#ai feature for employee
+@login_required
+@role_required(["employee"])
+def ai_employee_coach(request):
+    employee = EmployeeProfile.objects.get(user=request.user)
+    assignments = EmployeeKpi.objects.filter(employee=employee)
+
+    data = f"=== KPI DATA FOR {employee.user.get_full_name()} ===\n"
+
+    for ek in assignments:
+        # the recent progress
+        last = (
+            ProgressEntry.objects
+            .filter(employee_kpi=ek, date__lte=now().date())
+            .order_by("-date")
+            .first()
+        )
+
+        progress = ek.progress_percentage()
+        deadline = ek.end_date
+        status = ek.status()
+
+        data += f"""
+KPI: {ek.kpi.title}
+Progress: {progress}%
+Status: {status}
+Deadline: {deadline}
+Last Update: {last.date if last else 'No updates yet'}
+Notes: {last.note if last else 'No notes available'}
+"""
+
+
+    ai_output = generate_kpi_insights(data, mode="employee")
+    ai_output_html = markdown.markdown(ai_output)
+
+    return render(request, "ai/employee_ai.html", {
+        "ai_output_html": ai_output_html
+    })
