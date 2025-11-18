@@ -2,6 +2,50 @@
 {% block content%}
 
 <div class="max-w-7xl mx-auto">
+  <!-- Toast Messages Container -->
+  {% if messages %}
+  <div class="toast toast-top toast-end z-50">
+    {% for message in messages %}
+    <div class="alert
+      {% if message.tags == 'success' %}alert-success
+      {% elif message.tags == 'error' %}alert-error
+      {% elif message.tags == 'warning' %}alert-warning
+      {% else %}alert-info{% endif %}
+      shadow-lg animate-slide-in">
+      <div class="flex items-center gap-3">
+        <!-- Icon based on message type -->
+        {% if message.tags == 'success' %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {% elif message.tags == 'error' %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {% elif message.tags == 'warning' %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        {% else %}
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        {% endif %}
+
+        <span class="font-semibold">{{ message }}</span>
+
+        <!-- Close button -->
+        <button class="btn btn-ghost btn-sm btn-circle ml-2" onclick="this.parentElement.parentElement.remove()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
   <!-- Page Header -->
   <div class="mb-8">
     <h1 class="text-4xl font-bold text-base-content flex items-center gap-3">
@@ -155,15 +199,53 @@
   {% endif %}
 </div>
 
-<!-- Toast Notifications (for Materialize) -->
-{% if messages %}
+<!-- Auto-dismiss messages after 5 seconds -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    {% for message in messages %}
-      M.toast({html: "{{ message }}", classes: "{{ message.tags }}"});
-    {% endfor %}
+    const messages = document.querySelectorAll('.toast .alert');
+    messages.forEach(function(message) {
+      setTimeout(function() {
+        message.style.opacity = '0';
+        message.style.transform = 'translateX(100%)';
+        setTimeout(function() {
+          message.remove();
+        }, 300);
+      }, 5000);
+    });
   });
 </script>
-{% endif %}
+
+<style>
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
+
+  .toast {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 400px;
+  }
+
+  .toast .alert {
+    transition: all 0.3s ease;
+    min-width: 300px;
+  }
+</style>
 
 {% endblock %}
