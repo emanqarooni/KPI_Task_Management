@@ -213,13 +213,7 @@
                 <div class="badge badge-accent badge-sm">{{ k.weight }}%</div>
               </td>
               <td>
-                {% if k.status == 'Complete' %}
-                  <span class="badge badge-success badge-sm">Complete</span>
-                {% elif k.status == 'In Progress' %}
-                  <span class="badge badge-warning badge-sm">In Progress</span>
-                {% else %}
-                  <span class="badge badge-ghost badge-sm">No Progress</span>
-                {% endif %}
+                <span class="badge kpi-status-{{ k.status|lower|cut:' ' }}">{{ k.status }}</span>
               </td>
               <td>
                 <div class="text-sm">
