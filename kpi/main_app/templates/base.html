@@ -11,10 +11,8 @@
   </head>
 
   <body>
-    {% if user.is_authenticated %}
     <div class="flex">
-
-      <!-- Sidebar - FIXED CLASSES -->
+      <!-- Sidebar -->
       <aside id="sidebar" class="sidebar-purple sidebar-collapsed min-h-screen flex flex-col items-center py-6">
         <!-- Hamburger Menu Toggle -->
         <button id="sidebar-toggle" class="btn btn-ghost btn-square text-white hover:bg-white/20 mb-6">
@@ -97,7 +95,6 @@
         {% endif %}
       </aside>
 
-
       <!-- Backdrop overlay for mobile - ADDED -->
       <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
 
@@ -111,13 +108,13 @@
               <h1 class="text-xl font-bold">SEEF</h1>
               <h2 class="text-sm text-base-content/70">
                 {% if user.employeeprofile.role == 'manager' %}
-                Manager Portal
+                  Manager Portal
                 {% elif user.employeeprofile.role == 'admin' %}
-                Admin Portal
+                  Admin Portal
                 {% elif user.employeeprofile.role == 'employee' %}
-                Employee Portal
+                  Employee Portal
                 {% else %}
-                Portal
+                  Portal
                 {% endif %}
               </h2>
             </div>
@@ -125,24 +122,29 @@
 
           <!-- Right side - Notification & Profile -->
           <div class="flex-none gap-2">
-            {% if user.is_authenticated %}
-            <!-- Notification Icon -->
-            <button class="btn btn-ghost btn-circle">
-              <div class="indicator">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span class="badge badge-sm badge-primary indicator-item">3</span>
-              </div>
-            </button>
+            {% if user.is_authenticated and user.employeeprofile.role != 'admin' %}
+              <a href="{% url 'notifications' %}">
+                <div class="dropdown dropdown-end">
+                  <label tabindex="0" class="btn btn-ghost btn-circle">
+                    <div class="indicator">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                      </svg>
+                      {% if unread_notifications_count > 0 %}
+                      <span class="badge badge-sm badge-primary indicator-item">{{ unread_notifications_count }}</span>
+                      {% endif %}
+                    </div>
+                  </label>
+                </div>
+              </a>
+            {% endif %}
 
-            <!-- Profile Dropdown -->
-            <div class="dropdown dropdown-end">
-              <label tabindex="0" class="btn btn-ghost btn-circle avatar">
-                <div class="w-10 rounded-full">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-full h-full text-primary">
-                      <path fill-rule="evenodd" d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" clip-rule="evenodd" />
-                    </svg>
+            {% if user.is_authenticated %}
+              <!-- Profile Dropdown -->
+              <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+                  <div class="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                      <img src="{{ user.employeeprofile.image.url }}" alt="{{ user.username }}" />
                   </div>
                 </label>
                 <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-100 rounded-box w-52 mt-3 border border-base-300">
@@ -168,12 +170,10 @@
                 </ul>
               </div>
             {% else %}
-            <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Login</a>
+              <a href="{% url 'login' %}" class="btn btn-primary btn-sm">Login</a>
             {% endif %}
           </div>
         </header>
-
-        {% endif %}
 
         <!-- Main Content Area -->
         <main class="flex-1 p-6 bg-base-200 min-h-screen">
