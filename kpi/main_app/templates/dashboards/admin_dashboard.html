@@ -1,83 +1,88 @@
-{% extends 'base.html' %}
-{% load static %}
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block content %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
 <div class="dashboard-container">
-  <a href="{% url 'ai_admin_insights' %}" class="btn blue">AI Organizational Insights</a>
   <div class="dashboard-content">
-    <h2>Admin Dashboard</h2>
+    <div class="flex_one_line">
+      <h2>Admin Dashboard</h2>
+      <a href="{% url 'ai_admin_insights' %}" class="btn blue"
+        >AI Organizational Insights</a
+      >
+    </div>
     <div class="kpi-box">
-        <h3>System Overview</h3>
-        <p><strong>Total Users:</strong>  {{ total_users }}</p>
-        <p><strong>Total Employees:</strong> {{ total_employees }}</p>
-        <p><strong>Total Managers:</strong> {{ total_managers }}</p>
-        <h4>Departments</h4>
+      <h3>System Overview</h3>
+      <p><strong>Total Users:</strong> {{ total_users }}</p>
+      <p><strong>Total Employees:</strong> {{ total_employees }}</p>
+      <p><strong>Total Managers:</strong> {{ total_managers }}</p>
+      <h4>Departments</h4>
       <ul>
-    <li>Sales & Marketing: {{ department_data.Sales_Marketing }}</li>
-    <li>Information Technology: {{ department_data.Information_Technology }}</li>
-    <li>Human Resources: {{ department_data.Human_Resources }}</li>
-    <li>Project Management: {{ department_data.Project_Management }}</li>
-    </ul>
+        <li>Sales & Marketing: {{ department_data.Sales_Marketing }}</li>
+        <li>
+          Information Technology: {{ department_data.Information_Technology }}
+        </li>
+        <li>Human Resources: {{ department_data.Human_Resources }}</li>
+        <li>Project Management: {{ department_data.Project_Management }}</li>
+      </ul>
     </div>
     <h3>Employees ({{ total_employees }})</h3>
     <div>
       {% if employees %}
-        <table class="table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Username</th>
-              <th>Job Role</th>
-              <th>Department</th>
-              <th>Manager</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for employee in employees %}
-            <tr>
-              <td>{{ forloop.counter }}</td>
-              <td>{{ employee.user.get_full_name|default:"-" }}</td>
-              <td>{{ employee.user.username }}</td>
-              <td>{{ employee.job_role }}</td>
-              <td>{{ employee.get_department_display }}</td>
-              <td>{{ employee.manager.get_full_name|default:"No Manager" }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Job Role</th>
+            <th>Department</th>
+            <th>Manager</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for employee in employees %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ employee.user.get_full_name|default:"-" }}</td>
+            <td>{{ employee.user.username }}</td>
+            <td>{{ employee.job_role }}</td>
+            <td>{{ employee.get_department_display }}</td>
+            <td>{{ employee.manager.get_full_name|default:"No Manager" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
       {% else %}
-        <p>No employees found</p>
+      <p>No employees found</p>
       {% endif %}
     </div>
     <h3>Managers ({{ total_managers }})</h3>
     <div>
       {% if managers %}
-        <table class="table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Username</th>
-              <th>Job Role</th>
-              <th>Department</th>
-              <th>Team Size</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for manager in managers %}
-            <tr>
-              <td>{{ forloop.counter }}</td>
-              <td>{{ manager.user.get_full_name|default:"-" }}</td>
-              <td>{{ manager.user.username }}</td>
-              <td>{{ manager.job_role }}</td>
-              <td>{{ manager.get_department_display }}</td>
-              <td>{{ manager.user.managed_employees.count }} employees</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Job Role</th>
+            <th>Department</th>
+            <th>Team Size</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for manager in managers %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ manager.user.get_full_name|default:"-" }}</td>
+            <td>{{ manager.user.username }}</td>
+            <td>{{ manager.job_role }}</td>
+            <td>{{ manager.get_department_display }}</td>
+            <td>{{ manager.user.managed_employees.count }} employees</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
       {% else %}
-        <p>No managers found</p>
+      <p>No managers found</p>
       {% endif %}
     </div>
     <!-- KPI Assignments Section -->
@@ -138,38 +143,38 @@
   </div>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('adminChart');
-    if (ctx) {
-        const adminLabels = {{ chart_labels|safe }};
-        const adminValues = {{ chart_values|safe }};
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: adminLabels,
-                datasets: [{
-                    data: adminValues,
-                    backgroundColor: [
-                        '#3B82F6',
-                        '#10B981',
-                        '#F59E0B',
-                        '#EF4444',
-                        '#8B5CF6',
-                        '#EC4899'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom' }
-                }
-            }
-        });
-    }
-});
+  document.addEventListener('DOMContentLoaded', function() {
+      const ctx = document.getElementById('adminChart');
+      if (ctx) {
+          const adminLabels = {{ chart_labels|safe }};
+          const adminValues = {{ chart_values|safe }};
+          new Chart(ctx, {
+              type: 'pie',
+              data: {
+                  labels: adminLabels,
+                  datasets: [{
+                      data: adminValues,
+                      backgroundColor: [
+                          '#3B82F6',
+                          '#10B981',
+                          '#F59E0B',
+                          '#EF4444',
+                          '#8B5CF6',
+                          '#EC4899'
+                      ],
+                      borderWidth: 2,
+                      borderColor: '#fff'
+                  }]
+              },
+              options: {
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                      legend: { position: 'bottom' }
+                  }
+              }
+          });
+      }
+  });
 </script>
 {% endblock %}
