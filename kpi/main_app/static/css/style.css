@@ -1318,7 +1318,6 @@ input:focus {
   background-color: white;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
   transform: translateY(-2px);
-
 }
 
 .form-group input::placeholder {
@@ -1683,7 +1682,7 @@ input:focus {
 
 /* Profile Header Section */
 .profile-header {
-  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   border-radius: 1rem;
   padding: 3rem 2rem 2rem;
   margin-bottom: 2rem;
@@ -1693,18 +1692,23 @@ input:focus {
 }
 
 .profile-header::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   right: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(59, 130, 246, 0.15) 0%,
+    transparent 70%
+  );
   animation: profile-pulse 8s ease-in-out infinite;
 }
 
 @keyframes profile-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(0, 0) scale(1);
   }
   50% {
@@ -1732,10 +1736,9 @@ input:focus {
   height: 150px;
   border-radius: 50%;
   border: 5px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
-              0 0 0 10px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 0 10px rgba(59, 130, 246, 0.2);
   object-fit: cover;
-  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1745,8 +1748,7 @@ input:focus {
 
 .profile-avatar:hover {
   transform: scale(1.05);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4),
-              0 0 0 10px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4), 0 0 0 10px rgba(59, 130, 246, 0.3);
 }
 
 .profile-avatar-default {
@@ -1767,15 +1769,16 @@ input:focus {
   right: 10px;
   width: 24px;
   height: 24px;
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   border-radius: 50%;
-  border: 4px solid #0F172A;
+  border: 4px solid #0f172a;
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
   animation: pulse-status 2s ease-in-out infinite;
 }
 
 @keyframes pulse-status {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 20px rgba(16, 185, 129, 0.6);
   }
   50% {
@@ -1817,7 +1820,7 @@ input:focus {
 }
 
 .profile-role-badge::before {
-  content: '👤';
+  content: "👤";
   font-size: 1rem;
 }
 
@@ -1850,14 +1853,14 @@ input:focus {
   gap: 1rem;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #E2E8F0;
+  border-bottom: 2px solid #e2e8f0;
 }
 
 .profile-card-icon {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1869,7 +1872,7 @@ input:focus {
 .profile-card-title {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #0F172A;
+  color: #0f172a;
   margin: 0;
 }
 
@@ -1885,14 +1888,14 @@ input:focus {
   align-items: flex-start;
   gap: 1rem;
   padding: 1rem;
-  background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border-radius: 0.75rem;
-  border-left: 4px solid #3B82F6;
+  border-left: 4px solid #3b82f6;
   transition: all 0.3s ease;
 }
 
 .profile-info-item:hover {
-  background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
   transform: translateX(5px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
 }
@@ -1905,7 +1908,7 @@ input:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #3B82F6;
+  color: #3b82f6;
   font-size: 1.25rem;
   flex-shrink: 0;
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
@@ -1918,7 +1921,7 @@ input:focus {
 .profile-info-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #64748B;
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.25rem;
@@ -1927,15 +1930,15 @@ input:focus {
 .profile-info-value {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #0F172A;
+  color: #0f172a;
   word-break: break-word;
 }
 
 /* Profile Stats Card */
 .profile-stats-card {
   grid-column: 1 / -1;
-  background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
-  border: 2px solid #DBEAFE;
+  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+  border: 2px solid #dbeafe;
 }
 
 .profile-stats-grid {
@@ -1951,13 +1954,13 @@ input:focus {
   text-align: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
-  border: 1px solid #E2E8F0;
+  border: 1px solid #e2e8f0;
 }
 
 .profile-stat-item:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
-  border-color: #3B82F6;
+  border-color: #3b82f6;
 }
 
 .profile-stat-icon {
@@ -1965,7 +1968,7 @@ input:focus {
   height: 60px;
   margin: 0 auto 1rem;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1977,14 +1980,14 @@ input:focus {
 .profile-stat-value {
   font-size: 2rem;
   font-weight: 700;
-  color: #3B82F6;
+  color: #3b82f6;
   margin-bottom: 0.5rem;
 }
 
 .profile-stat-label {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #64748B;
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -2003,7 +2006,7 @@ input:focus {
   align-items: center;
   gap: 0.5rem;
   padding: 0.875rem 1.75rem;
-  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   font-weight: 600;
   border-radius: 0.75rem;
@@ -2015,7 +2018,7 @@ input:focus {
 }
 
 .profile-action-btn:hover {
-  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
 }
@@ -2026,7 +2029,7 @@ input:focus {
 }
 
 .profile-action-btn-secondary {
-  background: linear-gradient(135deg, #64748B 0%, #475569 100%);
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
   box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
 }
 
@@ -2037,21 +2040,21 @@ input:focus {
 
 /* Empty State for Missing Info */
 .profile-empty-value {
-  color: #94A3B8;
+  color: #94a3b8;
   font-style: italic;
 }
 
 /* Gender Icon Mapping */
 .profile-info-item[data-gender="male"] .profile-info-icon {
-  color: #3B82F6;
+  color: #3b82f6;
 }
 
 .profile-info-item[data-gender="female"] .profile-info-icon {
-  color: #EC4899;
+  color: #ec4899;
 }
 
 .profile-info-item[data-gender="other"] .profile-info-icon {
-  color: #8B5CF6;
+  color: #8b5cf6;
 }
 
 /* Responsive Design */
@@ -2095,38 +2098,38 @@ input:focus {
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
   .profile-card {
-    background: #1E293B;
+    background: #1e293b;
     border-color: #334155;
   }
 
   .profile-card-title {
-    color: #F1F5F9;
+    color: #f1f5f9;
   }
 
   .profile-info-item {
-    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   }
 
   .profile-info-label {
-    color: #94A3B8;
+    color: #94a3b8;
   }
 
   .profile-info-value {
-    color: #F1F5F9;
+    color: #f1f5f9;
   }
 
   .profile-stat-item {
-    background: #1E293B;
+    background: #1e293b;
     border-color: #334155;
   }
 
   .profile-stat-label {
-    color: #94A3B8;
+    color: #94a3b8;
   }
 
   .profile-stats-card {
-    background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 100%);
-    border-color: #1E40AF;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    border-color: #1e40af;
   }
 }
 
@@ -2142,7 +2145,7 @@ input:focus {
 
   .profile-card {
     box-shadow: none;
-    border: 1px solid #E2E8F0;
+    border: 1px solid #e2e8f0;
     page-break-inside: avoid;
   }
 
@@ -2153,12 +2156,12 @@ input:focus {
 
 /* Accessibility */
 .profile-action-btn:focus-visible {
-  outline: 2px solid #3B82F6;
+  outline: 2px solid #3b82f6;
   outline-offset: 4px;
 }
 
 .profile-info-item:focus-within {
-  outline: 2px solid #3B82F6;
+  outline: 2px solid #3b82f6;
   outline-offset: 2px;
   border-radius: 0.75rem;
 }
@@ -2177,7 +2180,7 @@ input:focus {
   width: 48px;
   height: 48px;
   border: 4px solid rgba(59, 130, 246, 0.2);
-  border-top-color: #3B82F6;
+  border-top-color: #3b82f6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -2198,10 +2201,15 @@ input:focus {
   animation: fadeInUp 0.6s ease-out;
 }
 
-.profile-card:nth-child(1) { animation-delay: 0.1s; }
-.profile-card:nth-child(2) { animation-delay: 0.2s; }
-.profile-card:nth-child(3) { animation-delay: 0.3s; }
-/* ===================================
+.profile-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.profile-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.profile-card:nth-child(3) {
+  animation-delay: 0.3s;
+} /* ===================================
    Password Reset Pages Styling
    =================================== */
 
@@ -2266,8 +2274,7 @@ input:focus {
   backdrop-filter: blur(10px);
   border-radius: 1.5rem;
   padding: 3rem;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
   width: 100%;
   max-width: 500px;
   position: relative;
@@ -2442,6 +2449,7 @@ input:focus {
   width: 100%;
   padding: 0.875rem 1rem;
   padding-left: 3rem;
+  padding-right: 3rem; /* Add space for password toggle button */
   font-size: 1rem;
   border: 2px solid #e2e8f0;
   border-radius: 0.75rem;
@@ -2449,6 +2457,10 @@ input:focus {
   color: #0f172a;
   transition: all 0.3s ease;
   outline: none;
+}
+
+.password-form-group input[type="email"] {
+  padding-right: 1rem; /* Email doesn't need extra space */
 }
 
 .password-form-group input:focus {
@@ -2466,10 +2478,11 @@ input:focus {
 .password-input-icon {
   position: absolute;
   left: 1rem;
-  top: 70%;
+  top: 65%;
   transform: translateY(-50%);
   color: #64748b;
-  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
   pointer-events: none;
   transition: color 0.3s ease;
 }
@@ -2481,20 +2494,29 @@ input:focus {
 /* Password Toggle */
 .password-toggle {
   position: absolute;
-  right: 1rem;
-  top: 70%;
+  right: 0.75rem;
+  top: 65%;
   transform: translateY(-50%);
   background: none;
   border: none;
   color: #64748b;
   cursor: pointer;
-  font-size: 1.25rem;
   padding: 0.5rem;
   transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
 }
 
 .password-toggle:hover {
   color: #3b82f6;
+}
+
+.password-toggle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
 }
 
 /* Password Strength Indicator */
@@ -2962,4 +2984,79 @@ input:focus {
     box-shadow: none;
     border: 1px solid #e2e8f0;
   }
+}
+/* Form Group - UPDATED */
+.password-form-group {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.password-form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+/* Input Fields - UPDATED */
+.password-form-group input[type="email"],
+.password-form-group input[type="password"],
+.password-form-group input[type="text"] {
+  width: 100%;
+  padding: 0.875rem 3rem 0.875rem 3rem;
+  font-size: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background-color: #f8fafc;
+  color: #0f172a;
+  transition: all 0.3s ease;
+  outline: none;
+  position: relative;
+}
+
+.password-form-group input[type="email"] {
+  padding-right: 1rem;
+}
+
+/* Input Icons - FIXED POSITIONING */
+.password-input-icon {
+  position: absolute;
+  left: 1rem;
+  bottom: 0.875rem;
+  color: #64748b;
+  width: 1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
+  transition: color 0.3s ease;
+}
+
+/* Password Toggle - FIXED POSITIONING */
+.password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.password-toggle:hover {
+  color: #3b82f6;
+}
+
+.password-toggle svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
 }
