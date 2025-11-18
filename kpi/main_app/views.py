@@ -10,8 +10,6 @@ from django.contrib import messages
 from .decorators import RoleRequiredMixin, role_required
 from django.contrib.auth.models import User
 from django.db.models import Sum, Q, Count
-# from django.db.models import Sum
-# from django.db.models import Q
 from .services.ai import generate_kpi_insights
 import markdown
 from django.utils.timezone import now
@@ -60,7 +58,6 @@ def admin_dashboard(request):
     # Department counts
     department_counts = EmployeeProfile.objects.values('department').annotate(count=Count('id'))
 
-    # Use safe keys for template
     department_data = {
         "Sales_Marketing": 0,
         "Information_Technology": 0,
@@ -80,7 +77,7 @@ def admin_dashboard(request):
         key = department_map.get(dept_code, dept_code)
         department_data[key] = dept['count']
 
-    # KPI data
+
     all_kpis = Kpi.objects.all()
     employee_kpi_assignments = EmployeeKpi.objects.select_related(
         'employee__user', 'employee__manager', 'kpi'
@@ -103,13 +100,13 @@ def admin_dashboard(request):
             'weighted_score': round(weighted_score, 2),
         })
 
-    # ✅ Calculate total weighted score per employee
+
     employee_total_scores = {}
     for data in employee_kpi_data:
         name = data['employee_name']
         employee_total_scores[name] = employee_total_scores.get(name, 0) + data['weighted_score']
 
-    # Chart lists
+
     chart_labels_list = []
     chart_values_list = []
 
