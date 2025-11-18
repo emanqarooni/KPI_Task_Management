@@ -9,8 +9,7 @@ from .forms import AssignKpiForm, KpiProgressForm
 from django.contrib import messages
 from .decorators import RoleRequiredMixin, role_required
 from django.contrib.auth.models import User
-from django.db.models import Sum
-from django.db.models import Q
+from django.db.models import Sum, Q, Count
 from .services.ai import generate_kpi_insights
 import markdown
 from django.utils.timezone import now
@@ -30,161 +29,167 @@ from decimal import Decimal
 
 import google.generativeai as genai
 
+# create your views here
 
 # Employee dashboard'
 @login_required
 def dashboard(request):
     employee_profile = EmployeeProfile.objects.get(user=request.user)
-
     if employee_profile.role == "admin":
         return redirect("admin_dashboard")
     elif employee_profile.role == "manager":
         return redirect("manager_dashboard")
     else:
         return redirect("employee_dashboard")
-
-
 # Admin dashboard
 @login_required
 @role_required(["admin"])
 def admin_dashboard(request):
+    # Total users
     total_users_count = User.objects.count()
-    total_employees_count = EmployeeProfile.objects.filter(role="employee").count()
-
+    # Employees & managers
+    all_employees = EmployeeProfile.objects.filter(role="employee").select_related('user')
+    total_employees_count = all_employees.count()
+    all_managers = EmployeeProfile.objects.filter(role="manager").select_related('user')
+    total_managers_count = all_managers.count()
+    # Department counts
+    department_counts = EmployeeProfile.objects.values('department').annotate(count=Count('id'))
+    department_data = {
+        "Sales_Marketing": 0,
+        "Information_Technology": 0,
+        "Human_Resources": 0,
+        "Project_Management": 0,
+    }
+    department_map = {
+        "SM": "Sales_Marketing",
+        "IT": "Information_Technology",
+        "HR": "Human_Resources",
+        "PM": "Project_Management",
+    }
+    for dept in department_counts:
+        dept_code = dept['department']
+        key = department_map.get(dept_code, dept_code)
+        department_data[key] = dept['count']
     all_kpis = Kpi.objects.all()
-
+    employee_kpi_assignments = EmployeeKpi.objects.select_related(
+        'employee__user', 'employee__manager', 'kpi'
+    )
+    employee_kpi_data = []
+    for assignment in employee_kpi_assignments:
+        progress_percentage = assignment.progress_percentage()
+        weighted_score = (progress_percentage * float(assignment.weight)) / 100
+        employee_kpi_data.append({
+            'employee_name': assignment.employee.user.get_full_name() or assignment.employee.user.username,
+            'manager_name': assignment.employee.manager.get_full_name() if assignment.employee.manager else 'No Manager',
+            'kpi_title': assignment.kpi.title,
+            'target_value': assignment.target_value,
+            'current_progress': assignment.total_progress(),
+            'progress_percentage': progress_percentage,
+            'weight': assignment.weight,
+            'status': assignment.status(),
+            'weighted_score': round(weighted_score, 2),
+        })
+    employee_total_scores = {}
+    for data in employee_kpi_data:
+        name = data['employee_name']
+        employee_total_scores[name] = employee_total_scores.get(name, 0) + data['weighted_score']
     chart_labels_list = []
     chart_values_list = []
-
     for kpi in all_kpis:
         chart_labels_list.append(kpi.title)
-
-        total_progress_for_kpi = 0
-        employee_kpis_for_this_kpi = EmployeeKpi.objects.filter(kpi=kpi)
-
-        for employee_kpi in employee_kpis_for_this_kpi:
-            progress_entries = ProgressEntry.objects.filter(employee_kpi=employee_kpi)
-            for progress_entry in progress_entries:
-                total_progress_for_kpi += float(progress_entry.value)
-
+        total_progress_for_kpi = ProgressEntry.objects.filter(
+            employee_kpi__kpi=kpi
+        ).aggregate(total=Sum("value"))["total"] or 0
         chart_values_list.append(float(total_progress_for_kpi))
-
     context = {
         "total_users": total_users_count,
         "total_employees": total_employees_count,
-        "kpis": all_kpis,
+        "total_managers": total_managers_count,
+        "department_data": department_data,
+        "employees": all_employees,
+        "managers": all_managers,
+        "employee_kpi_data": employee_kpi_data,
+        "employee_total_scores": employee_total_scores,  # <- added
         "chart_labels": json.dumps(chart_labels_list),
         "chart_values": json.dumps([float(v) for v in chart_values_list]),
     }
-
     return render(request, "dashboards/admin_dashboard.html", context)
-
-
 # Manager dashboard
 @login_required
 @role_required(["manager"])
 def manager_dashboard(request):
     manager_profile = EmployeeProfile.objects.get(user=request.user)
     manager_department = manager_profile.department
-
     employees_in_department = EmployeeProfile.objects.filter(
-        department=manager_department, role="employee"
+        department=manager_department,
+        role="employee"
     )
-
     employee_dashboard_rows = []
-
     for employee in employees_in_department:
         employee_kpis = EmployeeKpi.objects.filter(employee=employee)
-
         if employee_kpis.exists():
             total_progress_value = 0
             total_target_value = 0
-
             for employee_kpi in employee_kpis:
                 progress_entries = employee_kpi.progressentry_set.all()
                 for entry in progress_entries:
                     total_progress_value += entry.value
-
                 total_target_value += employee_kpi.target_value
-
             if total_target_value == 0:
                 completion_percentage = 0
             else:
-                completion_percentage = round(
-                    (total_progress_value / total_target_value) * 100
-                )
-
+                completion_percentage = round((total_progress_value / total_target_value) * 100)
             if completion_percentage == 0:
                 status_text = "No Progress"
             elif completion_percentage >= 100:
                 status_text = "Complete"
             else:
                 status_text = "Moderate"
-
         else:
             completion_percentage = 0
             status_text = "No KPI Assigned"
-
-        employee_dashboard_rows.append(
-            {
-                "name": employee.user.username,
-                "completion": completion_percentage,
-                "status": status_text,
-            }
-        )
-
+        employee_dashboard_rows.append({
+            "name": employee.user.username,
+            "completion": completion_percentage,
+            "status": status_text,
+        })
     context = {
         "manager_name": manager_profile.user.username,
         "department": manager_profile.get_department_display(),
         "employees_count": employees_in_department.count(),
         "employee_rows": employee_dashboard_rows,
     }
-
     return render(request, "dashboards/manager_dashboard.html", context)
-
-
 # Employee dashboard
 @login_required
 @role_required(["employee"])
 def employee_dashboard(request):
     employee_profile = EmployeeProfile.objects.get(user=request.user)
     assigned_kpis = EmployeeKpi.objects.filter(employee=employee_profile)
-
     chart_labels_list = []
     chart_values_list = []
     kpi_cards_list = []
-
     for employee_kpi in assigned_kpis:
         kpi_title = employee_kpi.kpi.title
         total_progress_value = 0
-
         progress_entries = employee_kpi.progressentry_set.all()
         for entry in progress_entries:
             total_progress_value += entry.value
-
         if employee_kpi.target_value == 0:
             progress_percentage = 0
         else:
-            progress_percentage = round(
-                (total_progress_value / employee_kpi.target_value) * 100
-            )
-
+            progress_percentage = round((total_progress_value / employee_kpi.target_value) * 100)
         days_remaining = (employee_kpi.end_date - date.today()).days
-
         chart_labels_list.append(kpi_title)
         chart_values_list.append(progress_percentage)
-
-        kpi_cards_list.append(
-            {
-                "title": kpi_title,
-                "target": employee_kpi.target_value,
-                "progress": total_progress_value,
-                "percentage": progress_percentage,
-                "days_left": days_remaining,
-                "id": employee_kpi.id,
-            }
-        )
-
+        kpi_cards_list.append({
+            "title": kpi_title,
+            "target": employee_kpi.target_value,
+            "progress": total_progress_value,
+            "percentage": progress_percentage,
+            "days_left": days_remaining,
+            "id": employee_kpi.id,
+        })
     context = {
         "employee_name": employee_profile.user.username,
         "role": employee_profile.job_role,
@@ -192,16 +197,10 @@ def employee_dashboard(request):
         "chart_labels": json.dumps(chart_labels_list),
         "chart_values": json.dumps(chart_values_list),
     }
-
     return render(request, "dashboards/employee_dashboard.html", context)
 
 
-# Manager Dashboard
 
-# Admin Dashboard
-
-
-# create your views here
 def home(request):
     return render(request, "home.html")
 
