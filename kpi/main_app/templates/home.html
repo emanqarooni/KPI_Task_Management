@@ -1,6 +1,7 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
 
-  <body>
+  <div class="body">
     <div class="home-container">
       <!-- HERO SECTION -->
       <section class="hero-section">
@@ -94,9 +95,10 @@
             Start managing KPIs the smart way – track progress, improve
             accountability, and align your team with clarity.
           </p>
-          <a href="#" class="btn-primary">Get Started</a>
+
+          <a href="{% url 'login' %}" class="btn-primary">Get Started</a>
         </div>
       </section>
     </div>
-  </body>
+  </div>
 {% endblock %}

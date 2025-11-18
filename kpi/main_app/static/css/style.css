@@ -758,7 +758,7 @@ input:focus {
 
 /* home page */
 
-body {
+.body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: #ffffff;
   color: #0f172a;

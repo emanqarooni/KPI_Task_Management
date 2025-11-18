@@ -1,23 +1,178 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
 
-{% if object  %}
-<h1>Edit <span class="teal-text">{{object.title}}</span></h1>
-{% else %}
-<h1>Add KPI</h1>
-{% endif %}
+<div class="max-w-4xl mx-auto">
+  <!-- Back Button -->
+  <div class="mb-6">
+    <a href="{% url 'index' %}" class="btn btn-ghost btn-sm">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+      </svg>
+      Back to KPIs
+    </a>
+  </div>
 
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  <table>
-    {{form.as_table}}
-  </table>
-  <br>
-  <input type="submit" value="Submit!" class="btn" />
-</form>
+  <!-- Page Header -->
+  <div class="mb-8">
+    {% if object %}
+    <h1 class="text-4xl font-bold text-base-content flex items-center gap-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+      </svg>
+      Edit <span class="text-primary">{{ object.title }}</span>
+    </h1>
+    <p class="text-base-content/60 mt-2">Update the details of this Key Performance Indicator</p>
+    {% else %}
+    <h1 class="text-4xl font-bold text-base-content flex items-center gap-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Add New KPI
+    </h1>
+    <p class="text-base-content/60 mt-2">Create a new Key Performance Indicator for your organization</p>
+    {% endif %}
+  </div>
 
-<script>
-  let selectEl = document.getElementById("id_department")
-  M.FormSelect.init(selectEl)
-</script>
+  <!-- Form Card -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Display form errors if any -->
+        {% if form.errors %}
+        <div class="alert alert-error">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <h3 class="font-bold">Please correct the following errors:</h3>
+            <ul class="list-disc list-inside mt-2">
+              {% for field in form %}
+                {% for error in field.errors %}
+                  <li>{{ field.label }}: {{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+              {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- KPI Title Field -->
+        <div class="form-control">
+          <label class="label" for="{{ form.title.id_for_label }}">
+            <span class="label-text font-semibold text-base flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+              </svg>
+              KPI Title
+              {% if form.title.field.required %}<span class="text-error ml-1">*</span>{% endif %}
+            </span>
+          </label>
+          <input type="text"
+                 name="{{ form.title.name }}"
+                 id="{{ form.title.id_for_label }}"
+                 value="{{ form.title.value|default:'' }}"
+                 class="input input-bordered w-full"
+                 placeholder="Enter KPI title..."
+                 {% if form.title.field.required %}required{% endif %}>
+          {% if form.title.help_text %}
+          <label class="label">
+            <span class="label-text-alt text-base-content/60">{{ form.title.help_text }}</span>
+          </label>
+          {% endif %}
+          {% if form.title.errors %}
+          <label class="label">
+            <span class="label-text-alt text-error">{{ form.title.errors.0 }}</span>
+          </label>
+          {% endif %}
+        </div>
+
+        <!-- Description Field -->
+        <div class="form-control">
+          <label class="label" for="{{ form.description.id_for_label }}">
+            <span class="label-text font-semibold text-base flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+              </svg>
+              Description
+              {% if form.description.field.required %}<span class="text-error ml-1">*</span>{% endif %}
+            </span>
+          </label>
+          <textarea name="{{ form.description.name }}"
+                    id="{{ form.description.id_for_label }}"
+                    class="textarea textarea-bordered w-full h-32"
+                    placeholder="Describe the KPI and what it measures..."
+                    {% if form.description.field.required %}required{% endif %}>{{ form.description.value|default:'' }}</textarea>
+          {% if form.description.help_text %}
+          <label class="label">
+            <span class="label-text-alt text-base-content/60">{{ form.description.help_text }}</span>
+          </label>
+          {% endif %}
+          {% if form.description.errors %}
+          <label class="label">
+            <span class="label-text-alt text-error">{{ form.description.errors.0 }}</span>
+          </label>
+          {% endif %}
+        </div>
+
+        <!-- Department Field -->
+        <div class="form-control">
+          <label class="label" for="{{ form.department.id_for_label }}">
+            <span class="label-text font-semibold text-base flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              Department
+              {% if form.department.field.required %}<span class="text-error ml-1">*</span>{% endif %}
+            </span>
+          </label>
+          <select name="{{ form.department.name }}"
+                  id="{{ form.department.id_for_label }}"
+                  class="select select-bordered w-full"
+                  {% if form.department.field.required %}required{% endif %}>
+            <option value="">Select a department...</option>
+            {% for value, label in form.department.field.choices %}
+              {% if value %}
+              <option value="{{ value }}" {% if form.department.value == value %}selected{% endif %}>{{ label }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+          {% if form.department.help_text %}
+          <label class="label">
+            <span class="label-text-alt text-base-content/60">{{ form.department.help_text }}</span>
+          </label>
+          {% endif %}
+          {% if form.department.errors %}
+          <label class="label">
+            <span class="label-text-alt text-error">{{ form.department.errors.0 }}</span>
+          </label>
+          {% endif %}
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Action Buttons -->
+        <div class="card-actions justify-end gap-3">
+          <a href="{% url 'index' %}" class="btn btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Cancel
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            {% if object %}Update KPI{% else %}Create KPI{% endif %}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
