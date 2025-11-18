@@ -47,13 +47,17 @@ def dashboard(request):
 def admin_dashboard(request):
     # Total users
     total_users_count = User.objects.count()
+
     # Employees & managers
     all_employees = EmployeeProfile.objects.filter(role="employee").select_related('user')
     total_employees_count = all_employees.count()
+
     all_managers = EmployeeProfile.objects.filter(role="manager").select_related('user')
     total_managers_count = all_managers.count()
+
     # Department counts
     department_counts = EmployeeProfile.objects.values('department').annotate(count=Count('id'))
+
     department_data = {
         "Sales_Marketing": 0,
         "Information_Technology": 0,
@@ -70,6 +74,8 @@ def admin_dashboard(request):
         dept_code = dept['department']
         key = department_map.get(dept_code, dept_code)
         department_data[key] = dept['count']
+
+
     all_kpis = Kpi.objects.all()
     employee_kpi_assignments = EmployeeKpi.objects.select_related(
         'employee__user', 'employee__manager', 'kpi'
@@ -89,12 +95,17 @@ def admin_dashboard(request):
             'status': assignment.status(),
             'weighted_score': round(weighted_score, 2),
         })
+
+
     employee_total_scores = {}
     for data in employee_kpi_data:
         name = data['employee_name']
         employee_total_scores[name] = employee_total_scores.get(name, 0) + data['weighted_score']
+
+
     chart_labels_list = []
     chart_values_list = []
+
     for kpi in all_kpis:
         chart_labels_list.append(kpi.title)
         total_progress_for_kpi = ProgressEntry.objects.filter(
