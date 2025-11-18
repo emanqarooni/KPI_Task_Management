@@ -327,12 +327,12 @@ def assign_kpi(request):
 
             # send notification to employees
             create_notification(
-                recipient=employee_kpi.employee.user,
+                recipient=kpi_assignment.employee.user,
                 sender=request.user,
                 notification_type='kpi_assigned',
                 title='New KPI Assigned',
-                message=f'You have been assigned a new KPI: {employee_kpi.kpi.title}. Target: {employee_kpi.target_value}',
-                employee_kpi=employee_kpi
+                message=f'You have been assigned a new KPI: {kpi_assignment.kpi.title}. Target: {kpi_assignment.target_value}',
+                employee_kpi=kpi_assignment
             )
 
             # send notification to employees
@@ -441,12 +441,12 @@ def employee_kpi_edit(request, pk):
 
         # send notification to employee
         create_notification(
-            recipient=employee_kpi.employee.user,
+            recipient=kpi_assignment.employee.user,
             sender=request.user,
             notification_type='kpi_updated',
             title='KPI Updated',
-            message=f'Your KPI "{employee_kpi.kpi.title}" has been updated by your manager.',
-            employee_kpi=employee_kpi
+            message=f'Your KPI "{kpi_assignment.kpi.title}" has been updated by your manager.',
+            employee_kpi=kpi_assignment
         )
 
         # send notification to employee
@@ -493,9 +493,26 @@ def employee_kpi_delete(request, pk):
     return render(request, "main_app/employee_kpi_delete.html", {"kpi": kpi_assign})
 
 @login_required
-@role_required(['manager'])
 def employee_kpi_detail(request, pk):
-    kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
+    profile = request.user.employeeprofile
+
+    # managers can view any kpi in their department
+    if profile.role == 'manager':
+        kpi_assign = get_object_or_404(
+            EmployeeKpi,
+            pk=pk,
+            employee__department=profile.department
+        )
+    # employees can only view their own KPIs
+    elif profile.role == 'employee':
+        kpi_assign = get_object_or_404(
+            EmployeeKpi,
+            pk=pk,
+            employee__user=request.user
+        )
+    else:
+        return redirect('unauthorized')
+
     progress_entries = kpi_assign.progressentry_set.order_by("date")
     return render(
         request,
@@ -1169,6 +1186,21 @@ def notifications(request):
     }
     return render(request, "notifications/notifications.html", context)
 
+
+@login_required
+def mark_notification_read(request, notification_id):
+    # marking a single notification as read
+    notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+    notification.is_read = True
+    notification.save()
+    return redirect('notifications')
+
+@login_required
+def mark_all_notifications_read(request):
+    # marking all notifications as read
+    Notification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
+    messages.success(request, "All notifications marked as read.")
+    return redirect('notifications')
 
 ## AI feature for Manager View
 @login_required
