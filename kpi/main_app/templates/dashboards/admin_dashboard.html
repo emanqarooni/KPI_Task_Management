@@ -1,15 +1,23 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block content %}
 <div class="dashboard-container">
+
   <a href="{% url 'ai_admin_insights' %}" class="btn blue">AI Organizational Insights</a>
+
   <div class="dashboard-content">
+
     <h2>Admin Dashboard</h2>
+
+
     <div class="kpi-box">
         <h3>System Overview</h3>
+
         <p><strong>Total Users:</strong>  {{ total_users }}</p>
         <p><strong>Total Employees:</strong> {{ total_employees }}</p>
         <p><strong>Total Managers:</strong> {{ total_managers }}</p>
+
         <h4>Departments</h4>
       <ul>
     <li>Sales & Marketing: {{ department_data.Sales_Marketing }}</li>
@@ -18,6 +26,7 @@
     <li>Project Management: {{ department_data.Project_Management }}</li>
     </ul>
     </div>
+
     <h3>Employees ({{ total_employees }})</h3>
     <div>
       {% if employees %}
@@ -49,6 +58,8 @@
         <p>No employees found</p>
       {% endif %}
     </div>
+
+
     <h3>Managers ({{ total_managers }})</h3>
     <div>
       {% if managers %}
@@ -80,8 +91,10 @@
         <p>No managers found</p>
       {% endif %}
     </div>
+
     <!-- KPI Assignments Section -->
     <h3>Employee KPI Assignments</h3>
+
     <table class="table">
       <thead>
         <tr>
@@ -114,8 +127,10 @@
         {% endfor %}
       </tbody>
     </table>
+
     <!-- Final Weighted Score per Employee -->
     <h3>Final Weighted KPI Score (Total)</h3>
+
     <table class="table">
       <thead>
         <tr>
@@ -132,14 +147,17 @@
         {% endfor %}
       </tbody>
     </table>
+
     <!-- KPI Overview Chart -->
     <h3>KPI Overview Chart</h3>
     <canvas id="adminChart"></canvas>
+
   </div>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const ctx = document.getElementById('adminChart');
+
     if (ctx) {
         const adminLabels = {{ chart_labels|safe }};
         const adminValues = {{ chart_values|safe }};
