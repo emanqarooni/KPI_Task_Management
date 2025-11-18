@@ -1,50 +1,80 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
 <div class="dashboard-container">
-
   <div class="dashboard-content">
 
     <h2>Manager Dashboard</h2>
-    <p>Manager: {{ manager_name }}</p>
-    <p>Department: {{ department }}</p>
-    <p>Total Employees: {{ employees_count }}</p>
 
+
+    <a href="{% url 'ai_kpi_insights' %}" class="btn blue">
+      Generate AI KPI Insights
+    </a>
+
+
+    <div class="kpi-box manager-summary-box">
+      <h3>Manager Overview</h3>
+
+      <div class="kpi-grid manager-summary-grid">
+        <div class="kpi-item manager-card">
+          <h4>Manager</h4>
+          <p><strong>{{ manager_name }}</strong></p>
+        </div>
+
+        <div class="kpi-item manager-card">
+          <h4>Department</h4>
+          <p><strong>{{ department }}</strong></p>
+        </div>
+
+        <div class="kpi-item manager-card">
+          <h4>Total Employees</h4>
+          <p><strong>{{ employees_count }}</strong></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TEAM KPI TABLE -->
     <h3>Team KPI Summary</h3>
 
-    <table>
-      <tr>
-        <th>Employee</th>
-        <th>KPI Completion</th>
-        <th>Status</th>
-      </tr>
-      {% for row in employee_rows %}
-      <tr>
-        <td>{{ row.name }}</td>
-        <td>{{ row.completion }}%</td>
-        <td>{{ row.status }}</td>
-      </tr>
-      {% endfor %}
-    </table>
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>KPI Completion</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in employee_rows %}
+          <tr>
+            <td>{{ row.name }}</td>
+            <td>{{ row.completion }}%</td>
+            <td>{{ row.status }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-    <div class="kpi-box">
+    <!-- CHART -->
+    <div class="kpi-box manager-chart-box">
+      <h3>Team KPI Performance Chart</h3>
       <canvas id="managerChart"></canvas>
     </div>
 
   </div>
 </div>
 
-<div>
-  <a href="{% url 'ai_kpi_insights' %}" class="btn blue">
-    Generate AI KPI Insights
-  </a>
-</div>
 <script>
-const managerData = {{ employee_rows|safe }};
+const managerLabels = [
+{% for row in employee_rows %}"{{ row.name }}",{% endfor %}
+];
 
-const managerLabels = managerData.map(item => item.name);
-const managerValues = managerData.map(item => item.completion);
+const managerValues = [
+{% for row in employee_rows %}{{ row.completion }},{% endfor %}
+];
 
 new Chart(document.getElementById("managerChart"), {
     type: "bar",
@@ -53,7 +83,10 @@ new Chart(document.getElementById("managerChart"), {
         datasets: [{
             label: "Team KPI Completion (%)",
             data: managerValues,
-            borderWidth: 1
+            backgroundColor: "rgba(102, 126, 234, 0.6)",
+            borderColor: "rgba(102, 126, 234, 1)",
+            borderWidth: 2,
+            borderRadius: 6
         }]
     }
 });

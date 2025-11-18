@@ -4,7 +4,7 @@
 
 /* Sidebar Styles */
 .sidebar-purple {
-  background-color: #0f172a;
+  background-color: #0F172A;
   transition: all 0.3s ease;
   overflow-x: hidden;
   position: fixed;
@@ -69,12 +69,12 @@
 
 /* Button Styles */
 .btn-purple {
-  background-color: #0f172a;
-  border-color: #0f172a;
+  background-color: #0F172A;
+  border-color: #0F172A;
 }
 
 .btn-purple:hover {
-  background-color: #1e293b;
+  background-color: #1E293B;
 }
 
 /* Active Link State */
@@ -236,19 +236,19 @@
 
 /* KPI Status Colors */
 .kpi-success {
-  color: #10b981;
+  color: #10B981;
 }
 
 .kpi-warning {
-  color: #f59e0b;
+  color: #F59E0B;
 }
 
 .kpi-error {
-  color: #ef4444;
+  color: #EF4444;
 }
 
 .kpi-info {
-  color: #3b82f6;
+  color: #3B82F6;
 }
 
 /* ===================================
@@ -320,7 +320,7 @@ input:focus {
 
 /* Table Header */
 .kpi-table-header {
-  background-color: #0f172a;
+  background-color: #0F172A;
   color: white;
 }
 
@@ -335,33 +335,33 @@ input:focus {
 /* KPI Status Badges */
 .kpi-status-active,
 .kpi-status-inprogress {
-  background-color: #10b981;
+  background-color: #10B981;
   color: white;
   font-weight: 600;
 }
 
 .kpi-status-pending,
 .kpi-status-noprogress {
-  background-color: #f59e0b;
+  background-color: #F59E0B;
   color: white;
   font-weight: 600;
 }
 
 .kpi-status-completed,
 .kpi-status-complete {
-  background-color: #3b82f6;
+  background-color: #3B82F6;
   color: white;
   font-weight: 600;
 }
 
 .kpi-status-overdue {
-  background-color: #ef4444;
+  background-color: #EF4444;
   color: white;
   font-weight: 600;
 }
 
 .kpi-status-inactive {
-  background-color: #6b7280;
+  background-color: #6B7280;
   color: white;
   font-weight: 600;
 }
@@ -439,8 +439,8 @@ input:focus {
   width: 1rem;
   height: 1rem;
   border-radius: 50%;
-  background-color: #3b82f6;
-  border: 3px solid #dbeafe;
+  background-color: #3B82F6;
+  border: 3px solid #DBEAFE;
   position: relative;
   z-index: 2;
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
@@ -449,7 +449,7 @@ input:focus {
 .progress-line {
   width: 2px;
   flex: 1;
-  background: linear-gradient(to bottom, #3b82f6, #93c5fd);
+  background: linear-gradient(to bottom, #3B82F6, #93C5FD);
   margin-top: 0.5rem;
   min-height: 3rem;
 }
@@ -510,7 +510,7 @@ input:focus {
 }
 
 /* ===================================
-  Delete Confirmation Page Styling
+   Delete Confirmation Page Styling
    =================================== */
 
 /* Error state card border */
@@ -540,8 +540,7 @@ input:focus {
 }
 
 @keyframes pulse-warning {
-  0%,
-  100% {
+  0%, 100% {
     opacity: 1;
   }
   50% {
@@ -566,34 +565,34 @@ input:focus {
 
 /* Action Badge Colors with Gradients */
 .badge-activity-progress {
-  background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+  background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
   color: white;
   font-weight: 600;
-  border: 2px solid #f59e0b;
+  border: 2px solid #F59E0B;
   box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
 }
 
 .badge-activity-assign {
-  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
   color: white;
   font-weight: 600;
-  border: 2px solid #3b82f6;
+  border: 2px solid #3B82F6;
   box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
 }
 
 .badge-activity-update {
-  background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+  background: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);
   color: white;
   font-weight: 600;
-  border: 2px solid #8b5cf6;
+  border: 2px solid #8B5CF6;
   box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
 }
 
 .badge-activity-delete {
-  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  background: linear-gradient(135deg, #F87171 0%, #EF4444 100%);
   color: white;
   font-weight: 600;
-  border: 2px solid #ef4444;
+  border: 2px solid #EF4444;
   box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
 }
 
@@ -614,7 +613,7 @@ input:focus {
 .activity-table-row:hover {
   background-color: rgba(59, 130, 246, 0.05);
   transform: translateX(4px);
-  box-shadow: -4px 0 0 0 #3b82f6;
+  box-shadow: -4px 0 0 0 #3B82F6;
 }
 
 /* Filter Card Animation */
@@ -628,19 +627,19 @@ input:focus {
 
 /* Avatar with Activity Color Border */
 .avatar-progress {
-  border: 3px solid #f59e0b !important;
+  border: 3px solid #F59E0B !important;
 }
 
 .avatar-assign {
-  border: 3px solid #3b82f6 !important;
+  border: 3px solid #3B82F6 !important;
 }
 
 .avatar-update {
-  border: 3px solid #8b5cf6 !important;
+  border: 3px solid #8B5CF6 !important;
 }
 
 .avatar-delete {
-  border: 3px solid #ef4444 !important;
+  border: 3px solid #EF4444 !important;
 }
 
 /* Activity Description Tooltip Effect */
@@ -650,7 +649,7 @@ input:focus {
 }
 
 .activity-description:hover {
-  color: #3b82f6;
+  color: #3B82F6;
 }
 
 /* Empty State Animation */
@@ -659,8 +658,7 @@ input:focus {
 }
 
 @keyframes float {
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0px);
   }
   50% {
@@ -674,8 +672,7 @@ input:focus {
 }
 
 @keyframes pulse-blue {
-  0%,
-  100% {
+  0%, 100% {
     box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
   }
   50% {
@@ -685,18 +682,18 @@ input:focus {
 
 /* Timestamp Styling */
 .activity-timestamp {
-  color: #6b7280;
+  color: #6B7280;
   font-size: 0.875rem;
 }
 
 .activity-timestamp:hover {
-  color: #3b82f6;
+  color: #3B82F6;
   transition: color 0.2s ease;
 }
 
 /* Table Header Gradient for Activity Logs */
 .activity-table-header {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
   color: white;
   font-weight: 700;
   text-transform: uppercase;
@@ -713,7 +710,7 @@ input:focus {
 
 .activity-loading-spinner {
   border: 4px solid rgba(59, 130, 246, 0.3);
-  border-top: 4px solid #3b82f6;
+  border-top: 4px solid #3B82F6;
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -721,12 +718,8 @@ input:focus {
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {
