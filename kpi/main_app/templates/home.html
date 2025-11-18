@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-
-  <div class="body">
     <div class="home-container">
       <!-- HERO SECTION -->
       <section class="hero-section">
@@ -100,5 +98,12 @@
         </div>
       </section>
     </div>
-  </div>
+
+    <script>
+  // Add home-page class to body
+  document.addEventListener('DOMContentLoaded', function() {
+    document.body.classList.add('home-page');
+  });
+</script>
+
 {% endblock %}

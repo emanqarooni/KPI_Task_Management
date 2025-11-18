@@ -225,6 +225,7 @@ def kpis_index(request):
 
 
 @login_required
+@role_required(['admin'])
 def kpis_detail(request, kpi_id):
     kpi = Kpi.objects.get(id=kpi_id)
     return render(request, "kpi/detail.html", {"kpi": kpi})
