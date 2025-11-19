@@ -130,7 +130,7 @@ class ActivityLog(models.Model):
     ACTION_CHOICES = [
         ("PROGRESS_ADDED", "Added Progress"),
         ("KPI_ASSIGNED", "Assigned KPI"),
-        ("KPI_UPDATED", "Updated KPI Assiganment"),
+        ("KPI_UPDATED", "Updated KPI Assignment"),
         ("KPI_DELETED", "Deleted KPI Assignment"),
     ]
 
