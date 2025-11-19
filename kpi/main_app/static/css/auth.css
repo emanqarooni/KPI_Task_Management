@@ -171,10 +171,10 @@
   padding: 0.875rem 1rem;
   padding-left: 3rem;
   font-size: 1rem;
-  border: 2px solid #0e1013;
+  border: 2px solid #7a7c7e;
   border-radius: 0.75rem;
-  background-color: #96b5d4;
-  color: #fcfdff;
+  background-color: #f7f7f8;
+  color: #000000;
   transition: all 0.3s ease;
   outline: none;
 }
@@ -729,13 +729,11 @@
   line-height: 1.5;
   border: 2px solid #e2e8f0;
   border-radius: 0.75rem;
-  background-color: #a4c8ea;
-  color: #0d0d0d;
+  background-color: #f8fafc;
+  color: #0f172a;
   transition: all 0.3s ease;
   outline: none;
   box-sizing: border-box;
-
-
 }
 
 .password-form-group input:focus {
@@ -743,7 +741,6 @@
   background-color: white;
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
   transform: translateY(-2px);
-  color: white;
 }
 
 .password-form-group input::placeholder {
@@ -754,7 +751,7 @@
 .password-input-icon {
   position: absolute;
   left: 1rem;
-  top: 55%;
+  top: 45px;
   color: #64748b;
   width: 1.25rem;
   height: 1.25rem;
