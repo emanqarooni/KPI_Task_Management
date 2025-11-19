@@ -2,9 +2,9 @@
 ## Date: 11/11/2025
 ### By: Eman Qarooni, Eman Rauf, Shooq BinZaiman, Fatima Zaid
 
-[Eman Qarooni Github]("https://github.com/emanqarooni") | [Eman Rauf Github]("https://github.com/emannn077") |
-[Shooq BinZaiman Github]("https://github.com/shooqbinzaiman") |
-[Fatima Zaid]("https://github.com/fatima-zaid")
+[Eman Qarooni Github](https://github.com/emanqarooni) | [Eman Rauf Github](https://github.com/emannn077) |
+[Shooq BinZaiman Github](https://github.com/shooqbinzaiman) |
+[Fatima Zaid](https://github.com/fatima-zaid)
 
 🧭 Overview
 
@@ -97,6 +97,28 @@ Employee:
 
 A Trello board was used to track development progress and can be viewed [here](https://trello.com/b/gjUDr0Cr/project-4-kpi).
 ### ***Screenshots***
-![Wireframe](main_app/static/uploads/Wireframe.png)
-![ERD](main_app/static/uploads/ERD.png)
+### Wireframe:
+![Wireframe4](Wireframe4.png)
+### ERD:
+![ERD](ERD4.png)
 
+### ***Credits***
+
+##### 1. CSS:
+[Daisyui](https://daisyui.com/docs/install/django/)
+
+##### 2. PDF exporting using reportlab:
+[Reportlab](https://docs.reportlab.com/pdf-accessibility/)
+/ [Medium](https://medium.com/@saijalshakya/generating-pdf-with-reportlab-in-django-ee0235c2f133)
+
+##### 3. Excel exporting using openpyxl:
+[Geeksforgeeks](https://www.geeksforgeeks.org/python/introduction-to-python-openpyxl/)
+/ [Stackoverflow](https://stackoverflow.com/questions/33217306/return-openpyxl-workbook-object-as-httpresponse-in-django-is-it-possible)
+
+##### 4. Notifications:
+[Stackoverflow](https://stackoverflow.com/questions/72264677/how-can-i-implement-notifications-system-in-django)
+/ [Readthedocs](https://django-notification-system.readthedocs.io/en/latest/)
+/ [Medium](https://medium.com/@anas-issath/i-built-a-real-time-notification-system-in-django-3bb5cb97916d)
+
+#### 5. Chartjs:
+[Chartjs](https://pypi.org/project/django-chartjs/)
