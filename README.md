@@ -104,9 +104,9 @@ A Trello board was used to track development progress and can be viewed [here](h
 ![ERD](./images/ERD4.png)
 ***
 ## Admin View
-![Dashboard](Admin%20dashboard.png)
-![KPI](admin%20kpi.png)
-![filter](Admin%20filter.png)
+![Dashboard](./images/Admin%20dashboard.png)
+![KPI](./images/admin%20kpi.png)
+![filter](./images/Admin%20filter.png)
 ![activitylog](Admin%20activity.png)
 ***
 ## Manager View
