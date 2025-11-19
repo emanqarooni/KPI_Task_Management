@@ -17,8 +17,6 @@ GENDER = (
 )
 
 # Create your models here.
-
-
 class EmployeeProfile(models.Model):
     ROLE_CHOICES = [
         ("admin", "Admin"),
@@ -153,11 +151,10 @@ class ActivityLog(models.Model):
         help_text="Employee affected by the action"
     )
 
-
     class Meta:
+        # show activity logs from newest to oldest
         ordering = ["-timestamp"]
-        verbose_name = "Activity Log"
-        verbose_name_plural = "Activity Logs"
+
 
     def __str__(self):
         return f"{self.user.username if self.user else 'Unknown'} - {self.get_action_display()} - {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
