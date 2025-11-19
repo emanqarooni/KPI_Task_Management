@@ -156,6 +156,7 @@ class ActivityLog(models.Model):
         ordering = ["-timestamp"]
 
 
+    @classmethod
     def create_log(cls, user, action, description, related_user=None):
         return cls.objects.create(
             user=user,
