@@ -352,7 +352,7 @@ def profile(request):
     return render(request, "users/profile.html")
 
 
-# Assign KPI: managers assign employees to KPI; KPIs & employees filtered by manager's department
+# assigning kpi 
 @login_required
 @role_required(["manager"])
 def assign_kpi(request):
@@ -380,16 +380,6 @@ def assign_kpi(request):
                 title="New KPI Assigned",
                 message=f"You have been assigned a new KPI: {kpi_assignment.kpi.title}. Target: {kpi_assignment.target_value}",
                 employee_kpi=kpi_assignment,
-            )
-
-            # send notification to employees
-            create_notification(
-                recipient=employee_kpi.employee.user,
-                sender=request.user,
-                notification_type="kpi_assigned",
-                title="New KPI Assigned",
-                message=f"You have been assigned a new KPI: {employee_kpi.kpi.title}. Target: {employee_kpi.target_value}",
-                employee_kpi=employee_kpi,
             )
 
             messages.success(request, "KPI assigned successfully.")
