@@ -13,66 +13,68 @@
     <p class="text-base-content/60 mt-2">Track all user actions and system activities across your organization</p>
   </div>
 
-  <!-- Filter Card -->
-  <div class="card bg-base-100 shadow-xl mb-6 filter-card">
-    <div class="card-body">
-      <h2 class="card-title text-lg mb-4 flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-        </svg>
-        Filter Logs
-      </h2>
-      <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- User Filter -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-medium">Filter by User</span>
-          </label>
-          <select name="user" id="user" class="select select-bordered w-full">
-            <option value="">All Users</option>
-            {% for user in active_users %}
-              <option value="{{ user.username }}" {% if current_user_filter == user.username %}selected{% endif %}>
-                {{ user.username }} ({{ user.employeeprofile.get_role_display }})
-              </option>
-            {% endfor %}
-          </select>
+<!-- Filter Card -->
+<div class="card bg-base-100 shadow-xl mb-6 filter-card">
+  <div class="card-body">
+    <h2 class="card-title text-lg mb-4 flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+      </svg>
+      Filter Logs
+    </h2>
+    <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- User Search Bar -->
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">Search by User</span>
+        </label>
+        <div class="relative">
+          <input
+            type="text"
+            name="user"
+            id="user"
+            placeholder="Type username..."
+            value="{{ current_user_filter }}"
+            class="input input-bordered w-full pl-10"
+          />
         </div>
+      </div>
 
-        <!-- Action Filter -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text font-medium">Filter by Action</span>
-          </label>
-          <select name="action" id="action" class="select select-bordered w-full">
-            <option value="">All Actions</option>
-            {% for value, label in available_actions %}
-              <option value="{{ value }}" {% if current_action_filter == value %}selected{% endif %}>
-                {{ label }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
+      <!-- Action Filter -->
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text font-medium">Filter by Action</span>
+        </label>
+        <select name="action" id="action" class="select select-bordered w-full">
+          <option value="">All Actions</option>
+          {% for value, label in available_actions %}
+            <option value="{{ value }}" {% if current_action_filter == value %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
 
-        <!-- Filter Buttons -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text opacity-0">Actions</span>
-          </label>
-          <div class="flex gap-2">
-            <button type="submit" class="btn btn-primary flex-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              Filter
-            </button>
-            <a href="{% url 'activity_logs' %}" class="btn btn-ghost flex-1">
-              Clear
-            </a>
-          </div>
+      <!-- Filter Buttons -->
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text opacity-0">Actions</span>
+        </label>
+        <div class="flex gap-2">
+          <button type="submit" class="btn btn-primary flex-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Filter
+          </button>
+          <a href="{% url 'activity_logs' %}" class="btn btn-ghost flex-1">
+            Clear
+          </a>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   </div>
+</div>
 
   <!-- Activity Logs Table -->
   {% if logs %}

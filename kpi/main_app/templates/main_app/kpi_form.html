@@ -91,33 +91,35 @@
           {% endif %}
         </div>
 
-        <!-- Description Field -->
-        <div class="form-control">
-          <label class="label" for="{{ form.description.id_for_label }}">
-            <span class="label-text font-semibold text-base flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
-              </svg>
-              Description
-              {% if form.description.field.required %}<span class="text-error ml-1">*</span>{% endif %}
-            </span>
-          </label>
-          <textarea name="{{ form.description.name }}"
-                    id="{{ form.description.id_for_label }}"
-                    class="textarea textarea-bordered w-full h-32"
-                    placeholder="Describe the KPI and what it measures..."
-                    {% if form.description.field.required %}required{% endif %}>{{ form.description.value|default:'' }}</textarea>
-          {% if form.description.help_text %}
-          <label class="label">
-            <span class="label-text-alt text-base-content/60">{{ form.description.help_text }}</span>
-          </label>
-          {% endif %}
-          {% if form.description.errors %}
-          <label class="label">
-            <span class="label-text-alt text-error">{{ form.description.errors.0 }}</span>
-          </label>
-          {% endif %}
-        </div>
+<!-- Description Field -->
+<div class="form-control">
+  <label class="label" for="{{ form.description.id_for_label }}">
+    <span class="label-text font-semibold text-base flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+      </svg>
+      Description
+      {% if form.description.field.required %}<span class="text-error ml-1">*</span>{% endif %}
+    </span>
+  </label>
+  <textarea name="{{ form.description.name }}"
+            id="{{ form.description.id_for_label }}"
+            class="textarea textarea-bordered w-full h-32"
+            placeholder="Describe the KPI and what it measures..."
+            {% if form.description.field.required %}required{% endif %}>{{ form.description.value|default:'' }}</textarea>
+  {% if form.description.help_text %}
+  <label class="label">
+    <span class="label-text-alt text-base-content/60">{{ form.description.help_text }}</span>
+  </label>
+  {% endif %}
+  {% if form.description.errors %}
+  <label class="label">
+    <span class="label-text-alt text-error">{{ form.description.errors.0 }}</span>
+  </label>
+  {% endif %}
+</div>
+
+
 
         <!-- Department Field -->
         <div class="form-control">

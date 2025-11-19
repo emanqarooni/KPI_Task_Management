@@ -1,7 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponse
-from .models import EmployeeKpi, ProgressEntry, Kpi, EmployeeProfile, DEPARTMENT, ActivityLog, Notification
+from .models import (
+    EmployeeKpi,
+    ProgressEntry,
+    Kpi,
+    EmployeeProfile,
+    DEPARTMENT,
+    ActivityLog,
+    Notification,
+)
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, UpdateView, View
@@ -31,6 +39,7 @@ import google.generativeai as genai
 
 # create your views here
 
+
 # Employee dashboard'
 @login_required
 def dashboard(request):
@@ -41,6 +50,8 @@ def dashboard(request):
         return redirect("manager_dashboard")
     else:
         return redirect("employee_dashboard")
+
+
 # Admin dashboard
 @login_required
 @role_required(["admin"])
@@ -49,14 +60,18 @@ def admin_dashboard(request):
     total_users_count = User.objects.count()
 
     # Employees & managers
-    all_employees = EmployeeProfile.objects.filter(role="employee").select_related('user')
+    all_employees = EmployeeProfile.objects.filter(role="employee").select_related(
+        "user"
+    )
     total_employees_count = all_employees.count()
 
-    all_managers = EmployeeProfile.objects.filter(role="manager").select_related('user')
+    all_managers = EmployeeProfile.objects.filter(role="manager").select_related("user")
     total_managers_count = all_managers.count()
 
     # Department counts
-    department_counts = EmployeeProfile.objects.values('department').annotate(count=Count('id'))
+    department_counts = EmployeeProfile.objects.values("department").annotate(
+        count=Count("id")
+    )
 
     department_data = {
         "Sales_Marketing": 0,
@@ -71,46 +86,55 @@ def admin_dashboard(request):
         "PM": "Project_Management",
     }
     for dept in department_counts:
-        dept_code = dept['department']
+        dept_code = dept["department"]
         key = department_map.get(dept_code, dept_code)
-        department_data[key] = dept['count']
-
+        department_data[key] = dept["count"]
 
     all_kpis = Kpi.objects.all()
     employee_kpi_assignments = EmployeeKpi.objects.select_related(
-        'employee__user', 'employee__manager', 'kpi'
+        "employee__user", "employee__manager", "kpi"
     )
     employee_kpi_data = []
     for assignment in employee_kpi_assignments:
         progress_percentage = assignment.progress_percentage()
         weighted_score = (progress_percentage * float(assignment.weight)) / 100
-        employee_kpi_data.append({
-            'employee_name': assignment.employee.user.get_full_name() or assignment.employee.user.username,
-            'manager_name': assignment.employee.manager.get_full_name() if assignment.employee.manager else 'No Manager',
-            'kpi_title': assignment.kpi.title,
-            'target_value': assignment.target_value,
-            'current_progress': assignment.total_progress(),
-            'progress_percentage': progress_percentage,
-            'weight': assignment.weight,
-            'status': assignment.status(),
-            'weighted_score': round(weighted_score, 2),
-        })
-
+        employee_kpi_data.append(
+            {
+                "employee_name": assignment.employee.user.get_full_name()
+                or assignment.employee.user.username,
+                "manager_name": (
+                    assignment.employee.manager.get_full_name()
+                    if assignment.employee.manager
+                    else "No Manager"
+                ),
+                "kpi_title": assignment.kpi.title,
+                "target_value": assignment.target_value,
+                "current_progress": assignment.total_progress(),
+                "progress_percentage": progress_percentage,
+                "weight": assignment.weight,
+                "status": assignment.status(),
+                "weighted_score": round(weighted_score, 2),
+            }
+        )
 
     employee_total_scores = {}
     for data in employee_kpi_data:
-        name = data['employee_name']
-        employee_total_scores[name] = employee_total_scores.get(name, 0) + data['weighted_score']
-
+        name = data["employee_name"]
+        employee_total_scores[name] = (
+            employee_total_scores.get(name, 0) + data["weighted_score"]
+        )
 
     chart_labels_list = []
     chart_values_list = []
 
     for kpi in all_kpis:
         chart_labels_list.append(kpi.title)
-        total_progress_for_kpi = ProgressEntry.objects.filter(
-            employee_kpi__kpi=kpi
-        ).aggregate(total=Sum("value"))["total"] or 0
+        total_progress_for_kpi = (
+            ProgressEntry.objects.filter(employee_kpi__kpi=kpi).aggregate(
+                total=Sum("value")
+            )["total"]
+            or 0
+        )
         chart_values_list.append(float(total_progress_for_kpi))
     context = {
         "total_users": total_users_count,
@@ -125,6 +149,8 @@ def admin_dashboard(request):
         "chart_values": json.dumps([float(v) for v in chart_values_list]),
     }
     return render(request, "dashboards/admin_dashboard.html", context)
+
+
 # Manager dashboard
 @login_required
 @role_required(["manager"])
@@ -132,8 +158,7 @@ def manager_dashboard(request):
     manager_profile = EmployeeProfile.objects.get(user=request.user)
     manager_department = manager_profile.department
     employees_in_department = EmployeeProfile.objects.filter(
-        department=manager_department,
-        role="employee"
+        department=manager_department, role="employee"
     )
     employee_dashboard_rows = []
     for employee in employees_in_department:
@@ -149,7 +174,9 @@ def manager_dashboard(request):
             if total_target_value == 0:
                 completion_percentage = 0
             else:
-                completion_percentage = round((total_progress_value / total_target_value) * 100)
+                completion_percentage = round(
+                    (total_progress_value / total_target_value) * 100
+                )
             if completion_percentage == 0:
                 status_text = "No Progress"
             elif completion_percentage >= 100:
@@ -159,11 +186,13 @@ def manager_dashboard(request):
         else:
             completion_percentage = 0
             status_text = "No KPI Assigned"
-        employee_dashboard_rows.append({
-            "name": employee.user.username,
-            "completion": completion_percentage,
-            "status": status_text,
-        })
+        employee_dashboard_rows.append(
+            {
+                "name": employee.user.username,
+                "completion": completion_percentage,
+                "status": status_text,
+            }
+        )
     context = {
         "manager_name": manager_profile.user.username,
         "department": manager_profile.get_department_display(),
@@ -171,6 +200,8 @@ def manager_dashboard(request):
         "employee_rows": employee_dashboard_rows,
     }
     return render(request, "dashboards/manager_dashboard.html", context)
+
+
 # Employee dashboard
 @login_required
 @role_required(["employee"])
@@ -189,18 +220,22 @@ def employee_dashboard(request):
         if employee_kpi.target_value == 0:
             progress_percentage = 0
         else:
-            progress_percentage = round((total_progress_value / employee_kpi.target_value) * 100)
+            progress_percentage = round(
+                (total_progress_value / employee_kpi.target_value) * 100
+            )
         days_remaining = (employee_kpi.end_date - date.today()).days
         chart_labels_list.append(kpi_title)
         chart_values_list.append(progress_percentage)
-        kpi_cards_list.append({
-            "title": kpi_title,
-            "target": employee_kpi.target_value,
-            "progress": total_progress_value,
-            "percentage": progress_percentage,
-            "days_left": days_remaining,
-            "id": employee_kpi.id,
-        })
+        kpi_cards_list.append(
+            {
+                "title": kpi_title,
+                "target": employee_kpi.target_value,
+                "progress": total_progress_value,
+                "percentage": progress_percentage,
+                "days_left": days_remaining,
+                "id": employee_kpi.id,
+            }
+        )
     context = {
         "employee_name": employee_profile.user.username,
         "role": employee_profile.job_role,
@@ -211,25 +246,22 @@ def employee_dashboard(request):
     return render(request, "dashboards/employee_dashboard.html", context)
 
 
-
 def home(request):
     return render(request, "home.html")
 
 
 @login_required
-@role_required(['admin'])
+@role_required(["admin"])
 def kpis_index(request):
     kpis = Kpi.objects.all()
     return render(request, "kpi/index.html", {"kpis": kpis})
 
 
-
 @login_required
-@role_required(['admin'])
+@role_required(["admin"])
 def kpis_detail(request, kpi_id):
     kpi = Kpi.objects.get(id=kpi_id)
     return render(request, "kpi/detail.html", {"kpi": kpi})
-
 
 
 class KpiCreate(RoleRequiredMixin, CreateView):
@@ -239,20 +271,21 @@ class KpiCreate(RoleRequiredMixin, CreateView):
     allowed_roles = ["admin"]
 
 
-
 @login_required
-@role_required(['employee'])
+@role_required(["employee"])
 def add_progress(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = KpiProgressForm(request.POST, user=request.user)
 
         if form.is_valid():
-            employee_kpi = form.cleaned_data['employee_kpi']
+            employee_kpi = form.cleaned_data["employee_kpi"]
 
             if employee_kpi.status() == "Complete":
-                messages.error(request, "This KPI is already complete. You cannot add more progress.")
-                return redirect('employee_kpi')
-
+                messages.error(
+                    request,
+                    "This KPI is already complete. You cannot add more progress.",
+                )
+                return redirect("employee_kpi")
 
             progress = form.save()
 
@@ -261,41 +294,44 @@ def add_progress(request):
 
             # send notification to manager
             if employee_kpi.employee.manager:
-                notification_title = 'KPI Completed!' if is_completed else 'Progress Updated'
+                notification_title = (
+                    "KPI Completed!" if is_completed else "Progress Updated"
+                )
                 notification_message = (
-                    f'{request.user.get_full_name() or request.user.username} has completed the KPI: {employee_kpi.kpi.title}'
-                    if is_completed else
-                    f'{request.user.get_full_name() or request.user.username} added progress to "{employee_kpi.kpi.title}". '
-                    f'Current progress: {employee_kpi.progress_percentage()}%'
+                    f"{request.user.get_full_name() or request.user.username} has completed the KPI: {employee_kpi.kpi.title}"
+                    if is_completed
+                    else f'{request.user.get_full_name() or request.user.username} added progress to "{employee_kpi.kpi.title}". '
+                    f"Current progress: {employee_kpi.progress_percentage()}%"
                 )
 
                 create_notification(
                     recipient=employee_kpi.employee.manager,
                     sender=request.user,
-                    notification_type='kpi_completed' if is_completed else 'progress_added',
+                    notification_type=(
+                        "kpi_completed" if is_completed else "progress_added"
+                    ),
                     title=notification_title,
                     message=notification_message,
-                    employee_kpi=employee_kpi
+                    employee_kpi=employee_kpi,
                 )
 
             log_activity(
                 user=request.user,
-                action='PROGRESS_ADDED',
+                action="PROGRESS_ADDED",
                 description=f"Added progress for '{progress.employee_kpi.kpi.title}' - Value: {progress.value}",
-                related_user=None
+                related_user=None,
             )
             messages.success(request, "Progress added successfully!")
-            return redirect('employee_kpi')
+            return redirect("employee_kpi")
 
     else:
         form = KpiProgressForm(user=request.user)
 
-    return render(request, 'kpi/progress.html', {'form': form})
-
+    return render(request, "kpi/progress.html", {"form": form})
 
 
 @login_required
-@role_required(['employee'])
+@role_required(["employee"])
 def employee_kpi(request):
     employee_kpi = EmployeeKpi.objects.all()
     return render(request, "kpi/employee_kpi.html", {"employee_kpi": employee_kpi})
@@ -316,9 +352,10 @@ def unauthorized(request):
 def profile(request):
     return render(request, "users/profile.html")
 
+
 # Assign KPI: managers assign employees to KPI; KPIs & employees filtered by manager's department
 @login_required
-@role_required(['manager'])
+@role_required(["manager"])
 def assign_kpi(request):
     # pass request.user into the form so it filters by department if user is manager
     form = AssignKpiForm(
@@ -327,23 +364,23 @@ def assign_kpi(request):
     )
     if request.method == "POST":
         if form.is_valid():
-            kpi_assignment=form.save()
+            kpi_assignment = form.save()
 
             log_activity(
                 user=request.user,
-                action='KPI_ASSIGNED',
+                action="KPI_ASSIGNED",
                 description=f"Assigned '{kpi_assignment.kpi.title}' to {kpi_assignment.employee.user.username} (Target: {kpi_assignment.target_value}, Weight: {kpi_assignment.weight}%)",
-                related_user=kpi_assignment.employee.user
+                related_user=kpi_assignment.employee.user,
             )
 
             # send notification to employees
             create_notification(
                 recipient=kpi_assignment.employee.user,
                 sender=request.user,
-                notification_type='kpi_assigned',
-                title='New KPI Assigned',
-                message=f'You have been assigned a new KPI: {kpi_assignment.kpi.title}. Target: {kpi_assignment.target_value}',
-                employee_kpi=kpi_assignment
+                notification_type="kpi_assigned",
+                title="New KPI Assigned",
+                message=f"You have been assigned a new KPI: {kpi_assignment.kpi.title}. Target: {kpi_assignment.target_value}",
+                employee_kpi=kpi_assignment,
             )
 
             # send notification to employees
@@ -360,8 +397,9 @@ def assign_kpi(request):
             return redirect("employee_kpi_list")
     return render(request, "main_app/assign_kpi.html", {"form": form})
 
+
 @login_required
-@role_required(['manager'])
+@role_required(["manager"])
 def employee_kpi_list(request):
     if (
         request.user.is_authenticated
@@ -370,36 +408,38 @@ def employee_kpi_list(request):
     ):
         dept = request.user.employeeprofile.department
         # show only assignments where employee is in manager's department
-        kpis = EmployeeKpi.objects.filter(employee__department=dept).select_related(
-            "employee__user", "kpi"
-        ).order_by('-id')
+        kpis = (
+            EmployeeKpi.objects.filter(employee__department=dept)
+            .select_related("employee__user", "kpi")
+            .order_by("-id")
+        )
     else:
         kpis = EmployeeKpi.objects.select_related("employee__user", "kpi").all()
 
     # search functionality
-    search_query = request.GET.get('search', '').strip()
+    search_query = request.GET.get("search", "").strip()
     if search_query:
         kpis = kpis.filter(
-            Q(employee__user__username__icontains=search_query) |
-            Q(employee__user__first_name__icontains=search_query) |
-            Q(employee__user__last_name__icontains=search_query) |
-            Q(employee__job_role__icontains=search_query)
+            Q(employee__user__username__icontains=search_query)
+            | Q(employee__user__first_name__icontains=search_query)
+            | Q(employee__user__last_name__icontains=search_query)
+            | Q(employee__job_role__icontains=search_query)
         )
 
     # filter by KPI
-    kpi_filter = request.GET.get('kpi', '')
+    kpi_filter = request.GET.get("kpi", "")
     if kpi_filter:
         kpis = kpis.filter(kpi__id=kpi_filter)
 
     # order by newest first
-    kpis = kpis.order_by('-id')
+    kpis = kpis.order_by("-id")
 
-    status_filter = request.GET.get('status', '')
+    status_filter = request.GET.get("status", "")
     if status_filter:
         # convert the queryset to a list and filter by status since status is a method
         filtered_kpis = []
         for kpi in kpis:
-            kpi_status = kpi.status().lower().replace(' ', '_')
+            kpi_status = kpi.status().lower().replace(" ", "_")
             if kpi_status == status_filter:
                 filtered_kpis.append(kpi)
         kpis = filtered_kpis
@@ -419,16 +459,17 @@ def employee_kpi_list(request):
         all_kpis = Kpi.objects.all()
 
     context = {
-        'kpis': kpis,
-        'all_kpis': all_kpis,
-        'search_query': search_query,
-        'kpi_filter': kpi_filter,
-        'status_filter': status_filter,
+        "kpis": kpis,
+        "all_kpis": all_kpis,
+        "search_query": search_query,
+        "kpi_filter": kpi_filter,
+        "status_filter": status_filter,
     }
     return render(request, "main_app/employee_kpi_list.html", context)
 
+
 @login_required
-@role_required(['manager'])
+@role_required(["manager"])
 def employee_kpi_edit(request, pk):
     kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
     if kpi_assign.progressentry_set.exists():
@@ -445,19 +486,19 @@ def employee_kpi_edit(request, pk):
 
         log_activity(
             user=request.user,
-            action='KPI_UPDATED',
+            action="KPI_UPDATED",
             description=f"Updated KPI '{kpi_assignment.kpi.title}' for {kpi_assignment.employee.user.username}",
-            related_user=kpi_assignment.employee.user
+            related_user=kpi_assignment.employee.user,
         )
 
         # send notification to employee
         create_notification(
             recipient=kpi_assignment.employee.user,
             sender=request.user,
-            notification_type='kpi_updated',
-            title='KPI Updated',
+            notification_type="kpi_updated",
+            title="KPI Updated",
             message=f'Your KPI "{kpi_assignment.kpi.title}" has been updated by your manager.',
-            employee_kpi=kpi_assignment
+            employee_kpi=kpi_assignment,
         )
 
         # send notification to employee
@@ -477,8 +518,9 @@ def employee_kpi_edit(request, pk):
         request, "main_app/employee_kpi_edit.html", {"form": form, "kpi": kpi_assign}
     )
 
+
 @login_required
-@role_required(['manager'])
+@role_required(["manager"])
 def employee_kpi_delete(request, pk):
     kpi_assign = get_object_or_404(EmployeeKpi, pk=pk)
     if kpi_assign.progressentry_set.exists():
@@ -492,9 +534,9 @@ def employee_kpi_delete(request, pk):
 
         log_activity(
             user=request.user,
-            action='KPI_DELETED',
+            action="KPI_DELETED",
             description=f"Deleted KPI assignment '{kpi_title}' from {employee_name}",
-            related_user=related_user
+            related_user=related_user,
         )
 
         kpi_assign.delete()
@@ -503,26 +545,21 @@ def employee_kpi_delete(request, pk):
 
     return render(request, "main_app/employee_kpi_delete.html", {"kpi": kpi_assign})
 
+
 @login_required
 def employee_kpi_detail(request, pk):
     profile = request.user.employeeprofile
 
     # managers can view any kpi in their department
-    if profile.role == 'manager':
+    if profile.role == "manager":
         kpi_assign = get_object_or_404(
-            EmployeeKpi,
-            pk=pk,
-            employee__department=profile.department
+            EmployeeKpi, pk=pk, employee__department=profile.department
         )
     # employees can only view their own KPIs
-    elif profile.role == 'employee':
-        kpi_assign = get_object_or_404(
-            EmployeeKpi,
-            pk=pk,
-            employee__user=request.user
-        )
+    elif profile.role == "employee":
+        kpi_assign = get_object_or_404(EmployeeKpi, pk=pk, employee__user=request.user)
     else:
-        return redirect('unauthorized')
+        return redirect("unauthorized")
 
     progress_entries = kpi_assign.progressentry_set.order_by("date")
     return render(
@@ -1144,7 +1181,11 @@ def activity_logs(request):
         all_logs = all_logs.filter(action=selected_action)
 
     if selected_user:
-        all_logs = all_logs.filter(user__username=selected_user)
+        all_logs = all_logs.filter(
+            Q(user__username__icontains=selected_user)
+            | Q(user__first_name__icontains=selected_user)
+            | Q(user__last_name__icontains=selected_user)
+        )
 
     recent_logs = all_logs[:50]
 
@@ -1201,17 +1242,23 @@ def notifications(request):
 @login_required
 def mark_notification_read(request, notification_id):
     # marking a single notification as read
-    notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+    notification = get_object_or_404(
+        Notification, id=notification_id, recipient=request.user
+    )
     notification.is_read = True
     notification.save()
-    return redirect('notifications')
+    return redirect("notifications")
+
 
 @login_required
 def mark_all_notifications_read(request):
     # marking all notifications as read
-    Notification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
+    Notification.objects.filter(recipient=request.user, is_read=False).update(
+        is_read=True
+    )
     messages.success(request, "All notifications marked as read.")
-    return redirect('notifications')
+    return redirect("notifications")
+
 
 ## AI feature for Manager View
 @login_required
@@ -1219,7 +1266,9 @@ def mark_all_notifications_read(request):
 def ai_kpi_insights(request):
     manager_user = request.user
 
-    employees = EmployeeProfile.objects.filter(manager=manager_user)
+    employees = EmployeeProfile.objects.filter(
+        manager=manager_user,
+    )
     data = ""
 
     for emp in employees:
@@ -1372,16 +1421,13 @@ Average Team Progress: {avg_progress:.1f}%
         else:
             data += f"\nEmployee: {emp.user.get_full_name()}\nNo active KPI.\n"
 
-
     ai_output = generate_kpi_insights(data, mode="admin")
     ai_output_html = markdown.markdown(ai_output)
 
     return render(request, "ai/admin_insights.html", {"ai_output_html": ai_output_html})
 
 
-
-
-#ai feature for employee
+# ai feature for employee
 @login_required
 @role_required(["employee"])
 def ai_employee_coach(request):
@@ -1393,8 +1439,7 @@ def ai_employee_coach(request):
     for ek in assignments:
         # the recent progress
         last = (
-            ProgressEntry.objects
-            .filter(employee_kpi=ek, date__lte=now().date())
+            ProgressEntry.objects.filter(employee_kpi=ek, date__lte=now().date())
             .order_by("-date")
             .first()
         )
@@ -1412,10 +1457,7 @@ Last Update: {last.date if last else 'No updates yet'}
 Notes: {last.note if last else 'No notes available'}
 """
 
-
     ai_output = generate_kpi_insights(data, mode="employee")
     ai_output_html = markdown.markdown(ai_output)
 
-    return render(request, "ai/employee_ai.html", {
-        "ai_output_html": ai_output_html
-    })
+    return render(request, "ai/employee_ai.html", {"ai_output_html": ai_output_html})
