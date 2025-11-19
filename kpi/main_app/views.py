@@ -482,12 +482,12 @@ def employee_kpi_edit(request, pk):
 
         # send notification to employee
         create_notification(
-            recipient=employee_kpi.employee.user,
+            recipient=kpi_assignment.employee.user,
             sender=request.user,
             notification_type="kpi_updated",
             title="KPI Updated",
-            message=f'Your KPI "{employee_kpi.kpi.title}" has been updated by your manager.',
-            employee_kpi=employee_kpi,
+            message=f'Your KPI "{kpi_assignment.kpi.title}" has been updated by your manager.',
+            employee_kpi=kpi_assignment,
         )
 
         messages.success(request, "KPI updated successfully.")
