@@ -2,10 +2,8 @@
 <link rel="=stylesheet" href="{% static 'css/auth.css' %}" />
 <div class="login-container">
   <div class="login-card">
-    <!-- Login Header -->
     <div class="login-header">
       <div class="login-logo">
-        <!-- You can add your logo SVG or icon here -->
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -25,11 +23,9 @@
       <p>Sign in to your account to continue</p>
     </div>
 
-    <!-- Login Form -->
     <form action="{% url 'login' %}" method="post" class="login-form">
       {% csrf_token %}
 
-      <!-- Username Field -->
       <div class="form-group">
         <label for="id_username">Username</label>
         <input
@@ -65,7 +61,6 @@
         {% endif %}
       </div>
 
-      <!-- Password Field -->
       <div class="form-group">
         <label for="id_password">Password</label>
         <input
@@ -126,7 +121,6 @@
         {% endif %}
       </div>
 
-      <!-- Non-field errors -->
       {% if form.non_field_errors %}
       <ul class="errorlist">
         {% for error in form.non_field_errors %}
@@ -135,7 +129,6 @@
       </ul>
       {% endif %}
 
-      <!-- Remember Me & Forgot Password -->
       <div class="form-options">
         <div class="remember-me">
           <input type="checkbox" id="remember" name="remember" />
@@ -146,14 +139,12 @@
         >
       </div>
 
-      <!-- Submit Button -->
       <button type="submit" class="btn-login">Sign In</button>
     </form>
   </div>
 </div>
 
 <script>
-  // Toggle password visibility
   function togglePassword() {
     const passwordField = document.getElementById("id_password")
     const eyeIcon = document.getElementById("eyeIcon")
@@ -172,7 +163,6 @@
     }
   }
 
-  // Add loading state to button on submit
   document
     .querySelector(".login-form")
     .addEventListener("submit", function (e) {
