@@ -1,4 +1,3 @@
-
 /* ===================================
    Login Page Styling
    =================================== */
@@ -1462,7 +1461,7 @@
 .password-toggle {
   position: absolute;
   right: 0.75rem;
-  top: 65%; 
+  top: 65%;
   background: none;
   border: none;
   color: #64748b;
@@ -1848,6 +1847,8 @@
   .password-form-group input[type="email"] {
     height: 48px;
     font-size: 0.95rem;
+    color: rgb(0, 0, 0);
+    background-color: #bfdbfe;
   }
 
   .password-reset-btn {
@@ -1856,7 +1857,7 @@
   }
 
   .password-input-icon {
-    top: 2.3rem;
+    top: 65%;
   }
 
   .password-toggle {
