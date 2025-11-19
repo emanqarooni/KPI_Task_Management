@@ -99,10 +99,25 @@ To build a simple, efficient, and scalable system that helps organizations:
 A Trello board was used to track development progress and can be viewed [here](https://trello.com/b/gjUDr0Cr/project-4-kpi).
 ### ***Screenshots***
 ### Wireframe:
-![Wireframe4](Wireframe4.png)
+![Wireframe4](./images/Wireframe4.png)
 ### ERD:
-![ERD](ERD4.png)
-
+![ERD](./images/ERD4.png)
+***
+## Admin View
+![Dashboard](Admin%20dashboard.png)
+![KPI](admin%20kpi.png)
+![filter](Admin%20filter.png)
+![activitylog](Admin%20activity.png)
+***
+## Manager View
+![Dashboard](Manager%20Dashboard.png)
+![AssignKpi](Manager%20KPI.png)
+![Report](./manager%20report.png)
+***
+## Employe View
+![Dashboard](./employee%20dashboard.png)
+![AddProgress](add%20progress.png)
+![Track](track%20progress.png)
 ### ***Credits***
 
 #### 1. CSS:

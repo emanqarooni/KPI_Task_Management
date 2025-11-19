@@ -156,6 +156,16 @@ class ActivityLog(models.Model):
         ordering = ["-timestamp"]
 
 
+    @classmethod
+    def create_log(cls, user, action, description, related_user=None):
+        return cls.objects.create(
+            user=user,
+            action=action,
+            description=description,
+            related_user=related_user
+        )
+
+
     def __str__(self):
         return f"{self.user.username if self.user else 'Unknown'} - {self.get_action_display()} - {self.timestamp.strftime('%Y-%m-%d %H:%M')}"
 
