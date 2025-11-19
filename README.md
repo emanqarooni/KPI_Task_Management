@@ -81,9 +81,9 @@ To build a simple, efficient, and scalable system that helps organizations:
 - *Authentication system :* Users log in and are redirected to their respective dashboard.
 
 - *Clean and simple UI :* Beginner-friendly HTML/CSS structure following CH4 standards.
+- *AI Feature*: Added AI feature for each role where admin can get insights of department, manager and employee. The manager will get insights of his employees and employee will get Suggestion to improve there tasks.
 
 - *Future expansion :* Integrate AI suggestions for performance improvements.
-
 
 ## ⚙️ Tools & Technologies
 
@@ -94,6 +94,7 @@ To build a simple, efficient, and scalable system that helps organizations:
 - Version Control: *Git & GitHub*
 - Project Management: *Trello and Teams*
 - Utilities: *Pillow (for images), Django Auth System*
+-  AI: *Gemini*
 
 A Trello board was used to track development progress and can be viewed [here](https://trello.com/b/gjUDr0Cr/project-4-kpi).
 ### ***Screenshots***
