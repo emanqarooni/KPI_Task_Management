@@ -352,7 +352,7 @@ def profile(request):
     return render(request, "users/profile.html")
 
 
-# assigning kpi 
+# assigning kpi
 @login_required
 @role_required(["manager"])
 def assign_kpi(request):
@@ -478,16 +478,6 @@ def employee_kpi_edit(request, pk):
             action="KPI_UPDATED",
             description=f"Updated KPI '{kpi_assignment.kpi.title}' for {kpi_assignment.employee.user.username}",
             related_user=kpi_assignment.employee.user,
-        )
-
-        # send notification to employee
-        create_notification(
-            recipient=kpi_assignment.employee.user,
-            sender=request.user,
-            notification_type="kpi_updated",
-            title="KPI Updated",
-            message=f'Your KPI "{kpi_assignment.kpi.title}" has been updated by your manager.',
-            employee_kpi=kpi_assignment,
         )
 
         # send notification to employee
