@@ -99,14 +99,29 @@ To build a simple, efficient, and scalable system that helps organizations:
 A Trello board was used to track development progress and can be viewed [here](https://trello.com/b/gjUDr0Cr/project-4-kpi).
 ### ***Screenshots***
 ### Wireframe:
-![Wireframe4](Wireframe4.png)
+![Wireframe4](./images/Wireframe4.png)
 ### ERD:
-![ERD](ERD4.png)
-
+![ERD](./images/ERD4.png)
+***
+## Admin View
+![Dashboard](./images/Admin%20dashboard.png)
+![KPI](./images/admin%20kpi.png)
+![filter](./images/Admin%20filter.png)
+![activitylog](./images/Admin%20activity.png)
+***
+## Manager View
+![Dashboard](./images/Manager%20Dashboard.png)
+![AssignKpi](./images/Manager%20KPI.png)
+![Report](./images/manager%20report.png)
+***
+## Employe View
+![Dashboard](./images/employee%20dashboard.png)
+![AddProgress](./images/add%20progress.png)
+![Track](./images/track%20progress.png)
 ### ***Credits***
 
 #### 1. CSS:
-[Daisyui](https://daisyui.com/docs/install/django/)
+[Daisyui](./https://daisyui.com/docs/install/django/)
 
 #### 2. PDF exporting using reportlab:
 [Reportlab](https://docs.reportlab.com/pdf-accessibility/)

@@ -2,6 +2,7 @@ import google.generativeai as genai
 from django.conf import settings
 from dotenv import load_dotenv
 import os
+from datetime import date
 
 load_dotenv()
 genai.configure(api_key=settings.GOOGLE_API_KEY)
@@ -10,8 +11,9 @@ genai.configure(api_key=settings.GOOGLE_API_KEY)
 def generate_kpi_insights(text_data, mode="manager"):
     try:
         model = genai.GenerativeModel("models/gemini-2.5-flash")
+        today = date.today().strftime("%Y-%m-%d")
 
-#ai feature prompt for employee
+        # ai feature prompt for employee
         if mode == "employee":
             prompt = f"""
 You are a friendly, supportive **Personal KPI Coach**.
@@ -62,13 +64,13 @@ Employee KPI Data:
 {text_data}
 """
 
-## ai feature prompt for
+        ## ai feature prompt for
         elif mode == "manager":
             prompt = f"""
 You are an expert KPI performance analyst helping a MANAGER understand their team's performance.
 
 IMPORTANT RULES:
-- Today's date is 2025-11-17. Ignore “future” dates.
+- Today's date is {today}. Ignore “future” dates.
 - Only analyze the “Current Task (Detailed)” section deeply.
 - Anything under “Previous Tasks” must be treated as completed or inactive.
 - Do NOT criticize completed/old tasks.
@@ -86,7 +88,7 @@ KPI Data:
 {text_data}
 """
 
-##ai feature for admin only
+        ##ai feature for admin only
         else:
             prompt = f"""
 You are an expert ORGANIZATIONAL KPI ANALYST.
@@ -98,7 +100,7 @@ Provide a company-wide overview across:
 - Employees
 
 IMPORTANT RULES:
-- Today is 2025-11-17. Ignore “future” dates.
+- Today is {today}. Ignore “future” dates.
 - Employees with “No active KPI” represent operational gaps (NOT failures).
 - Completed KPIs should NOT be criticized.
 - Focus on trends, workload distribution, and departmental performance.
