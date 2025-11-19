@@ -67,9 +67,7 @@
   {% for row in employee_rows %}"{{ row.name }}",{% endfor %}
   ];
 
-  const managerValues = [
-  {% for row in employee_rows %}{{ row.completion }},{% endfor %}
-  ];
+  const managerValues = [{% for row in employee_rows %}{{ row.completion }},{% endfor %}];
 
   new Chart(document.getElementById("managerChart"), {
       type: "bar",
