@@ -30,7 +30,6 @@ from datetime import datetime, date
 from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill
 import json
-from .utils import log_activity
 from django.contrib.admin.views.decorators import staff_member_required
 from decimal import Decimal
 
@@ -315,7 +314,7 @@ def add_progress(request):
                     employee_kpi=employee_kpi,
                 )
 
-            log_activity(
+            ActivityLog.create_log(
                 user=request.user,
                 action="PROGRESS_ADDED",
                 description=f"Added progress for '{progress.employee_kpi.kpi.title}' - Value: {progress.value}",
@@ -366,7 +365,7 @@ def assign_kpi(request):
         if form.is_valid():
             kpi_assignment = form.save()
 
-            log_activity(
+            ActivityLog.create_log(
                 user=request.user,
                 action="KPI_ASSIGNED",
                 description=f"Assigned '{kpi_assignment.kpi.title}' to {kpi_assignment.employee.user.username} (Target: {kpi_assignment.target_value}, Weight: {kpi_assignment.weight}%)",
@@ -484,7 +483,7 @@ def employee_kpi_edit(request, pk):
     if request.method == "POST" and form.is_valid():
         kpi_assignment = form.save()
 
-        log_activity(
+        ActivityLog.create_log(
             user=request.user,
             action="KPI_UPDATED",
             description=f"Updated KPI '{kpi_assignment.kpi.title}' for {kpi_assignment.employee.user.username}",
@@ -532,7 +531,7 @@ def employee_kpi_delete(request, pk):
         kpi_title = kpi_assign.kpi.title
         related_user = kpi_assign.employee.user
 
-        log_activity(
+        ActivityLog.create_log(
             user=request.user,
             action="KPI_DELETED",
             description=f"Deleted KPI assignment '{kpi_title}' from {employee_name}",
