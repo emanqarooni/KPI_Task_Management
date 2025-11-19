@@ -211,7 +211,7 @@
 .password-toggle {
   position: absolute;
   right: 1rem;
-  top: 70%;
+  top: 65%;
   transform: translateY(-50%);
   background: none;
   border: none;
@@ -1462,7 +1462,7 @@
 .password-toggle {
   position: absolute;
   right: 0.75rem;
-  top: 2.15rem; /* Adjusted for label */
+  top: 65%; 
   background: none;
   border: none;
   color: #64748b;
