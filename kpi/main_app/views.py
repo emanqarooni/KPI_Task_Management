@@ -332,7 +332,10 @@ def add_progress(request):
 @login_required
 @role_required(["employee"])
 def employee_kpi(request):
-    employee_kpi = EmployeeKpi.objects.all()
+    employee_profile = EmployeeProfile.objects.get(user=request.user)
+
+    employee_kpi = EmployeeKpi.objects.filter(employee=employee_profile)
+
     return render(request, "kpi/employee_kpi.html", {"employee_kpi": employee_kpi})
 
 
