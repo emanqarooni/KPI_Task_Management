@@ -1,1 +1,1 @@
-web: gunicorn kpi.wsgi
+web: gunicorn kpi.kpi.wsgi
