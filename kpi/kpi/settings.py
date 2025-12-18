@@ -36,7 +36,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    "kpi.main_app.apps.MainAppConfig",
+    "main_app.apps.MainAppConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -69,7 +69,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 # added the notification decorator so that the counter can show in all of the views in the templates
-                'kpi.main_app.context_processors.notification_count',
+                'main_app.context_processors.notification_count',
             ],
         },
     },
@@ -133,8 +133,6 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 LOGIN_REDIRECT_URL="/dashboard/"
 LOGOUT_REDIRECT_URL="/"
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
 
 # LOGIN_URL = "/accounts/login/"
 
