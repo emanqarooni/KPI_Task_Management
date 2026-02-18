@@ -83,8 +83,14 @@
           </h2>
           <div class="flex items-center gap-4">
             <div class="avatar placeholder">
-              <div class="bg-primary text-primary-content rounded-full w-10">
-                <img src="{{ kpi.employee.image.url }}" alt="">
+              <div class="rounded-full w-14 h-14 flex items-center justify-center overflow-hidden" style="background-color: #4f46e5;">
+                {% if kpi.employee.image %}
+                  <img src="{{ kpi.employee.image.url }}" alt="Profile Image" class="w-full h-full object-cover rounded-full">
+                {% else %}
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" style="width:36px; height:36px;">
+                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                  </svg>
+                {% endif %}
               </div>
             </div>
             <div>
