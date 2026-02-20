@@ -82,13 +82,18 @@
             Employee Information
           </h2>
           <div class="flex items-center gap-4">
-            <div class="avatar placeholder">
-              <div class="rounded-full w-14 h-14 flex items-center justify-center overflow-hidden" style="background-color: #4f46e5;">
+            <div class="avatar">
+              <div class="w-10 rounded-full overflow-hidden">
                 {% if kpi.employee.image %}
-                  <img src="{{ kpi.employee.image.url }}" alt="Profile Image" class="w-full h-full object-cover rounded-full">
+                  <img src="{{ kpi.employee.image.url }}" alt="{{ kpi.employee.user.username }}" class="w-full h-full object-cover rounded-full" />
                 {% else %}
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" style="width:36px; height:36px;">
-                    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+                  <svg xmlns="http://www.w3.org/2000/svg"
+                       class="profile-avatar-default w-full h-full"
+                       viewBox="0 0 24 24"
+                       fill="currentColor">
+                    <path fill-rule="evenodd"
+                      d="M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+                      clip-rule="evenodd" />
                   </svg>
                 {% endif %}
               </div>

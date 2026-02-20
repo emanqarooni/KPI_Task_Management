@@ -9,33 +9,21 @@
       </a>
     </div>
 
-    <div class="kpi-box manager-summary-box">
+    <div class="kpi-box">
       <h3>Manager Overview</h3>
-
-      <div class="kpi-grid manager-summary-grid">
-        <div class="kpi-item manager-card">
-          <h4>Manager</h4>
-          <p><strong>{{ manager_name }}</strong></p>
-        </div>
-
-        <div class="kpi-item manager-card">
-          <h4>Department</h4>
-          <p><strong>{{ department }}</strong></p>
-        </div>
-
-        <div class="kpi-item manager-card">
-          <h4>Total Employees</h4>
-          <p><strong>{{ employees_count }}</strong></p>
-        </div>
-      </div>
+      <p style="font-size: 1.2rem; font-weight: bold;"><strong>Manager:</strong> {{ manager_name }}</p>
+      <p style="font-size: 1.2rem; font-weight: bold;"><strong>Department:</strong> {{ department }}</p>
+      <p style="font-size: 1.2rem; font-weight: bold;"><strong>Total Employees:</strong> {{ employees_count }}</p>
     </div>
 
     <h3>Team KPI Summary</h3>
 
-    <div class="table-container">
+    <div>
+      {% if employee_rows %}
       <table class="table">
         <thead>
           <tr>
+            <th>#</th>
             <th>Employee</th>
             <th>KPI Completion</th>
             <th>Status</th>
@@ -44,6 +32,7 @@
         <tbody>
           {% for row in employee_rows %}
           <tr>
+            <td>{{ forloop.counter }}</td>
             <td>{{ row.name }}</td>
             <td>{{ row.completion }}%</td>
             <td>{{ row.status }}</td>
@@ -51,37 +40,77 @@
           {% endfor %}
         </tbody>
       </table>
+      {% else %}
+      <p>No team members found</p>
+      {% endif %}
     </div>
 
-    <!-- CHART -->
-    <div class="kpi-box manager-chart-box">
-      <h3>Team KPI Performance Chart</h3>
-      <canvas id="managerChart"></canvas>
-    </div>
+    <h3>Team KPI Performance Chart</h3>
+    <canvas id="managerChart"></canvas>
+
   </div>
 </div>
 
 <script>
-  const managerLabels = [
-  {% for row in employee_rows %}"{{ row.name }}",{% endfor %}
-  ];
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('managerChart');
 
-  const managerValues = [{% for row in employee_rows %}{{ row.completion }},{% endfor %}];
+    if (ctx) {
+        const managerLabels = [
+          {% for row in employee_rows %}"{{ row.name }}",{% endfor %}
+        ];
 
-  new Chart(document.getElementById("managerChart"), {
-      type: "bar",
-      data: {
-          labels: managerLabels,
-          datasets: [{
-              label: "Team KPI Completion (%)",
-              data: managerValues,
-              backgroundColor: "rgba(102, 126, 234, 0.6)",
-              borderColor: "rgba(102, 126, 234, 1)",
-              borderWidth: 2,
-              borderRadius: 6
-          }]
-      }
-  });
+        const managerValues = [{% for row in employee_rows %}{{ row.completion }},{% endfor %}];
+
+        const barColors = [
+            "rgba(99, 102, 241, 0.8)",
+            "rgba(34, 197, 94, 0.8)",
+            "rgba(251, 146, 60, 0.8)",
+            "rgba(236, 72, 153, 0.8)",
+            "rgba(14, 165, 233, 0.8)",
+            "rgba(168, 85, 247, 0.8)",
+        ];
+
+        new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: managerLabels,
+                datasets: [{
+                    label: "KPI Completion (%)",
+                    data: managerValues,
+                    backgroundColor: managerLabels.map((_, i) => barColors[i % barColors.length]),
+                    borderRadius: 6,
+                    borderWidth: 0,
+                    maxBarThickness: 60,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + "%";
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + "%";
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
 </script>
-
 {% endblock %}
